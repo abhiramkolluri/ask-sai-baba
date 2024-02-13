@@ -1,0 +1,4 @@
+pymongo
+python-dotenv
+sentence_transformers
+scrapy
