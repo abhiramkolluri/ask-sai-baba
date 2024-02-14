@@ -6,32 +6,41 @@ from scrapy_splash import SplashRequest
 class CrawlingSpider(CrawlSpider):
     name = "sathyacrawler"
     allowed_domains = ["sathyasai.org"]
-    start_urls = ["https://www.sathyasai.org/resources/ebooks/sathya-sai-speaks"]
-
+    visited_urls_file = 'visited_urls.txt' 
+    # start_urls = ["https://www.sathyasai.org/resources/ebooks/sathya-sai-speaks"]
+    
+    start_urls = ["https://saispeaks.sathyasai.org/discourses/?collection=Sri%20Sathya%20Sai%20Speaks%2C%20Vol%2043%20%282010%29"]
 
     # def start_requests(self):
-    #     for url in self.start_urls:
-    #         yield SplashRequest(url, args={'wait': 2})
+    #     # for url in self.start_urls:
+    #     #     yield SplashRequest(url, args={'wait': 2})
+    #     url = "https://saispeaks.sathyasai.org/discourses/?collection=Sri%20Sathya%20Sai%20Speaks%2C%20Vol%2043%20%282010%29"
+    #     yield SplashRequest(url)
 
     
 
     rules = (
         Rule(
             LinkExtractor(allow='discourses/.*'),
-            callback='parse',
+            # callback='parse',
             # process_request='splash_request',
         ),
     )
 
+    # def splash_request(self, request):
+    #     return SplashRequest(
+    #         request.url,
+    #         callback=request.callback,
+    #         endpoint='render.html',
+    #         args={'wait': 3.5},
+    #     )
 
-    def splash_request(self, request):
-        return SplashRequest(
-            request.url,
-            callback=request.callback,
-            endpoint='render.html',
-            args={'wait': 3.5},
-        )
-    def parse(self,response):
+    def parse(self, response):
+        # url = 'http://www.licitor.com/ventes-judiciaires-immobilieres/tgi-fontainebleau/mercredi-15-juin-2016.html'
+        yield SplashRequest(url=response.url, callback=self.parse_item, args={'wait': 0.5})
+
+    def parse_item(self,response):
+        
         discourse_listings = response.css('.discourse-listings')
         for discourse_listing in discourse_listings:
             yield {
