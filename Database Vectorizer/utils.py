@@ -23,10 +23,9 @@ def search(model,query,collection):
     for i in result:
         print(f"Movie name: {i['title']}, \nMovie Plot : {i['plot']} \n")
 
-def insertEmbedding(collection,model,newcollection,limit = 50):
-    for document in collection.find().limit(limit):
-        document['plot_embedding_hf'] = generateEmbeddings(model,document['plot'])
-        newcollection.insert_one(document=document)
+def insertEmbedding(collection,model,document):
+        document['doc_embedding'] = generateEmbeddings(model,document['Content'])
+        collection.insert_one(document=document)
 
 
 
