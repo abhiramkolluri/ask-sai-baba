@@ -3,6 +3,7 @@ import os
 import pymongo
 import json
 from openai import OpenAI
+import openai
 # from sentence_transformers import SentenceTransformer
 from utils import generateEmbeddings,search,insertEmbedding
 
@@ -11,7 +12,7 @@ from utils import generateEmbeddings,search,insertEmbedding
 
 load_dotenv()
 
-# openai.api_key = os.getenv("OPEN_AI")
+openai.api_key = os.getenv("OPEN_AI")
 
 # client = OpenAI(
 #     # This is the default and can be omitted
@@ -22,31 +23,25 @@ client = pymongo.MongoClient(os.getenv("Mongo_uri"))
 db = client.saibabasayings
 collection = db.text
 
-with open('../data.json') as f:
-    data = json.load(f)
 
 
-collection.insert_many(data)
+
+
+
+
+
+
+def model(text):
+    return openai.embeddings.create(input = [text], model="text-embedding-3-small").data[0].embedding
+
+## create the embedding for the content and insert inside the database 
+
+# for d in data:
+#     text = d['Content'].replace("\n", " ")
+#     # insertEmbedding(collection=collection,model=model,document=d)
+#     d['content_embedding'] = model(text)
+#     collection.insert_one(d)
 
 # query = "can you give me a movie about romance in war"
 
 # search(model,query,testCollection)
-
-
-
-
-
-
-# def model(text):
-#     return client.embeddings.create(input = [text], model="text-embedding-ada-002").data[0].embedding
-
-    # return client.embeddings.create(input = [text], model="text-embedding-ada-002").data[0].embedding
-
-# for d in data:
-#     # print(d['Content'])
-#     # text = d['Content'].replace("\n", " ")
-#     insertEmbedding(collection=collection,model=model,document=d)
-#     # collection.insert_one(d)
-
-# print("finished inserting")
-    
