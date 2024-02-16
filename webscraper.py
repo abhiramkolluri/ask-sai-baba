@@ -29,24 +29,21 @@ for option in options:
     # Load the page
     driver.get(url)
 
+    ### load the form for the each option
+
     selection_input  = driver.find_element(By.CLASS_NAME,"discourse-collection")
     selection_input.send_keys(option['text'])
-
-
     button = driver.find_element(By.ID,"edit-discourse-search-submit")
     button.click()
+
+
     # Wait for the page to fully load (adjust wait time as needed)
     driver.implicitly_wait(20)
     wait = WebDriverWait(driver, 10)
     discourse_listings = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'discourse-listing')))
 
-    # print(driver.find_element(By.CLASS_NAME,"discourse-listings"))
-
     # Extract the HTML content after JavaScript execution
     html_content = driver.page_source
-    # html_content = driver.find_element(By.CLASS_NAME,"discourse-listings")
-
-    # print(html_content)
 
     sleep(2)
 
@@ -57,7 +54,7 @@ for option in options:
 
     # Find all elements with class 'discourse-listing'
     discourse_listings = soup.find_all(class_='discourse-listing')
-    # print(len(discourse_listings))
+    
     # Iterate over each discourse listing
     for discourse_listing in discourse_listings:
         # Find elements with class 'title' and 'content' within the discourse listing

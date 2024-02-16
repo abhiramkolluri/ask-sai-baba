@@ -3,25 +3,25 @@ def generateEmbeddings(model,text:str) -> list[float]:
     return embeddings.tolist()
 
 
-def search(model,query,collection):
+def search(embedding,collection):
     pipeline = [
   {
     '$vectorSearch': {
-      'index': 'vector_index', 
-        'path': 'plot_embedding_hf', 
-        'queryVector': generateEmbeddings(model,query),
-        'numCandidates': 100, 
+      'index': 'sathyasearch', 
+        'path': 'content_embedding', 
+        'queryVector': embedding,
+        'numCandidates': 200,
        'limit': 4
     }
   },
 ]
 
     result = collection.aggregate(pipeline=pipeline)
+    print(result)
+    # print("-------------------------------------------------showing results--------------------------------------------------------")
 
-    print("-------------------------------showing results-----------------------------------")
-
-    for i in result:
-        print(f"Movie name: {i['title']}, \nMovie Plot : {i['plot']} \n")
+    # for i in result:
+    #     print(f"Title: {i['title']}, \nContent : {i['Content']} \n")
 
 def insertEmbedding(collection,model,document):
         document['doc_embedding'] = generateEmbeddings(model,document['Content'])
