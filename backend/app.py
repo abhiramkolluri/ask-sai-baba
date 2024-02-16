@@ -1,8 +1,9 @@
-from flask import Flask,url_for,render_template,request
+from flask import Flask,url_for,render_template,request,redirect
 from dotenv import load_dotenv
 import os
 import pymongo
 import openai
+from utils import search
 
 ## loading the env variables
 load_dotenv()
@@ -25,7 +26,9 @@ app = Flask(__name__)
 def index():
     if request.method == 'POST':
         ### generate the embedding and return it to the page
-        pass
+        query = request.form['query']
+        results = search(model(query),collection)
+        return redirect(url_for('/',results = results))
     else:
         ### else jsutrender the index page
         return render_template("index.html")
