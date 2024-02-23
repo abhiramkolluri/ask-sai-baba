@@ -3,6 +3,7 @@ import os
 import pymongo
 import json
 import openai
+from openai import OpenAI
 # from sentence_transformers import SentenceTransformer
 from utils import generateEmbeddings,search,insertEmbedding
 
@@ -10,7 +11,12 @@ from utils import generateEmbeddings,search,insertEmbedding
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPEN_AI")
+# openai.api_key = os.getenv("OPEN_AI")
+# from openai import OpenAI
+
+cl = OpenAI(
+  api_key=os.getenv("OPEN_AI"),
+)
 
 client = pymongo.MongoClient(os.getenv("Mongo_uri"))
 db = client.saibabasayings
@@ -25,7 +31,7 @@ collection = db.text
 
 
 def model(text):
-    return openai.embeddings.create(input = [text], model="text-embedding-3-small").data[0].embedding
+    return cl.embeddings.create(input = [text], model="text-embedding-3-small").data[0].embedding
 
 ## create the embedding for the content and insert inside the database 
 # for d in data:

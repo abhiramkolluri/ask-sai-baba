@@ -16,8 +16,18 @@ def search(embedding,collection):
     }
   },
 ]
-
-    return list(collection.aggregate(pipeline=pipeline))
+    result = collection.aggregate(pipeline=pipeline)
+    res = []
+    for i in result:
+        # print(f"Title: {i['title']}, \nContent : {i['Content']}, \nCollection : {i['collection:']},\nDate : {i['date:']}, \nDiscourse Number : {i['discourse_number:']} \n")
+        res.append({
+        'title': i['title'],
+        'content': i['Content'],
+        'collection': i['collection:'],
+        'date': i['date:'],
+        'discourse_number': i['discourse_number:']
+        })
+    return res
     
 ### inserting the embedding in the databse
 # def insertEmbedding(collection,model,document):

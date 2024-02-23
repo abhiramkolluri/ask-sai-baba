@@ -17,11 +17,19 @@ def search(embedding,collection):
 ]
 
     result = collection.aggregate(pipeline=pipeline)
-    print(result)
+    # print(list(result))
     # print("-------------------------------------------------showing results--------------------------------------------------------")
-
-    # for i in result:
-    #     print(f"Title: {i['title']}, \nContent : {i['Content']} \n")
+    res = []
+    for i in result:
+        # print(f"Title: {i['title']}, \nContent : {i['Content']}, \nCollection : {i['collection:']},\nDate : {i['date:']}, \nDiscourse Number : {i['discourse_number:']} \n")
+        res.append({
+        'title': i['title'],
+        'content': i['Content'],
+        'collection': i['collection:'],
+        'date': i['date:'],
+        'discourse_number': i['discourse_number:']
+        })
+    return res
 
 def insertEmbedding(collection,model,document):
         document['doc_embedding'] = generateEmbeddings(model,document['Content'])

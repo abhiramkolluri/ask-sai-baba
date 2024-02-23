@@ -28,7 +28,10 @@ def index():
         ### generate the embedding and return it to the page
         query = request.form['query']
         results = search(model(query),collection)
-        return redirect(url_for('/',results = results))
+        print(results)
+        # return redirect(url_for('/',results = results))
+        return redirect(url_for('/'))
+
     else:
         ### else jsutrender the index page
         return render_template("index.html")
