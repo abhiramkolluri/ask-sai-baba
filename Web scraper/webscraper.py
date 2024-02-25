@@ -18,12 +18,11 @@ with open(file, 'r') as f:
     options = json.load(f)
     
 results = []
+
+#loop through all of the options that exist for the religious text
 for option in options:
-    print(option)
-# Configure the Selenium webdriver
-# options = webdriver.ChromeOptions()
-# options.add_argument('--headless')  # Run Chrome in headless mode, without opening a browser window
-# options.add_argument('--disable-gpu')
+    
+    # Configure the Selenium webdriver
     driver = webdriver.Chrome()
 
     # Load the page
@@ -73,7 +72,7 @@ for option in options:
         results.append(res)
 
 
-    ## find the next page element if it exists
+    ## find the next page element if it exists and redo the same step as before
     try:
         nextpage = driver.find_element(By.CSS_SELECTOR,'li.next > a')
         nextpage.click()
