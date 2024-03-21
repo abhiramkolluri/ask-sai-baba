@@ -29,19 +29,20 @@ db = client.saibabasayings
 collection = db.text
 
 
-with open('..\Web scraper\data.json', 'r') as file:
+# Load the JSON data
+with open('../../ask-sai-baba/Web scraper/data.json', 'r') as file:
     # Load the JSON data
     data = json.load(file)
-
-# print(data)
+    for item in data:
+        if not collection.find_one(item):
+            collection.insert_one(item)
 
 
 def model(text):
     return openai.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
 
+
 # create the embedding for the content and insert inside the database
-
-
 def embeddingGenerator():
     for d in data:
         text = d['Content'].replace("\n", " ")
