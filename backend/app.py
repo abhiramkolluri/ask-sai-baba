@@ -74,7 +74,33 @@ def query_sai_baba():
         return jsonify({'response': result}), 200
     else:
         return jsonify({'message': 'No results found.'}), 404
+# Define a function to insert a user document into the "users" collection
 
 
+def create_user(first_name, last_name, email, password):
+    user = db['users']
+    user = {
+        'first_name': first_name,
+        'last_name': last_name,
+        'email': email,
+        'password': password
+    }
+    db.user.insert_one(user)
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    email = request.form.get('email')
+    if db.user.find_one({'email': email}):
+        return jsonify({'message': 'User already exists'}), 409
+    else:
+        user_data = {
+            'first_name': request.form.get('first_name'),
+            'last_name': request.form.get('last_name'),
+            'email': email,
+            'password': request.form.get('password')
+        }
+        db.user.insert_one(user_data)
+        return jsonify({'message': 'User registered successfully'}), 201
 if __name__ == "__main__":
     app.run(debug=True)
