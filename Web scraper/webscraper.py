@@ -5,112 +5,97 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
+
 from time import sleep
 import json
 
 url = "https://saispeaks.sathyasai.org/discourses/collection=Sri%20Sathya%20Sai%20Speaks%2C%20Vol%2043%20%282010%29"
-
-
 file = 'options.json'
 
 # Read the JSON file
 with open(file, 'r') as f:
     options = json.load(f)
-    
+
 results = []
 
-#loop through all of the options that exist for the religious text
+# Configure the Selenium webdriver
+driver = webdriver.Chrome()
+
+# Load the page
+driver.get(url)
+
+# Loop through all of the options that exist for the religious text
 for option in options:
-    
-    # Configure the Selenium webdriver
-    driver = webdriver.Chrome()
-
-    # Load the page
-    driver.get(url)
-
-    ### load the form for the each option
-
-    selection_input  = driver.find_element(By.CLASS_NAME,"discourse-collection")
+    selection_input = driver.find_element(
+        By.CLASS_NAME, "discourse-collection")
+    selection_input.clear()
     selection_input.send_keys(option['text'])
-    button = driver.find_element(By.ID,"edit-discourse-search-submit")
+
+    # Click the submit button
+    button = driver.find_element(By.ID, "edit-discourse-search-submit")
+
+    # Scroll the submit button into view
+    actions = ActionChains(driver)
+    actions.move_to_element(button).perform()
+
+    # Wait for the submit button to be clickable
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.element_to_be_clickable(
+        (By.ID, "edit-discourse-search-submit")))
+
     button.click()
 
+    # Wait for the page to fully load
+    sleep(5)  # Wait for 5 seconds for the page to load
 
-    # Wait for the page to fully load (adjust wait time as needed)
-    driver.implicitly_wait(20)
-    wait = WebDriverWait(driver, 10)
-    discourse_listings = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'discourse-listing')))
-
-    # Extract the HTML content after JavaScript execution
-    html_content = driver.page_source
-
-    sleep(2)
-
-    # Close the Selenium webdriver
-
-    # # Parse the HTML content with Beautiful Soup
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    # Find all elements with class 'discourse-listing'
-    discourse_listings = soup.find_all(class_='discourse-listing')
-    
-    # Iterate over each discourse listing
-    for discourse_listing in discourse_listings:
-        # Find elements with class 'title' and 'content' within the discourse listing
-        title = discourse_listing.find(class_='title')
-        content = discourse_listing.find(class_='content')
-        collection = discourse_listing.find(class_='collection')
-        date = discourse_listing.find(class_='date')
-        discoursenum = collection.find(class_='discourse-no')
-        res = {
-                "title":title.get_text(strip=True),
-                "Content:": content.get_text(strip=True),
-                "collection:": collection.get_text(strip=True),
-                "date:": date.get_text(strip=True),
-                "discourse_number:": discoursenum.get_text(strip=True) if not discoursenum == None else "" ,
-                }
-        results.append(res)
-
-
-    ## find the next page element if it exists and redo the same step as before
-    try:
-        nextpage = driver.find_element(By.CSS_SELECTOR,'li.next > a')
-        nextpage.click()
-
-        wait = WebDriverWait(driver, 10)
-        previous = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'li.prev > a')))
+    while True:  # Loop until there's no next page
+        # Extract the HTML content after JavaScript execution
         html_content = driver.page_source
 
-        sleep(2)
-
+        # Parse the HTML content with Beautiful Soup
         soup = BeautifulSoup(html_content, 'html.parser')
 
+        # Find all elements with class 'discourse-listing'
         discourse_listings = soup.find_all(class_='discourse-listing')
 
+        # Iterate over each discourse listing
         for discourse_listing in discourse_listings:
-
-            title = discourse_listing.find(class_='title')
-            content = discourse_listing.find(class_='content')
-            collection = discourse_listing.find(class_='collection')
-            date = discourse_listing.find(class_='date')
-            discoursenum = collection.find(class_='discourse-no')
+            title = discourse_listing.find(class_='title').get_text(strip=True)
+            content = discourse_listing.find(
+                class_='content').get_text(strip=True)
+            collection = discourse_listing.find(
+                class_='collection').get_text(strip=True)
+            date = discourse_listing.find(class_='date').get_text(strip=True)
+            # Extracting discourse number from collection
+            discoursenum = collection.split()[-1]
             res = {
-                "title":title.get_text(strip=True),
-                "Content:": content.get_text(strip=True),
-                "collection:": collection.get_text(strip=True),
-                "date:": date.get_text(strip=True),
-                "discourse_number:": discoursenum.get_text(strip=True) if not discoursenum == None else "" ,
-                }
+                "title": title,
+                "Content": content,
+                "collection": collection,
+                "date": date,
+                "discourse_number": discoursenum if discoursenum.isdigit() else "",
+            }
             results.append(res)
-            print(len(results))
-    except NoSuchElementException:
-        driver.quit()
-        print("there is no next page")
 
+        # Look for the next page link
+        try:
+            next_page = driver.find_element(By.CSS_SELECTOR, 'li.next > a')
+            next_page.click()
+            sleep(5)  # Wait for 5 seconds after clicking next page link
+        except NoSuchElementException:
+            print("No next page found for option:", option['text'])
+            break  # Exit the loop if there's no next page for the current option
 
+# Quit the driver after processing all options
+driver.quit()
 
-output_file = 'data.json'
-print(len(results))
 # Write the data to the JSON file
+output_file = 'data.json'
 with open(output_file, 'w') as f:
     json.dump(results, f, indent=4)
+
+print("Data saved successfully.")
+
+# Print the results to verify
+print(results)
