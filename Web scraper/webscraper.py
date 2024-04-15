@@ -2,11 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
-
+from html_parser import strip_tags
 from time import sleep
 import json
 
@@ -40,7 +41,7 @@ for option in options:
     actions.move_to_element(button).perform()
 
     # Wait for the submit button to be clickable
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 20)
     wait.until(EC.element_to_be_clickable(
         (By.ID, "edit-discourse-search-submit")))
 
@@ -61,17 +62,33 @@ for option in options:
 
         # Iterate over each discourse listing
         for discourse_listing in discourse_listings:
-            title = discourse_listing.find(class_='title').get_text(strip=True)
-            content = discourse_listing.find(
-                class_='content').get_text(strip=True)
+            # Extracting title and link
+            title_element = discourse_listing.find(class_='title')
+            title = title_element.get_text(strip=True)
+            link = title_element.find('a')['href']
+
+            # Open the link in a new tab
+            driver.execute_script("window.open('{}', '_blank');".format(link))
+            # Switch to the newly opened tab
+            driver.switch_to.window(driver.window_handles[1])
+
+            # Now you are on the linked page, you can extract data as before
+            message_panel = driver.find_element(
+                By.CLASS_NAME, "section-content")
+
+            # Locate all message elements within the panel
+            messages = message_panel.find_elements(
+                By.XPATH, './/*[self::div[@class="discourse_para"] or self::div[contains(@class, "discourse_section")] or self::div[contains(@class, "callout")] or self::div[@class="discourse_editor_note"]]')
+
+            # Extract data specific to each discourse listing
             collection = discourse_listing.find(
                 class_='collection').get_text(strip=True)
             date = discourse_listing.find(class_='date').get_text(strip=True)
-            # Extracting discourse number from collection
             discoursenum = collection.split()[-1]
+
             res = {
                 "title": title,
-                "Content": content,
+                "content": message_content,
                 "collection": collection,
                 "date": date,
                 "discourse_number": discoursenum if discoursenum.isdigit() else "",
@@ -96,6 +113,3 @@ with open(output_file, 'w') as f:
     json.dump(results, f, indent=4)
 
 print("Data saved successfully.")
-
-# Print the results to verify
-print(results)
