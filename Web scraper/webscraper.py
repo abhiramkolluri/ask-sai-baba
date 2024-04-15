@@ -80,6 +80,31 @@ for option in options:
             messages = message_panel.find_elements(
                 By.XPATH, './/*[self::div[@class="discourse_para"] or self::div[contains(@class, "discourse_section")] or self::div[contains(@class, "callout")] or self::div[@class="discourse_editor_note"]]')
 
+            # List to store message content for all messages
+            message_contents = []
+
+            # Check if there are no messages
+            if not messages:
+                print("No text found on the current discourse collection . Skipping.")
+            else:
+                # Iterate through each message element
+                for message_element in messages:
+                    # Extract and print the message content
+                    message_content = strip_tags(
+                        message_element.get_attribute("innerHTML"))
+                    print(message_content)
+                    # Append message content to the list
+                    message_contents.append(message_content)
+
+            # Combine message content for all messages into a single string
+            message_content = "\n".join(message_contents)
+
+            # Close the current tab and switch back to the main tab
+            driver.close()
+            driver.switch_to.window(driver.window_handles[0])
+            # Add a brief delay to ensure the main page is fully loaded
+            sleep(2)
+
             # Extract data specific to each discourse listing
             collection = discourse_listing.find(
                 class_='collection').get_text(strip=True)
