@@ -44,12 +44,24 @@ def model(text):
 
 
 # create the embedding for the content and insert inside the database
-def embeddingGenerator():
+def embeddingGenerator(data, model, collection):
     for d in data:
-        text = d['Content'].replace("\n", " ")
+        # Preprocess content (remove newlines)
+        text = d['content'].replace("\n", " ")
+        # Optional: Insert original document (if not already stored)
         # insertEmbedding(collection=collection,model=model,document=d)
-        d['content_embedding'] = model(text)
+        # Generate embedding and add it to the document
+        embedding = model(text)
+        d['content_embedding'] = embedding
+        # Update existing document with new embedding
+        collection.find_one_and_update({'_id': d['_id']}, {'$set': {'content_embedding': embedding}})
         collection.insert_one(d)
+
+        # Print generated embedding for reference
+        print(f"Generated embedding for document {d['_id']}: {embedding}")
+
+embeddingGenerator(data,model,collection)
+
 
 # testing the search functionality
 # query = "what is prayer ?"
