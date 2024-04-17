@@ -1,2 +1,5 @@
 /backend/.env
 /EmbeddingGenerator/.env
+openai.ini
+venv/
+
