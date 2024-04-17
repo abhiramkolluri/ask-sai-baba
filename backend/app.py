@@ -1,11 +1,13 @@
 from flask import Flask, url_for, render_template, request, redirect, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from dotenv import load_dotenv
+from decouple import config
+import configparser
 import os
 import binascii
 from pymongo import MongoClient
 import pymongo
-import openai
+from openai import OpenAI
 import json
 from utils import search
 
@@ -16,7 +18,6 @@ app = Flask(__name__)
 # loading the env variables
 load_dotenv()
 
-
 # Generate a random hex string with 32 bytes
 secret_key = binascii.hexlify(os.urandom(32)).decode()
 
@@ -24,36 +25,36 @@ print("Generated JWT Secret Key:", secret_key)
 
 
 # setting up open ai and mongodb
-openai.api_key = os.getenv("OPEN_AI")
 # client = MongoClient("localhost", 27017)
 # client = MongoClient(os.getenv("MONGO_URI"))
-
-
-MONGO_HOST = os.getenv('MONGO_HOST')
-MONGO_PORT = int(os.getenv('MONGO_PORT'))  # Convert port to integer
-MONGO_AUTH_SOURCE = os.getenv('MONGO_AUTH_SOURCE')
-MONGO_USERNAME = os.getenv('MONGO_USERNAME')
-MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
-
-
-app.config['JWT_SECRET_KEY'] = secret_key
-# os.getenv(
-#     'JWT_SECRET_KEY')  # Use your own secret key
-# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hour
-
-
-# Use these variables to connect to MongoDB
-client = MongoClient(host=MONGO_HOST, port=MONGO_PORT, authSource=MONGO_AUTH_SOURCE,
-                     username=MONGO_USERNAME, password=MONGO_PASSWORD)
+client = MongoClient(os.getenv("MONGO_URI"))
 
 db = client.saibabasayings
 collection = db.text
 
 
+# Print out the first few documents in the collection
+cursor = collection.find().limit(5)
+for doc in cursor:
+    print(doc)
+
+
+config = configparser.ConfigParser()
+
+# setting up openai
+config.read('openai.ini')
+
+app.config['JWT_SECRET_KEY'] = secret_key
+# os.getenv(
+#     'JWT_SECRET_KEY')  # Use your own secret key
+# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hour
+openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
+
+
 # embedding generator
 def model(text):
 
-    return openai.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
+    return openai_client.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
 
 
 jwt = JWTManager(app)
