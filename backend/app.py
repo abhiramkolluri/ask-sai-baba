@@ -54,7 +54,7 @@ openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
 # embedding generator
 def model(text):
 
-    return openai_client.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
+    return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
 
 
 jwt = JWTManager(app)
@@ -66,13 +66,28 @@ def index():
     return render_template("index.html")
 
 
+# @app.route('/search', methods=['POST'])
+# def search_endpoint():
+
+#     # generate the embedding and return it to the page
+#     query = request.form['query']
+#     results = search(model(query), collection)
+#     return jsonify(results)
 @app.route('/search', methods=['POST'])
 def search_endpoint():
-
-    # generate the embedding and return it to the page
-    query = request.form['query']
-    results = search(model(query), collection)
-    return jsonify(results)
+    # Check if the request contains JSON data
+    if request.is_json:
+        # Access the JSON data using request.json
+        query = request.json.get('query')
+        print("Received query:", query)  # Print the query
+        if query:
+            # Process the query
+            results = search(model(query), collection)
+            return jsonify(results)
+        else:
+            return jsonify({'error': 'Query parameter is missing'}), 400
+    else:
+        return jsonify({'error': 'Request must contain JSON data'}), 400
 
 
 # Endpoint for querying Sathya Sai Baba's teachings
