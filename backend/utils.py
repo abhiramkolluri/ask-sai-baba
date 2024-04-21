@@ -22,10 +22,10 @@ def search(embedding,collection):
         # print(f"Title: {i['title']}, \nContent : {i['Content']}, \nCollection : {i['collection:']},\nDate : {i['date:']}, \nDiscourse Number : {i['discourse_number:']} \n")
         res.append({
         'title': i['title'],
-        'content': i['Content'],
-        'collection': i['collection:'],
-        'date': i['date:'],
-        'discourse_number': i['discourse_number:']
+        'content': i['content'],
+        # 'collection': i['collection:'],
+        # 'date': i['date:'],
+        # 'discourse_number': i['discourse_number:']
         })
     return res
     
