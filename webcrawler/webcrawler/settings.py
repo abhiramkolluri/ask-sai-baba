@@ -1,5 +1,3 @@
-
-
 BOT_NAME = "webcrawler"
 
 SPIDER_MODULES = ["webcrawler.spiders"]
@@ -21,14 +19,12 @@ DOWNLOADER_MIDDLEWARES = {
 }
 
 
-# DOWNLOAD_HANDLERS = {
-#     "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-#     "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-# }
+ITEM_PIPELINES = {
+    'webcrawler.pipelines.CsvPipeline': 300,
+}
 
-
-# TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-
+FEED_FORMAT = 'json'
+FEED_URI = 'output.json'
 
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
