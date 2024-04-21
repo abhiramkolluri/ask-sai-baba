@@ -11,7 +11,8 @@ from html_parser import strip_tags
 from time import sleep
 import json
 
-url = "https://saispeaks.sathyasai.org/discourses/collection=Sri%20Sathya%20Sai%20Speaks%2C%20Vol%2043%20%282010%29"
+base_url = "https://saispeaks.sathyasai.org"
+url = f"{base_url}/discourses/collection=Sri%20Sathya%20Sai%20Speaks%2C%20Vol%2043%20%282010%29"
 file = 'options.json'
 
 # Read the JSON file
@@ -19,6 +20,7 @@ with open(file, 'r') as f:
     options = json.load(f)
 
 results = []
+clicked_links = []  # List to store clicked links
 
 # Configure the Selenium webdriver
 driver = webdriver.Chrome()
@@ -67,8 +69,15 @@ for option in options:
             title = title_element.get_text(strip=True)
             link = title_element.find('a')['href']
 
-            # Open the link in a new tab
-            driver.execute_script("window.open('{}', '_blank');".format(link))
+            # Combine the base URL with the relative link
+            full_link = base_url + link
+
+            # Append the clicked link to the list
+            clicked_links.append({"title": title, "link": full_link})
+
+            # Open the combined link in a new tab
+            driver.execute_script(
+                "window.open('{}', '_blank');".format(full_link))
             # Switch to the newly opened tab
             driver.switch_to.window(driver.window_handles[1])
 
@@ -117,6 +126,7 @@ for option in options:
                 "collection": collection,
                 "date": date,
                 "discourse_number": discoursenum if discoursenum.isdigit() else "",
+                "link": full_link  # Include the link in the dictionary
             }
             results.append(res)
 
@@ -133,8 +143,12 @@ for option in options:
 driver.quit()
 
 # Write the data to the JSON file
-output_file = 'data.json'
+output_file = 'data_all.json'
 with open(output_file, 'w') as f:
     json.dump(results, f, indent=4)
+
+# Write clicked links to the data file
+with open('data.json', 'w') as f:
+    json.dump(clicked_links, f, indent=4)
 
 print("Data saved successfully.")
