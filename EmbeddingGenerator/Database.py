@@ -40,14 +40,15 @@ with open('../../ask-sai-baba/Web scraper/data.json', 'r') as file:
 
 
 def model(text):
-    return openai_client.embeddings.create(input=[text], model="text-embedding-3-small").data[0].embedding
+    return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
 
 
 # create the embedding for the content and insert inside the database
 def embeddingGenerator(data, model, collection):
     for d in data:
         # Preprocess content (remove newlines)
-        text = d['content'].replace("\n", " ")
+        # text = d['content'].replace("\n", " ")
+        text = d['content'].strip('\n')
         # Optional: Insert original document (if not already stored)
         # insertEmbedding(collection=collection,model=model,document=d)
         # Generate embedding and add it to the document
@@ -55,7 +56,7 @@ def embeddingGenerator(data, model, collection):
         d['content_embedding'] = embedding
         # Update existing document with new embedding
         collection.find_one_and_update({'_id': d['_id']}, {'$set': {'content_embedding': embedding}})
-        collection.insert_one(d)
+        # collection.insert_one(d)
 
         # Print generated embedding for reference
         print(f"Generated embedding for document {d['_id']}: {embedding}")
