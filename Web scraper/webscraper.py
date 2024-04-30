@@ -99,8 +99,9 @@ for option in options:
                 # Iterate through each message element
                 for message_element in messages:
                     # Extract and print the message content
-                    message_content = strip_tags(
-                        message_element.get_attribute("innerHTML"))
+                    # message_content = strip_tags(
+                    # message_element.get_attribute("innerHTML"))
+                    message_content = strip_tags(message_element.text)
                     print(message_content)
                     # Append message content to the list
                     message_contents.append(message_content)
