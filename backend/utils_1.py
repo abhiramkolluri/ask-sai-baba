@@ -80,3 +80,31 @@ def search(user_query, collection):
     # Execute the search
     results = collection.aggregate(pipeline)
     return list(results)
+
+
+def handle_user_query(query, collection):
+
+    get_knowledge = search(query, collection)
+
+    search_result = ''
+    for result in get_knowledge:
+        search_result += f"Title: {result.get('title', 'N/A')}, Content: {result.get('content', 'N/A')}\\n"
+
+    completion = openai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba."},
+            {"role": "user", "content": "Answer this user query: " +
+             query + " with the following context: " + search_result}
+        ]
+    )
+
+    return (completion.choices[0].message.content), search_result
+
+
+# Conduct query with retrieval of sources
+query = "When does Sai Baba say is the best time to wake up in the morning?"
+response, source_information = handle_user_query(query, collection)
+
+print(f"Response: {response}")
+print(f"Source Information: \\n{source_information}")
