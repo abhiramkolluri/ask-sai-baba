@@ -107,4 +107,4 @@ query = "When does Sai Baba say is the best time to wake up in the morning?"
 response, source_information = handle_user_query(query, collection)
 
 print(f"Response: {response}")
-print(f"Source Information: \\n{source_information}")
+# print(f"Source Information: \\n{source_information}")
