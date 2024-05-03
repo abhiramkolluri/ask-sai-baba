@@ -78,18 +78,32 @@ def search(user_query, collection):
     ]
 
     # Execute the search
-    results = collection.aggregate(pipeline)
-    return list(results)
+    # results = collection.aggregate(pipeline)
+    # return list(results)
+    results = list(collection.aggregate(pipeline))
+    if not results:
+        return "No relevant information found in the collection."
+
+    return results
 
 
 def handle_user_query(query, collection):
+    # Check if the collection is valid
+    if not isinstance(collection, pymongo.collection.Collection):
+        return "Invalid collection. Please provide a valid MongoDB collection.", ""
 
+    # Retrieve knowledge from the collection
     get_knowledge = search(query, collection)
+
+    # Check if the search process was successful
+    if not isinstance(get_knowledge, list):
+        return "Search failed. Please try again later.", ""
 
     search_result = ''
     for result in get_knowledge:
-        search_result += f"Title: {result.get('title', 'N/A')}, Content: {result.get('content', 'N/A')}\\n"
+        search_result += f"Content: {result.get('content', 'N/A')}\\n"
 
+    # Generate AI response with search context
     completion = openai_client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
