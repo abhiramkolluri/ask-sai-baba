@@ -4,12 +4,16 @@ from dotenv import load_dotenv
 from decouple import config
 import configparser
 import os
+from datetime import datetime  # Import datetime module
+
 import binascii
 from pymongo import MongoClient
 import pymongo
 from openai import OpenAI
 import json
 from utils import search
+from utils_1 import handle_user_query
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -33,10 +37,10 @@ db = client.saibabasayings
 collection = db.text
 
 
-# Print out the first few documents in the collection
-cursor = collection.find().limit(5)
-for doc in cursor:
-    print(doc)
+# # Print out the first few documents in the collection
+# cursor = collection.find().limit(5)
+# for doc in cursor:
+#     print(doc)
 
 
 config = configparser.ConfigParser()
@@ -73,16 +77,31 @@ def index():
 #     query = request.form['query']
 #     results = search(model(query), collection)
 #     return jsonify(results)
+# Function to store user queries and embeddings in the collection
+def store_user_query(query_text, query_embedding):
+    # Get current timestamp
+    timestamp = datetime.now()
+    # Construct query data
+    query_data = {
+        'query_text': query_text,
+        'query_embedding': query_embedding,
+        'timestamp': timestamp
+    }
+    # Insert query data into MongoDB collection
+    db.user_queries.insert_one(query_data)
+
+
 @app.route('/search', methods=['POST'])
 def search_endpoint():
-    # Check if the request contains JSON data
     if request.is_json:
-        # Access the JSON data using request.json
         query = request.json.get('query')
-        print("Received query:", query)  # Print the query
         if query:
-            # Process the query
-            results = search(model(query), collection)
+            # Generate query embedding
+            query_embedding = model(query)
+            # Store user query and embedding in the collection
+            store_user_query(query, query_embedding)
+            # Proceed with search and return results
+            results = search(query_embedding, collection)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -90,25 +109,16 @@ def search_endpoint():
         return jsonify({'error': 'Request must contain JSON data'}), 400
 
 
-# Endpoint for querying Sathya Sai Baba's teachings
 @app.route('/api/primarysource/query', methods=['POST'])
-@jwt_required()
+# @jwt_required()
 def query_sai_baba():
     data = request.json
     query = data.get('query')
 
-    # Perform query on MongoDB collection
-    result = collection.find_one(
-        {'title': {'$regex': query, '$options': 'i'}},
-        # {'_id': 0}  # Exclude _id field from the result
-    )
+    # Call handle_user_query function to get response and source information
+    response, source_information = handle_user_query(query, collection)
 
-    if result:
-        # Convert ObjectId to string
-        result['_id'] = str(result['_id'])
-        return jsonify({'response': result}), 200
-    else:
-        return jsonify({'message': 'No results found.'}), 404
+    return jsonify({'response': response}), 200
 
 
 @app.route('/register', methods=['POST'])
