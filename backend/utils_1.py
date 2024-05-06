@@ -105,9 +105,9 @@ def handle_user_query(query, collection):
 
     # Generate AI response with search context
     completion = openai_client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="ft:gpt-3.5-turbo-0125:original-source:query-finetuned:9Ld6PMno",
         messages=[
-            {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba."},
+            {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it."},
             {"role": "user", "content": "Answer this user query: " +
              query + " with the following context: " + search_result}
         ]
