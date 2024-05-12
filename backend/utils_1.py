@@ -103,22 +103,32 @@ def handle_user_query(query, collection):
     search_result = ''
     for result in get_knowledge:
         search_result += f"Content: {result.get('content', 'N/A')}\\n"
-    with open('query_finetune.jsonl', 'rb') as f:
-        response = openai_client.files.create(file=f, purpose='fine-tune')
-        # print(response)
-    # return response
-        file_id = response.id
-        print("*****file_id***** = ", file_id)
 
-        response = openai_client.fine_tuning.jobs.create(
-            training_file=file_id,
-            model="gpt-3.5-turbo",
-        )
-        print(response)
-        job_id = response.id
-        # print("*****job_id***** = ", job_id)
+    jsonl_file = 'query_finetune.jsonl'
+    jsonl_last_modified = os.path.getmtime(jsonl_file)
 
-        list_models = openai_client.fine_tuning.jobs.list(limit=1)
+    # Check if fine-tuning is required
+    fine_tuning_required = False
+    list_models = openai_client.fine_tuning.jobs.list(limit=1)
+    if not list_models:
+        fine_tuning_required = True
+        print("JSONL file updated. Creating new model.")
+    else:
+        last_model = None
+        for model in list_models:
+            last_model = model
+            break  # We only need the last model
+        if last_model:
+            last_model_finished_at = last_model.finished_at
+            if last_model_finished_at < jsonl_last_modified:
+                fine_tuning_required = True
+                print("JSONL file updated. Creating new model.")
+            else:
+                print("JSONL file hasn't been updated in a while. Using old model.")
+        else:
+            fine_tuning_required = True
+            print("No previous models found. Creating new model.")
+
         # print("==================================All Models==========================", list_models)
         # openai_client.fine_tuning.jobs.retrieve(job_id)
 
