@@ -1,3 +1,4 @@
+import hashlib
 import uuid
 from dotenv import load_dotenv
 import os
@@ -18,7 +19,7 @@ config.read('openai.ini')
 # Set up MongoDB connection
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client.saibabasayings
-collection = db.text
+collection = db.paragraphs
 
 # Set up OpenAI client
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
@@ -58,8 +59,8 @@ def search(user_query, collection):
     pipeline = [
         {
             "$vectorSearch": {
-                'index': 'sathyasearch',
-                "path": "content_embedding",
+                'index': 'vector_index',
+                "path": "paragraph_embedding",
                 'queryVector': query_embedding,
                 'numCandidates': 200,
                 'limit': 10
@@ -102,18 +103,42 @@ def handle_user_query(query, collection):
     search_result = ''
     for result in get_knowledge:
         search_result += f"Content: {result.get('content', 'N/A')}\\n"
+    with open('query_finetune.jsonl', 'rb') as f:
+        response = openai_client.files.create(file=f, purpose='fine-tune')
+        # print(response)
+    # return response
+        file_id = response.id
+        print("*****file_id***** = ", file_id)
 
-    # Generate AI response with search context
-    completion = openai_client.chat.completions.create(
-        model="ft:gpt-3.5-turbo-0125:original-source:query-finetuned:9Ld6PMno",
-        messages=[
-            {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it."},
-            {"role": "user", "content": "Answer this user query: " +
-             query + " with the following context: " + search_result}
-        ]
-    )
+        response = openai_client.fine_tuning.jobs.create(
+            training_file=file_id,
+            model="gpt-3.5-turbo",
+        )
+        print(response)
+        job_id = response.id
+        # print("*****job_id***** = ", job_id)
 
-    return (completion.choices[0].message.content), search_result
+        list_models = openai_client.fine_tuning.jobs.list(limit=1)
+        # print("==================================All Models==========================", list_models)
+        # openai_client.fine_tuning.jobs.retrieve(job_id)
+
+        finished_at = openai_client.fine_tuning.jobs.retrieve(job_id)
+        # print("=================================Finished_At======================= ", finished_at)
+
+        model_id = finished_at
+        # print("*****model_id***** = ", model_id)
+
+        # Generate AI response with search context
+        completion = openai_client.chat.completions.create(
+            model=model_id,
+            messages=[
+                {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it."},
+                {"role": "user", "content": "Answer this user query: " +
+                 query + " with the following context: " + search_result}
+            ]
+        )
+
+        return (completion.choices[0].message.content), search_result
 
 
 # Conduct query with retrieval of sources
