@@ -129,26 +129,39 @@ def handle_user_query(query, collection):
             fine_tuning_required = True
             print("No previous models found. Creating new model.")
 
-        # print("==================================All Models==========================", list_models)
-        # openai_client.fine_tuning.jobs.retrieve(job_id)
+    if fine_tuning_required:
+        with open(jsonl_file, 'rb') as f:
+            response = openai_client.files.create(file=f, purpose='fine-tune')
+            file_id = response.id
 
-        finished_at = openai_client.fine_tuning.jobs.retrieve(job_id)
-        # print("=================================Finished_At======================= ", finished_at)
-
-        model_id = finished_at
-        # print("*****model_id***** = ", model_id)
-
-        # Generate AI response with search context
-        completion = openai_client.chat.completions.create(
-            model=model_id,
-            messages=[
-                {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it."},
-                {"role": "user", "content": "Answer this user query: " +
-                 query + " with the following context: " + search_result}
-            ]
+        response = openai_client.fine_tuning.jobs.create(
+            training_file=file_id,
+            model="gpt-3.5-turbo",
         )
+        job_id = response.id
 
-        return (completion.choices[0].message.content), search_result
+        # Wait until the job finishes
+        while True:
+            job_status = openai_client.fine_tuning.jobs.retrieve(job_id)
+            if job_status.status == 'succeeded':
+                fine_tuned_model_id = job_status.fine_tuned_model
+                print("Fine-tuned model created successfully.",
+                      fine_tuned_model_id)
+                with open('fine_tuned_model.txt', 'w') as model_file:
+                    model_file.write(fine_tuned_model_id)
+                break
+
+    # Generate AI response with search context
+    completion = openai_client.chat.completions.create(
+        model=model_id,
+        messages=[
+            {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it."},
+            {"role": "user", "content": "Answer this user query: " +
+                query + " with the following context: " + search_result}
+        ]
+    )
+
+    return (completion.choices[0].message.content), search_result
 
 
 # Conduct query with retrieval of sources
