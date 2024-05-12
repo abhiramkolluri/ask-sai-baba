@@ -88,6 +88,15 @@ def search(user_query, collection):
     return results
 
 
+def load_fine_tuned_model_id_from_file():
+    model_file_path = 'fine_tuned_model.txt'
+    if os.path.exists(model_file_path):
+        with open(model_file_path, 'r') as f:
+            return f.read().strip()
+    else:
+        return None
+
+
 def handle_user_query(query, collection):
     # Check if the collection is valid
     if not isinstance(collection, pymongo.collection.Collection):
@@ -150,6 +159,11 @@ def handle_user_query(query, collection):
                 with open('fine_tuned_model.txt', 'w') as model_file:
                     model_file.write(fine_tuned_model_id)
                 break
+            # Use the fine-tuned model ID
+        model_id = fine_tuned_model_id
+    else:
+        # Use the last fine-tuned model
+        model_id = load_fine_tuned_model_id_from_file()
 
     # Generate AI response with search context
     completion = openai_client.chat.completions.create(
