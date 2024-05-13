@@ -169,7 +169,7 @@ def handle_user_query(query, collection):
     completion = openai_client.chat.completions.create(
         model=model_id,
         messages=[
-            {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it."},
+            {"role": "system", "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it. Please avoid using words like \"user\" or \"query\" in your response. If a user asks an irrelevant or out of topic question, then please answer them with, \"It seems like there might be a misunderstanding with the question you provided. I'm here to offer spiritual guidance based on the teachings of Sathya Sai Baba. If you have any questions related to spirituality, personal growth, or Sai Baba's teachings, feel free to ask!\""},
             {"role": "user", "content": "Answer this user query: " +
                 query + " with the following context: " + search_result}
         ]
@@ -179,7 +179,7 @@ def handle_user_query(query, collection):
 
 
 # Conduct query with retrieval of sources
-query = "When does Sai Baba say is the best time to wake up in the morning?"
+query = "who is the first man on moon?"
 response, source_information = handle_user_query(query, collection)
 
 print(f"Response: {response}")
