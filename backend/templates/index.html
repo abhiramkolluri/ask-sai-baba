@@ -47,6 +47,23 @@
                         });
                     });
                 });
+                $(document).on('click', '.result-link', function (event) {
+                    event.preventDefault();
+                    let title = $(this).data('title');
+                    $.ajax({
+                        url: '/article',
+                        type: 'GET',
+                        data: { title: title },
+                        success: function (article) {
+                            $('#full-article').show();
+                            $('#article-title').text(article.title);
+                            $('#article-content').text(article.content);
+                        },
+                        error: function (error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                });
             </script>
 
 
