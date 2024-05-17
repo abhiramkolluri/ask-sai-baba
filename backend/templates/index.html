@@ -1,12 +1,32 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block head %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Search</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
 
-<title>Ask sai baba</title>
-{% endblock %}
+    <body>
+        <!-- Content to be added in later sessions -->
 
+        <body>
+            <h1>Search</h1>
+            <form id="search-form">
+                <input type="text" id="query" name="query" placeholder="Enter your query" required>
+                <button type="submit">Search</button>
+            </form>
+            <h2>Results</h2>
+            <ul id="results-list"></ul>
+            <div id="full-article" style="display:none;">
+                <h2>Full Article</h2>
+                <h3 id="article-title"></h3>
+                <p id="article-content"></p>
+            </div>
+            
+        </body>
 
-{% block body %}
+    </body>
 
-<h1>Hello world</h1>
-{% endblock %}
+</html>
