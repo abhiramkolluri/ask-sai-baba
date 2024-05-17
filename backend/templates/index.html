@@ -24,7 +24,32 @@
                 <h3 id="article-title"></h3>
                 <p id="article-content"></p>
             </div>
-            
+            <script>
+                $(document).ready(function () {
+                    $('#search-form').on('submit', function (event) {
+                        event.preventDefault();
+                        let query = $('#query').val();
+                        $.ajax({
+                            url: '/search',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ query: query }),
+                            success: function (response) {
+                                let resultsList = $('#results-list');
+                                resultsList.empty();
+                                response.forEach(function (result) {
+                                    resultsList.append('<li><a href="#" class="result-link" data-title="' + result.title + '">' + result.content + '</a></li>');
+                                });
+                            },
+                            error: function (error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    });
+                });
+            </script>
+
+
         </body>
 
     </body>
