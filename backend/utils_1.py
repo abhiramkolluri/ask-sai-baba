@@ -19,7 +19,9 @@ config.read('openai.ini')
 # Set up MongoDB connection
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client.saibabasayings
-collection = db.paragraphs
+paragraphs_collection = db.paragraphs
+text_collection = db.text
+
 
 # Set up OpenAI client
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
@@ -35,6 +37,36 @@ def get_embedding(text):
     except Exception as e:
         logging.error(f"Error generating embedding: {e}")
         return None
+
+
+def search_browse(embedding, collection):
+
+   # Define the vector search pipeline
+    pipeline = [
+        {
+            "$vectorSearch": {
+                'index': 'vector_index',
+                "path": "paragraph_embedding",
+                'queryVector': embedding,
+                'numCandidates': 200,
+                'limit': 4
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,  # Exclude the _id field
+                "collection": 1,
+                "title": 1,  # Include the plot field
+                "content": 1,  # Include the title field
+                "score": {
+                    "$meta": "vectorSearchScore"  # Include the search score
+                }
+            }
+        }
+    ]
+
+    results = collection.aggregate(pipeline)
+    return list(results)
 
 
 def search(user_query, collection):
@@ -86,6 +118,12 @@ def search(user_query, collection):
         return "No relevant information found in the collection."
 
     return results
+
+
+def get_full_article(title, collection):
+    article = collection.find_one(
+        {"title": title}, {"_id": 0, "title": 1, "Content": 1})
+    return article
 
 
 def load_fine_tuned_model_id_from_file():
@@ -179,8 +217,8 @@ def handle_user_query(query, collection):
 
 
 # Conduct query with retrieval of sources
-query = "who is the first man on moon?"
-response, source_information = handle_user_query(query, collection)
+query = "top 5 netflix movies?"
+response, source_information = handle_user_query(query, paragraphs_collection)
 
 print(f"Response: {response}")
 # print(f"Source Information: \\n{source_information}")
