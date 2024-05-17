@@ -11,8 +11,8 @@ from pymongo import MongoClient
 import pymongo
 from openai import OpenAI
 import json
-from utils import search
-from utils_1 import handle_user_query
+# from utils import search
+from utils_1 import handle_user_query, search_browse
 
 
 # Initialize Flask app
@@ -34,7 +34,8 @@ print("Generated JWT Secret Key:", secret_key)
 client = MongoClient(os.getenv("MONGO_URI"))
 
 db = client.saibabasayings
-collection = db.text
+paragraphs_collection = db.paragraphs
+text_collection = db.text
 
 
 # # Print out the first few documents in the collection
@@ -70,14 +71,6 @@ def index():
     return render_template("index.html")
 
 
-# @app.route('/search', methods=['POST'])
-# def search_endpoint():
-
-#     # generate the embedding and return it to the page
-#     query = request.form['query']
-#     results = search(model(query), collection)
-#     return jsonify(results)
-# Function to store user queries and embeddings in the collection
 def store_user_query(query_text, query_embedding):
     # Get current timestamp
     timestamp = datetime.now()
@@ -101,7 +94,7 @@ def search_endpoint():
             # Store user query and embedding in the collection
             store_user_query(query, query_embedding)
             # Proceed with search and return results
-            results = search(query_embedding, collection)
+            results = search_browse(query_embedding, collection)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -112,13 +105,23 @@ def search_endpoint():
 @app.route('/api/primarysource/query', methods=['POST'])
 # @jwt_required()
 def query_sai_baba():
-    data = request.json
-    query = data.get('query')
+    try:
+        data = request.json
+        if not data or 'query' not in data:
+            return jsonify({'error': 'Invalid request. Missing or malformed JSON data.'}), 400
 
-    # Call handle_user_query function to get response and source information
-    response, source_information = handle_user_query(query, collection)
+        query = data.get('query')
+        if not query.strip():
+            return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
 
-    return jsonify({'response': response}), 200
+        # store_user_query(query, model(query))
+
+        # Call handle_user_query function to get response and source information
+        response, source_information = handle_user_query(query, collection)
+
+        return jsonify({'response': response}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/register', methods=['POST'])
