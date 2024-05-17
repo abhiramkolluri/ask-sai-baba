@@ -12,7 +12,7 @@ import pymongo
 from openai import OpenAI
 import json
 # from utils import search
-from utils_1 import handle_user_query, search_browse
+from utils_1 import handle_user_query, search_browse, get_full_article
 
 
 # Initialize Flask app
@@ -24,24 +24,15 @@ load_dotenv()
 
 # Generate a random hex string with 32 bytes
 secret_key = binascii.hexlify(os.urandom(32)).decode()
-
 print("Generated JWT Secret Key:", secret_key)
 
 
 # setting up open ai and mongodb
-# client = MongoClient("localhost", 27017)
-# client = MongoClient(os.getenv("MONGO_URI"))
 client = MongoClient(os.getenv("MONGO_URI"))
 
 db = client.saibabasayings
 paragraphs_collection = db.paragraphs
 text_collection = db.text
-
-
-# # Print out the first few documents in the collection
-# cursor = collection.find().limit(5)
-# for doc in cursor:
-#     print(doc)
 
 
 config = configparser.ConfigParser()
@@ -94,7 +85,7 @@ def search_endpoint():
             # Store user query and embedding in the collection
             store_user_query(query, query_embedding)
             # Proceed with search and return results
-            results = search_browse(query_embedding, collection)
+            results = search_browse(query_embedding, paragraphs_collection)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -117,11 +108,25 @@ def query_sai_baba():
         # store_user_query(query, model(query))
 
         # Call handle_user_query function to get response and source information
-        response, source_information = handle_user_query(query, collection)
+        response, source_information = handle_user_query(
+            query, paragraphs_collection)
 
         return jsonify({'response': response}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/article', methods=['GET'])
+def get_article():
+    title = request.args.get('title')
+    if title:
+        article = get_full_article(title, text_collection)
+        if article:
+            return jsonify(article)
+        else:
+            return jsonify({'error': 'Article not found'}), 404
+    else:
+        return jsonify({'error': 'Title parameter is missing'}), 400
 
 
 @app.route('/register', methods=['POST'])
