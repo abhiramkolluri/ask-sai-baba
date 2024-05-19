@@ -71,11 +71,20 @@ def get_embedding(text):
         return None
 
 
+# Remove rows with empty strings in the 'content' column
+try:
+    print("Removing rows with empty strings in 'content' column...")
+    dataset_df = dataset_df[dataset_df['content'].str.strip() != ""]
+    print("Rows with empty strings removed.")
+except Exception as e:
+    logging.error(
+        f"Error removing rows with empty strings in 'content' column: {e}")
+
 # Remove the paragraph_embedding_optimised from each data point in the dataset as we are going to create new embeddings with the new OpenAI embedding Model "text-embedding-3-large"
 try:
-    dataset_df = dataset_df.dropna(subset=['content'])
-    print("\\nNumber of missing values in each column after removal:")
-    print(dataset_df.isnull().sum())
+    # dataset_df = dataset_df.dropna(subset=['content'])
+    # print("\\nNumber of missing values in each column after removal:")
+    # print(dataset_df.isnull().sum())
     print("Dropping column 'paragraph_embedding_optimised'...")
     dataset_df = dataset_df.drop(columns=['paragraph_embedding_optimised'])
     print("Column 'paragraph_embedding_optimised' dropped.")
@@ -102,6 +111,17 @@ except Exception as e:
     logging.error(f"Error converting DataFrame to dictionary: {e}")
     print(f"Error converting DataFrame to dictionary: {e}")
 
+
+# Save embeddings to a JSON file
+try:
+    print("Saving embeddings to JSON file...")
+    with open("embeddings.json", "w") as f:
+        json.dump(documents, f, indent=4)  # Indent for pretty formatting
+    print("Embeddings saved to JSON file.")
+except Exception as e:
+    logging.error(f"Error saving embeddings to JSON file: {e}")
+    print(f"Error saving embeddings to JSON file: {e}")
+
 # Insert data into MongoDB
 try:
     print("Inserting data into MongoDB...")
@@ -110,4 +130,3 @@ try:
 except Exception as e:
     logging.error(f"Error inserting data into MongoDB: {e}")
     print(f"Error inserting data into MongoDB: {e}")
-
