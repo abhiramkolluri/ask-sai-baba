@@ -1,8 +1,9 @@
+from flask_cors import CORS
 from flask import Flask, url_for, render_template, request, redirect, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from dotenv import load_dotenv
-from decouple import config
 import configparser
+from flask_caching import Cache
 import os
 from datetime import datetime  # Import datetime module
 
@@ -11,21 +12,19 @@ from pymongo import MongoClient
 import pymongo
 from openai import OpenAI
 import json
-# from utils import search
 from utils_1 import handle_user_query, search_browse, get_full_article
-
 
 # Initialize Flask app
 app = Flask(__name__)
 
+# CORS configuration
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # loading the env variables
 load_dotenv()
 
 # Generate a random hex string with 32 bytes
 secret_key = binascii.hexlify(os.urandom(32)).decode()
-print("Generated JWT Secret Key:", secret_key)
-
 
 # setting up open ai and mongodb
 client = MongoClient(os.getenv("MONGO_URI"))
@@ -34,22 +33,18 @@ db = client.saibabasayings
 paragraphs_collection = db.paragraphs
 text_collection = db.text
 
-
 config = configparser.ConfigParser()
 
 # setting up openai
 config.read('openai.ini')
 
 app.config['JWT_SECRET_KEY'] = secret_key
-# os.getenv(
-#     'JWT_SECRET_KEY')  # Use your own secret key
-# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hour
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
 
-
 # embedding generator
-def model(text):
 
+
+def model(text):
     return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
 
 
@@ -58,7 +53,6 @@ jwt = JWTManager(app)
 
 @app.route('/', methods=['GET'])
 def index():
-
     return render_template("index.html")
 
 
@@ -94,7 +88,6 @@ def search_endpoint():
 
 
 @app.route('/api/primarysource/query', methods=['POST'])
-# @jwt_required()
 def query_sai_baba():
     try:
         data = request.json
