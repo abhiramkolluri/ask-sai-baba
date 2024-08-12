@@ -1,12 +1,74 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block head %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Search</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
 
-<title>Ask sai baba</title>
-{% endblock %}
+    <body>
+        <!-- Content to be added in later sessions -->
+
+        <body>
+            <h1>Search</h1>
+            <form id="search-form">
+                <input type="text" id="query" name="query" placeholder="Enter your query" required>
+                <button type="submit">Search</button>
+            </form>
+            <h2>Results</h2>
+            <ul id="results-list"></ul>
+            <div id="full-article" style="display:none;">
+                <h2>Full Article</h2>
+                <h3 id="article-title"></h3>
+                <p id="article-content"></p>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $('#search-form').on('submit', function (event) {
+                        event.preventDefault();
+                        let query = $('#query').val();
+                        $.ajax({
+                            url: '/search',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ query: query }),
+                            success: function (response) {
+                                let resultsList = $('#results-list');
+                                resultsList.empty();
+                                response.forEach(function (result) {
+                                    resultsList.append('<li><a href="#" class="result-link" data-title="' + result.title + '">' + result.content + '</a></li>');
+                                });
+                            },
+                            error: function (error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    });
+                });
+                $(document).on('click', '.result-link', function (event) {
+                    event.preventDefault();
+                    let title = $(this).data('title');
+                    $.ajax({
+                        url: '/article',
+                        type: 'GET',
+                        data: { title: title },
+                        success: function (article) {
+                            $('#full-article').show();
+                            $('#article-title').text(article.title);
+                            $('#article-content').text(article.content);
+                        },
+                        error: function (error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                });
+            </script>
 
 
-{% block body %}
+        </body>
 
-<h1>Hello world</h1>
-{% endblock %}
+    </body>
+
+</html>

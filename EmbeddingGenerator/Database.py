@@ -1,45 +1,69 @@
+import uuid
 from dotenv import load_dotenv
 import os
+from pymongo import MongoClient
+from decouple import config
+import configparser
 import pymongo
 import json
-import openai
 from openai import OpenAI
-# from sentence_transformers import SentenceTransformer
-from utils import generateEmbeddings,search,insertEmbedding
+from sentence_transformers import SentenceTransformer
+from utils import generateEmbeddings, search, insertEmbedding
 
 
 
 load_dotenv()
+config = configparser.ConfigParser()
+config.read('openai.ini')
 
-openai.api_key = os.getenv("OPEN_AI")
+# openai.api_key = os.getenv("OPEN_AI")
+client = MongoClient(os.getenv("MONGO_URI"))
+openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
 
-client = pymongo.MongoClient(os.getenv("Mongo_uri"))
+
 db = client.saibabasayings
 collection = db.text
 
 
-
-
-
-with open('..\Web scraper\data.json', 'r') as file:
+# Load the JSON data
+with open('../../ask-sai-baba/Web scraper/data.json', 'r') as file:
     # Load the JSON data
     data = json.load(file)
-
-# print(data)
+    for item in data:
+        # Ensure each document has an _id field
+        if '_id' not in item:
+            # Generate a unique identifier if _id is missing
+            item['_id'] = str(uuid.uuid4())
+        # Check if the document already exists in the collection
+        if not collection.find_one({'_id': item['_id']}):
+            collection.insert_one(item)
 
 
 def model(text):
-    return openai.embeddings.create(input = [text], model="text-embedding-3-small").data[0].embedding
+    return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
 
-# create the embedding for the content and insert inside the database 
 
-def embeddingGenerator():
+# create the embedding for the content and insert inside the database
+def embeddingGenerator(data, model, collection):
     for d in data:
-        text = d['Content'].replace("\n", " ")
+        # Preprocess content (remove newlines)
+        # text = d['content'].replace("\n", " ")
+        text = d['content'].strip('\n')
+        # Optional: Insert original document (if not already stored)
         # insertEmbedding(collection=collection,model=model,document=d)
-        d['content_embedding'] = model(text)
-        collection.insert_one(d)
+        # Generate embedding and add it to the document
+        embedding = model(text)
+        d['content_embedding'] = embedding
+        # Update existing document with new embedding
+        collection.find_one_and_update({'_id': d['_id']}, {'$set': {'content_embedding': embedding}})
+        # collection.insert_one(d)
 
-### testing the search functionality
+        # Print generated embedding for reference
+        print(f"Generated embedding for document {d['_id']}: {embedding}")
+
+embeddingGenerator(data,model,collection)
+
+
+# testing the search functionality
 # query = "what is prayer ?"
 # search(model(query),collection)
