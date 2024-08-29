@@ -2,13 +2,9 @@ import uuid
 from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
-from decouple import config
 import configparser
-import pymongo
 import json
 from openai import OpenAI
-from sentence_transformers import SentenceTransformer
-from utils import generateEmbeddings, search, insertEmbedding
 
 
 

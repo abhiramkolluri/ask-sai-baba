@@ -19,7 +19,7 @@ pip install -r requirements.txt
 python textoptions.py
 ```
 
-## Scraping the content and getting the reiligious text
+## Scraping the content and getting the religious text
 
 1. Run the script `webscraper.py` using the following command:
 
