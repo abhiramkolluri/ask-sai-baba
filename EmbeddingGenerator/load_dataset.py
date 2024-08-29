@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
-from decouple import config
 import configparser
 import json
 from openai import OpenAI

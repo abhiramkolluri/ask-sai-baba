@@ -1,18 +1,15 @@
 from flask_cors import CORS
-from flask import Flask, url_for, render_template, request, redirect, jsonify
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from flask import Flask, render_template, request, jsonify
+from flask_jwt_extended import JWTManager, create_access_token
 from dotenv import load_dotenv
 import configparser
-from flask_caching import Cache
 import os
-from datetime import datetime  # Import datetime module
+from datetime import datetime
 
 import binascii
 from pymongo import MongoClient
-import pymongo
 from openai import OpenAI
-import json
-from utils_1 import handle_user_query, search_browse, get_full_article
+from utils import handle_user_query, search_browse, get_full_article
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -41,9 +38,8 @@ config.read('openai.ini')
 app.config['JWT_SECRET_KEY'] = secret_key
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
 
+
 # embedding generator
-
-
 def model(text):
     return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
 
@@ -111,6 +107,7 @@ def query_sai_baba():
 
 @app.route('/article', methods=['GET'])
 def get_article():
+    print(request.args)
     title = request.args.get('title')
     if title:
         article = get_full_article(title, text_collection)

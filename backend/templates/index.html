@@ -38,7 +38,13 @@
                                 let resultsList = $('#results-list');
                                 resultsList.empty();
                                 response.forEach(function (result) {
-                                    resultsList.append('<li><a href="#" class="result-link" data-title="' + result.title + '">' + result.content + '</a></li>');
+                                    resultsList.append('<li>' +
+                                        '<a href="#" class="expand-content" data-title="' + result.title + '">' + result.title + '</a><br>' +
+                                        '<span class="result-content">Article Content: ' + result.content + '</span><br>' +
+                                        '<span class="result-score">Model Score: ' + result.score + '</span><br>' +
+                                        '<a href="' + result.link + '" class="result-link">' + result.link + '</a><br>' +
+                                        '<span class="result-collection">Collection: ' + result.collection + '</span>' +
+                                        '</li><br>');
                                 });
                             },
                             error: function (error) {
@@ -47,7 +53,7 @@
                         });
                     });
                 });
-                $(document).on('click', '.result-link', function (event) {
+                $(document).on('click', '.expand-content', function (event) {
                     event.preventDefault();
                     let title = $(this).data('title');
                     $.ajax({

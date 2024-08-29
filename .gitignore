@@ -3,3 +3,8 @@
 openai.ini
 venv/
 
+/.idea
+/backend/__pycache__
+backend/embedding_generation.log
+backend/fine_tuned_model.txt
+/Web scraper/__pycache__
