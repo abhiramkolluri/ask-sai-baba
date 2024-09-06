@@ -78,14 +78,18 @@ Developing a website to make finding spiritual guidance easier for members of th
       ```bash
       flask run --port=8000
       ```
+     - Run the project on AWS EC2:
+      ```bash
+      nohup flask run --port=8000 > flask_output.log 2>&1 &
+      ```
 
-    This will initiate a process to create a new model on OpenAI using the training data found in `query_finetune.jsonl` located in the backend directory. The process should take about 10 minutes to complete. Once completed, the app will return a response to the default question "what is right to do?" on the terminal, indicating a successful setup.
+    This will initiate a process to create a new model on OpenAI using the training data found in `query_finetune.jsonl` in the backend directory. The process should take about 10 minutes to complete. Once completed, the app will return a response to the default question "What is right to do?" on the terminal, indicating a successful setup.
 
 ## Test the Project on Postman
-Donwload Postman from https://www.postman.com/downloads/
+Download Postman from https://www.postman.com/downloads/
 
-You can now test the project's endpoints using Postman. Make sure the backend server is running and use the appropriate endpoints to test the functionality of the project.
+You can now test the project's endpoints using Postman. Make sure the backend server is running, and use the appropriate endpoints to test the project's functionality.
 
 ---
 
-By following these steps, you should be able to set up and run the Ask-Sai-Baba project on your local machine successfully. If you encounter any issues, please consult the project's documentation or seek assistance from the project maintainers.
+By following these steps, you can successfully set up and run the Ask-Sai-Baba project on your local machine. If you have any issues, please consult the project's documentation or seek assistance from the project maintainers.
