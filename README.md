@@ -76,7 +76,7 @@ Developing a website to make finding spiritual guidance easier for members of th
 
     - Run the project:
       ```bash
-      flask run
+      flask run --port=8000
       ```
 
     This will initiate a process to create a new model on OpenAI using the training data found in `query_finetune.jsonl` located in the backend directory. The process should take about 10 minutes to complete. Once completed, the app will return a response to the default question "what is right to do?" on the terminal, indicating a successful setup.
