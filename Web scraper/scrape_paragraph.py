@@ -9,7 +9,7 @@ from html_parser import strip_tags
 import json
 
 base_url = "https://saispeaks.sathyasai.org"
-url = f"{base_url}/discourses/collection=Sri%20Sathya%20Sai%20Speaks%2C%20Vol%2043%20%282010%29"
+url = f"{base_url}/discourses/"
 file = 'options.json'
 
 # Read the JSON file

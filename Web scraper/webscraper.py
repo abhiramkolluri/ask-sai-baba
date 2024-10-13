@@ -3,14 +3,14 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
 from selenium.webdriver.common.action_chains import ActionChains
 from html_parser import strip_tags
 from time import sleep
 import json
 
 base_url = "https://saispeaks.sathyasai.org"
-url = f"{base_url}/discourses/collection=Sri%20Sathya%20Sai%20Speaks%2C%20Vol%2043%20%282010%29"
+url = f"{base_url}/discourses/"
 file = 'options.json'
 
 # Read the JSON file
@@ -25,6 +25,9 @@ driver = webdriver.Chrome()
 
 # Load the page
 driver.get(url)
+
+# Open the browser in full-screen mode
+driver.fullscreen_window()
 
 # Loop through all of the options that exist for the religious text
 for option in options:
@@ -42,10 +45,13 @@ for option in options:
 
     # Wait for the submit button to be clickable
     wait = WebDriverWait(driver, 20)
-    wait.until(EC.element_to_be_clickable(
-        (By.ID, "edit-discourse-search-submit")))
+    wait.until(EC.element_to_be_clickable((By.ID, "edit-discourse-search-submit")))
 
-    button.click()
+    try:
+        button.click()
+    except ElementClickInterceptedException:
+        # If click is intercepted, try to click via JavaScript
+        driver.execute_script("arguments[0].click();", button)
 
     # Wait for the page to fully load
     sleep(5)  # Wait for 5 seconds for the page to load
@@ -80,13 +86,23 @@ for option in options:
             driver.switch_to.window(driver.window_handles[1])
 
             # Now you are on the linked page, you can extract data as before
-            message_panel = driver.find_element(
-                By.CLASS_NAME, "section-content")
+            message_panel = driver.find_element(By.CLASS_NAME, "section-content")
+
+            try:
+                location_element = driver.find_element(By.CLASS_NAME, "discourse-location")
+                location = location_element.text.replace("Place\n", "")  # Clean the text if found
+            except NoSuchElementException:
+                location = ""  # Set to empty if element is not found
+
+            # Try to find occasion element
+            try:
+                occasion_element = driver.find_element(By.CLASS_NAME, "discourse-occasion")
+                occasion = occasion_element.text.replace("Occasion\n", "")  # Clean the text if found
+            except NoSuchElementException:
+                occasion = ""  # Set to empty if element is not found
 
             # Locate all message elements within the panel
-            messages = message_panel.find_elements(
-                By.XPATH, './/*[self::div[@class="discourse_para"] or self::div[contains(@class, "discourse_section")] or self::div[contains(@class, "callout")] or self::div[@class="discourse_editor_note"]]')
-
+            messages = message_panel.find_elements(By.CSS_SELECTOR, '.discourse_para, .discourse-poem, .discourse-quote')
             # List to store message content for all messages
             message_contents = []
 
@@ -114,8 +130,7 @@ for option in options:
             sleep(2)
 
             # Extract data specific to each discourse listing
-            collection = discourse_listing.find(
-                class_='collection').get_text(strip=True)
+            collection = discourse_listing.find(class_='collection').get_text(strip=True)
             date = discourse_listing.find(class_='date').get_text(strip=True)
             discoursenum = collection.split()[-1]
 
@@ -124,6 +139,8 @@ for option in options:
                 "content": message_content,
                 "collection": collection,
                 "date": date,
+                "location": location,
+                "occasion": occasion,
                 "discourse_number": discoursenum if discoursenum.isdigit() else "",
                 "link": full_link  # Include the link in the dictionary
             }
@@ -142,12 +159,12 @@ for option in options:
 driver.quit()
 
 # Write the data to the JSON file
-output_file = 'data_all.json'
+output_file = 'data.json'
 with open(output_file, 'w') as f:
     json.dump(results, f, indent=4)
 
 # Write clicked links to the data file
-with open('data.json', 'w') as f:
+with open('clicked_links.json', 'w') as f:
     json.dump(clicked_links, f, indent=4)
 
 print("Data saved successfully.")

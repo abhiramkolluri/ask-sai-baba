@@ -9,7 +9,7 @@ from datetime import datetime
 import binascii
 from pymongo import MongoClient
 from openai import OpenAI
-from utils import handle_user_query, search_browse, get_full_article
+from utils import handle_user_query, search_browse, get_full_article, model
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -27,8 +27,7 @@ secret_key = binascii.hexlify(os.urandom(32)).decode()
 client = MongoClient(os.getenv("MONGO_URI"))
 
 db = client.saibabasayings
-paragraphs_collection = db.paragraphs
-text_collection = db.text
+article_collection = db.articles
 
 config = configparser.ConfigParser()
 
@@ -37,12 +36,6 @@ config.read('openai.ini')
 
 app.config['JWT_SECRET_KEY'] = secret_key
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
-
-
-# embedding generator
-def model(text):
-    return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
-
 
 jwt = JWTManager(app)
 
@@ -75,7 +68,7 @@ def search_endpoint():
             # Store user query and embedding in the collection
             store_user_query(query, query_embedding)
             # Proceed with search and return results
-            results = search_browse(query_embedding, paragraphs_collection)
+            results = search_browse(query_embedding, article_collection)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -83,7 +76,7 @@ def search_endpoint():
         return jsonify({'error': 'Request must contain JSON data'}), 400
 
 
-@app.route('/api/primarysource/query', methods=['POST'])
+@app.route('/query', methods=['POST'])
 def query_sai_baba():
     try:
         data = request.json
@@ -94,29 +87,23 @@ def query_sai_baba():
         if not query.strip():
             return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
 
-        # store_user_query(query, model(query))
-
         # Call handle_user_query function to get response and source information
-        response, source_information = handle_user_query(
-            query, paragraphs_collection)
-
+        response, source_information = handle_user_query(query, article_collection)
         return jsonify({'response': response}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/article', methods=['GET'])
-def get_article():
-    print(request.args)
-    title = request.args.get('title')
-    if title:
-        article = get_full_article(title, text_collection)
+@app.route('/blog/<id>', methods=['GET'])
+def get_article(id):
+    if id:
+        article = get_full_article(id, article_collection)
         if article:
             return jsonify(article)
         else:
             return jsonify({'error': 'Article not found'}), 404
     else:
-        return jsonify({'error': 'Title parameter is missing'}), 400
+        return jsonify({'error': 'ID parameter is missing'}), 400
 
 
 @app.route('/register', methods=['POST'])

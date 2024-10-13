@@ -201,3 +201,4 @@ wsproto==1.2.0
 xxhash==3.4.1
 yarl==1.9.4
 zope.interface==6.2
+tiktoken~=0.8.0

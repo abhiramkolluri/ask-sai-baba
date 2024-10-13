@@ -1,65 +1,111 @@
+import re
 import uuid
+
+import pandas as pd
 from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
 import configparser
 import json
-from openai import OpenAI
 
+from backend.utils import get_embedding
 
-
+# Load environment variables and configurations
 load_dotenv()
 config = configparser.ConfigParser()
-config.read('openai.ini')
+config.read('../backend/openai.ini')
 
-# openai.api_key = os.getenv("OPEN_AI")
-client = MongoClient(os.getenv("MONGO_URI"))
-openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
-
-
+# Initialize MongoDB client
+client = MongoClient(os.getenv('MONGODB_URI'))
 db = client.saibabasayings
-collection = db.text
+collection = db.articles
 
 
-# Load the JSON data
-with open('../../ask-sai-baba/Web scraper/data.json', 'r') as file:
-    # Load the JSON data
-    data = json.load(file)
-    for item in data:
-        # Ensure each document has an _id field
-        if '_id' not in item:
-            # Generate a unique identifier if _id is missing
-            item['_id'] = str(uuid.uuid4())
-        # Check if the document already exists in the collection
-        if not collection.find_one({'_id': item['_id']}):
-            collection.insert_one(item)
+# Load dataset from JSON file
+def load_dataset(file_path):
+    print(f"Loading dataset from {file_path}...")
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            for item in data:
+                # Ensure each document has an _id field
+                if '_id' not in item:
+                    # Generate a unique identifier if _id is missing
+                    item['_id'] = re.sub(r'[^a-zA-Z0-9 ]', '', item['title']).replace(' ', '-') + str(uuid.uuid4())[-3:]
+
+        # Write the modified _id back to data.json
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)  # Use indent for pretty printing
+        dataset_df = pd.DataFrame(data)
+        print("Dataset loaded successfully.")
+        return dataset_df
+    except Exception as e:
+        print(f"Error loading dataset: {e}")
+        return None
 
 
-def model(text):
-    return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
+# Clean the dataset
+def clean_dataset(dataset_df):
+    try:
+        dataset_df = dataset_df.dropna(subset=['content'])
+        dataset_df = dataset_df[dataset_df['content'].str.strip() != ""]
+        print("Dataset cleaned.")
+        return dataset_df
+    except Exception as e:
+        print(f"Error cleaning dataset: {e}")
+        return dataset_df
 
 
-# create the embedding for the content and insert inside the database
-def embeddingGenerator(data, model, collection):
-    for d in data:
-        # Preprocess content (remove newlines)
-        # text = d['content'].replace("\n", " ")
-        text = d['content'].strip('\n')
-        # Optional: Insert original document (if not already stored)
-        # insertEmbedding(collection=collection,model=model,document=d)
-        # Generate embedding and add it to the document
-        embedding = model(text)
-        d['content_embedding'] = embedding
-        # Update existing document with new embedding
-        collection.find_one_and_update({'_id': d['_id']}, {'$set': {'content_embedding': embedding}})
-        # collection.insert_one(d)
+# Generate embeddings using OpenAI
+def generate_embeddings(dataset_df):
+    try:
+        print("Generating embeddings...")
+        # Create a list to store the embeddings
+        content_embeddings = []
+        for index, row in dataset_df.iterrows():
+            # Generate embedding for each document's content
+            embedding = get_embedding(row['content'])
+            content_embeddings.append(embedding)
+            print(f"Completed embedding generation for document: {row.get('title')}")
 
-        # Print generated embedding for reference
-        print(f"Generated embedding for document {d['_id']}: {embedding}")
+        dataset_df["content_embedding"] = content_embeddings
+        print("Embeddings generated for all documents.")
+        return dataset_df
+    except Exception as e:
+        print(f"Error generating embeddings: {e}")
+        return dataset_df
 
-embeddingGenerator(data,model,collection)
+
+# Save the embeddings to JSON
+def save_embeddings_to_json(output_file, documents):
+    try:
+        with open(output_file, 'w') as f:
+            json.dump(documents, f, indent=4)
+        print(f"Embeddings saved to {output_file}.")
+    except Exception as e:
+        print(f"Error saving embeddings: {e}")
 
 
-# testing the search functionality
-# query = "what is prayer ?"
-# search(model(query),collection)
+# Insert data into MongoDB
+def insert_data_into_mongo(documents):
+    try:
+        print("Inserting data into MongoDB...")
+        collection.insert_many(documents)
+        print("Data insertion into MongoDB completed.")
+    except Exception as e:
+        print(f"Error inserting data into MongoDB: {e}")
+
+
+# Combine dataset processing and MongoDB insertion
+def process_and_store_data(file_path, json_output_file):
+    dataset_df = load_dataset(file_path)
+    if dataset_df is not None:
+        dataset_df = clean_dataset(dataset_df)
+        dataset_df = generate_embeddings(dataset_df)
+        documents = dataset_df.to_dict('records')
+        save_embeddings_to_json(json_output_file, documents)
+        insert_data_into_mongo(documents)
+
+
+# Example usage
+process_and_store_data('../Web scraper/data.json', 'embeddings.json')

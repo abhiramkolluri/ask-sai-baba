@@ -17,11 +17,17 @@
                 <input type="text" id="query" name="query" placeholder="Enter your query" required>
                 <button type="submit">Search</button>
             </form>
+            <h2>Response</h2>
+            <div id="api-response"></div>
             <h2>Results</h2>
             <ul id="results-list"></ul>
             <div id="full-article" style="display:none;">
                 <h2>Full Article</h2>
                 <h3 id="article-title"></h3>
+                <p id="article-location"></p>
+                <p id="article-occasion"></p>
+                <p id="article-collection"></p>
+                <p id="article-link"></p>
                 <p id="article-content"></p>
             </div>
             <script>
@@ -39,12 +45,28 @@
                                 resultsList.empty();
                                 response.forEach(function (result) {
                                     resultsList.append('<li>' +
-                                        '<a href="#" class="expand-content" data-title="' + result.title + '">' + result.title + '</a><br>' +
+                                        '<a href="#" class="expand-content" data-id="' + result._id + '">' + result.title + '</a><br>' +
+                                        '<span class="result-occasion">Occasion: ' + result.occasion + '</span><br>' +
+                                        '<span class="result-location">Location: ' + result.location + '</span><br>' +
                                         '<span class="result-content">Article Content: ' + result.content + '</span><br>' +
-                                        '<span class="result-score">Model Score: ' + result.score + '</span><br>' +
                                         '<a href="' + result.link + '" class="result-link">' + result.link + '</a><br>' +
-                                        '<span class="result-collection">Collection: ' + result.collection + '</span>' +
+                                        '<span class="result-collection">Collection: ' + result.collection + '</span><br>' +
+                                        '<span class="result-score">Model Score: ' + result.score + '</span>' +
                                         '</li><br>');
+                                });
+                                // After getting the search results, automatically call the /query API
+                                $.ajax({
+                                    url: '/query',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({ query: query }),
+                                    success: function (data) {
+                                        // Display the response from the /query API
+                                        $('#api-response').text(data.response);
+                                    },
+                                    error: function (error) {
+                                        console.error('Error:', error);
+                                    }
                                 });
                             },
                             error: function (error) {
@@ -55,14 +77,17 @@
                 });
                 $(document).on('click', '.expand-content', function (event) {
                     event.preventDefault();
-                    let title = $(this).data('title');
+                    let id = $(this).data('id'); // Get the _id from data-id attribute
                     $.ajax({
-                        url: '/article',
+                        url: '/blog/' + encodeURIComponent(id),
                         type: 'GET',
-                        data: { title: title },
                         success: function (article) {
                             $('#full-article').show();
                             $('#article-title').text(article.title);
+                            $('#article-location').html('<strong>Location:</strong> ' + article.location);
+                            $('#article-occasion').html('<strong>Occasion:</strong> ' + article.occasion);
+                            $('#article-collection').html('<strong>Collection:</strong> ' + article.collection);
+                            $('#article-link').html('<strong>Reference:</strong> <a href="' + article.link + '" target="_blank">' + article.link + '</a>');
                             $('#article-content').text(article.content);
                         },
                         error: function (error) {

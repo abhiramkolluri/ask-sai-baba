@@ -1,3 +1,5 @@
+import numpy as np
+import tiktoken
 from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
@@ -8,26 +10,58 @@ import logging
 
 # Configure logging
 logging.basicConfig(filename='embedding_generation.log', level=logging.ERROR)
+
 load_dotenv()
 config = configparser.ConfigParser()
-config.read('openai.ini')
+config.read('../backend/openai.ini')
 
 # Set up MongoDB connection
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client.saibabasayings
-paragraphs_collection = db.paragraphs
-text_collection = db.text
+article_collection = db.articles
 
 # Set up OpenAI client
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
 
 
+# Function to count tokens using the tiktoken library
+def count_tokens(text):
+    encoding = tiktoken.encoding_for_model("text-embedding-ada-002")
+    tokens = encoding.encode(text)
+    return len(tokens)
+
+
+# Function to split text if it exceeds the token limit
+def split_text(text, max_tokens=8192):
+    encoding = tiktoken.encoding_for_model("text-embedding-ada-002")
+    tokens = encoding.encode(text)
+    chunks = [tokens[i:i + max_tokens] for i in range(0, len(tokens), max_tokens)]
+    return [encoding.decode(chunk) for chunk in chunks]
+
+
+def model(text):
+    return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
+
+
 def get_embedding(text):
     """Generate an embedding for the given text using OpenAI's API."""
+    # Check for valid input
+    if not text or not isinstance(text, str):
+        return None
+
     try:
-        # Call OpenAI API to get the embedding
-        embedding = openai_client.embeddings.create(
-            input=text, model="text-embedding-3-large").data[0].embedding
+        if count_tokens(text) > 8192:
+            print("Text too long for document splitting it...")
+            # Split the text into chunks if it exceeds the limit
+            text_chunks = split_text(text)
+            embeddings = [model(chunk) for chunk in text_chunks]
+            # You can decide how to handle embeddings: sum, average, or keep them separately
+            embedding = np.mean(embeddings, axis=0)  # Averaging embeddings
+        else:
+            embedding = model(text)
+        # Update existing document with new embedding
+        if isinstance(embedding, np.ndarray):
+            embedding = embedding.tolist()
         return embedding
     except Exception as e:
         logging.error(f"Error generating embedding: {e}")
@@ -40,28 +74,29 @@ def search_browse(embedding, collection):
         {
             "$vectorSearch": {
                 'index': 'vector_index',
-                "path": "paragraph_embedding",
+                "path": "content_embedding",
                 'queryVector': embedding,
                 'numCandidates': 50,
-                'limit': 4
+                'limit': 5
             }
         },
         {
             "$project": {
-                "_id": 0,  # Exclude the _id field
+                "_id": 1,
                 "collection": 1,
                 "title": 1,  # Include the plot field
                 "content": 1,  # Include the title field
                 "score": {
                     "$meta": "vectorSearchScore"  # Include the search score
                 },
+                "location": 1,
+                "occasion": 1,
                 "link": 1  # Include the article source link
             }
         }
     ]
-
-    results = collection.aggregate(pipeline)
-    return list(results)
+    results = list(collection.aggregate(pipeline))
+    return results
 
 
 def search(user_query, collection):
@@ -78,7 +113,6 @@ def search(user_query, collection):
 
     # Generate embedding for the user query
     query_embedding = get_embedding(user_query)
-
     if query_embedding is None:
         return "Invalid query or embedding generation failed."
 
@@ -87,38 +121,35 @@ def search(user_query, collection):
         {
             "$vectorSearch": {
                 'index': 'vector_index',
-                "path": "paragraph_embedding",
+                "path": "content_embedding",
                 'queryVector': query_embedding,
-                'numCandidates': 200,
-                'limit': 10
+                'numCandidates': 50,
+                'limit': 5
             }
         },
         {
             "$project": {
-                "_id": 0,  # Exclude the _id field
-                "title": 1,  # Include the plot field
-                "content": 1,  # Include the title field
+                "_id": 1,
+                "title": 1,
+                "content": 1,
                 "score": {
                     "$meta": "vectorSearchScore"  # Include the search score
                 },
+                "location": 1,
+                "occasion": 1,
                 "link": 1  # Include the article source link
             }
         }
     ]
 
     # Execute the search
-    # results = collection.aggregate(pipeline)
-    # return list(results)
     results = list(collection.aggregate(pipeline))
-    if not results:
-        return "No relevant information found in the collection."
-
     return results
 
 
-def get_full_article(title, collection):
+def get_full_article(id, collection):
     article = collection.find_one(
-        {"title": title}, {"_id": 0, "title": 1, "content": 1})
+        {"_id": id}, {"_id": 1, "title": 1, "content": 1, "location":1, "occasion": 1, "link": 1, "collection": 1})
     return article
 
 
@@ -173,10 +204,7 @@ def handle_user_query(query, collection):
             response = openai_client.files.create(file=f, purpose='fine-tune')
             file_id = response.id
 
-        response = openai_client.fine_tuning.jobs.create(
-            training_file=file_id,
-            model="gpt-3.5-turbo-0125",
-        )
+        response = openai_client.fine_tuning.jobs.create(training_file=file_id,model="gpt-3.5-turbo-0125")
         job_id = response.id
 
         # Wait until the job finishes
@@ -204,8 +232,7 @@ def handle_user_query(query, collection):
         messages=[
             {"role": "system",
              "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it. Please avoid using words like \"user\" or \"query\" in your response. If a user asks an irrelevant or out of topic question, then please answer them with, \"It seems like there might be a misunderstanding with the question you provided. I'm here to offer spiritual guidance based on the teachings of Sathya Sai Baba. If you have any questions related to spirituality, personal growth, or Sai Baba's teachings, feel free to ask!\""},
-            {"role": "user", "content": "Answer this user query: " +
-                                        query + " with the following context: " + search_result}
+            {"role": "user", "content": "Answer this user query: " + query + " with the following context: " + search_result}
         ]
     )
     return completion.choices[0].message.content, search_result
@@ -213,6 +240,6 @@ def handle_user_query(query, collection):
 
 # Conduct query with retrieval of sources
 query = "who is sai baba?"
-response, source_information = handle_user_query(query, paragraphs_collection)
+response, source_information = handle_user_query(query, article_collection)
 
-# print(f"Response: {response}")
+print(f"Response: {response}")
