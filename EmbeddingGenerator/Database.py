@@ -13,7 +13,7 @@ from backend.utils import get_embedding
 # Load environment variables and configurations
 load_dotenv()
 config = configparser.ConfigParser()
-config.read('../backend/openai.ini')
+config.read('openai.ini')
 
 # Initialize MongoDB client
 client = MongoClient(os.getenv('MONGODB_URI'))

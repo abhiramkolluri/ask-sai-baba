@@ -1,7 +1,7 @@
 import os
 
 
-def fine_tune_model(openai_client, jsonl_file='../backend/query_finetune.jsonl'):
+def fine_tune_model(openai_client, jsonl_file='query_finetune.jsonl'):
     # Check if the JSONL file exists
     if not os.path.exists(jsonl_file):
         return "JSONL file not found.", None
@@ -58,7 +58,7 @@ def fine_tune_model(openai_client, jsonl_file='../backend/query_finetune.jsonl')
 
 
 def load_fine_tuned_model_id_from_file():
-    model_file_path = '../backend/fine_tuned_model.txt'
+    model_file_path = 'fine_tuned_model.txt'
     if os.path.exists(model_file_path):
         with open(model_file_path, 'r') as f:
             return f.read().strip()
