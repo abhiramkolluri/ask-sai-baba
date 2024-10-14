@@ -178,7 +178,7 @@ def handle_user_query(query, collection):
     for result in get_knowledge:
         search_result += f"Content: {result.get('content', 'N/A')}\\n"
 
-    jsonl_file = 'query_finetune.jsonl'
+    jsonl_file = '../backend/query_finetune.jsonl'
     jsonl_last_modified = os.path.getmtime(jsonl_file)
 
     # Check if fine-tuning is required
