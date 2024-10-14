@@ -8,6 +8,8 @@ import pymongo
 from openai import OpenAI
 import logging
 
+from backend.fine_tuning import load_fine_tuned_model_id_from_file
+
 # Configure logging
 logging.basicConfig(filename='embedding_generation.log', level=logging.ERROR)
 
@@ -153,15 +155,6 @@ def get_full_article(id, collection):
     return article
 
 
-def load_fine_tuned_model_id_from_file():
-    model_file_path = 'fine_tuned_model.txt'
-    if os.path.exists(model_file_path):
-        with open(model_file_path, 'r') as f:
-            return f.read().strip()
-    else:
-        return None
-
-
 def handle_user_query(query, collection):
     # Check if the collection is valid
     if not isinstance(collection, pymongo.collection.Collection):
@@ -178,53 +171,7 @@ def handle_user_query(query, collection):
     for result in get_knowledge:
         search_result += f"Content: {result.get('content', 'N/A')}\\n"
 
-    jsonl_file = '../backend/query_finetune.jsonl'
-    jsonl_last_modified = os.path.getmtime(jsonl_file)
-
-    # Check if fine-tuning is required
-    fine_tuning_required = False
-    list_models = openai_client.fine_tuning.jobs.list(limit=1)
-
-    if not list_models or not list_models.data:
-        fine_tuning_required = True
-        print("No previous models found. Creating new model.")
-    else:
-        last_model = list_models.data[0]
-        last_model_finished_at = last_model.finished_at
-
-        # If the last model finished time is None or the JSONL file has been modified since the last model finished
-        if last_model_finished_at is None or last_model_finished_at < jsonl_last_modified:
-            fine_tuning_required = True
-            print("JSONL file updated. Creating new model.")
-        else:
-            print("JSONL file hasn't been updated in a while. Using old model.")
-
-    if fine_tuning_required:
-        with open(jsonl_file, 'rb') as f:
-            response = openai_client.files.create(file=f, purpose='fine-tune')
-            file_id = response.id
-
-        response = openai_client.fine_tuning.jobs.create(training_file=file_id,model="gpt-3.5-turbo-0125")
-        job_id = response.id
-
-        # Wait until the job finishes
-        while True:
-            job_status = openai_client.fine_tuning.jobs.retrieve(job_id)
-            if job_status.status == 'succeeded':
-                fine_tuned_model_id = job_status.fine_tuned_model
-                print("Fine-tuned model created successfully.",
-                      fine_tuned_model_id)
-                with open('fine_tuned_model.txt', 'w') as model_file:
-                    model_file.write(fine_tuned_model_id)
-                break
-            elif job_status.status in ['failed', 'cancelled']:
-                print(f"Fine-tuning job {job_status.status}. Exiting loop.")
-                return "Fine-tuning job did not succeed.", ""
-
-        model_id = fine_tuned_model_id
-    else:
-        # Use the last fine-tuned model
-        model_id = load_fine_tuned_model_id_from_file()
+    model_id = load_fine_tuned_model_id_from_file()
 
     # Generate AI response with search context
     completion = openai_client.chat.completions.create(
