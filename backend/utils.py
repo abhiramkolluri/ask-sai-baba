@@ -239,7 +239,7 @@ def handle_user_query(query, collection):
 
 
 # Conduct query with retrieval of sources
-query = "who is sai baba?"
-response, source_information = handle_user_query(query, article_collection)
+#query = "who is sai baba?"
+#response, source_information = handle_user_query(query, article_collection)
 
-print(f"Response: {response}")
+#print(f"Response: {response}")
