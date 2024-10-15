@@ -152,6 +152,14 @@ def search(user_query, collection):
 def get_full_article(id, collection):
     article = collection.find_one(
         {"_id": id}, {"_id": 1, "title": 1, "content": 1, "location":1, "occasion": 1, "link": 1, "collection": 1})
+    # Convert to markdown format
+    markdown_article = f"# {article['title']}\n\n"
+    markdown_article += f"**Location:** {article['location']}\n\n"
+    markdown_article += f"**Occasion:** {article['occasion']}\n\n"
+    markdown_article += f"**Collection:** {article['collection']}\n\n"
+    markdown_article += f"**Link:** [{article['link']}]({article['link']})\n\n"
+    markdown_article += f"## Content:\n\n{article['content']}\n"
+    article['markdown_format'] = markdown_article
     return article
 
 
