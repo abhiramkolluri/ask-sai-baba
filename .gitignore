@@ -5,7 +5,6 @@ venv/
 
 /.idea
 /backend/__pycache__
-backend/fine_tuned_model.txt
 /Web scraper/__pycache__
 Database Vectorizer\.env
 /backend/embedding_generation.log
