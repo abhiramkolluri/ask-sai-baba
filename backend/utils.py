@@ -8,7 +8,7 @@ import pymongo
 from openai import OpenAI
 import logging
 
-from backend.fine_tuning import load_fine_tuned_model_id_from_file
+from fine_tuning import load_fine_tuned_model_id_from_file
 
 # Configure logging
 logging.basicConfig(filename='embedding_generation.log', level=logging.ERROR)

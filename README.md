@@ -59,7 +59,7 @@ Developing a website to make finding spiritual guidance easier for members of th
    - Create a new file named `.env` inside the backend directory.
    - Add the MongoDB URI with the credentials provided by the ADMIN:
      ```
-     MONGO_URI=mongodb+srv://<username>:<password>@ask-sai-vidya.rk7x0ch.mongodb.net/
+     MONGO_URI=mongodb+srv://<username>:<password>@ask-sai-vidya.rk7x0ch.mongodb.net/?retryWrites=true&w=majority&appName=ask-sai-vidya"
      ```
      Replace `<username>` and `<password>` with the credentials provided.
 
@@ -75,6 +75,7 @@ Developing a website to make finding spiritual guidance easier for members of th
         ```
 
     - Run the project:
+      - Note: You can run on any port number
       ```bash
       flask run --port=8000
       ```
@@ -93,3 +94,6 @@ You can now test the project's endpoints using Postman. Make sure the backend se
 ---
 
 By following these steps, you can successfully set up and run the Ask-Sai-Baba project on your local machine. If you have any issues, please consult the project's documentation or seek assistance from the project maintainers.
+
+## Test the Project on the Browser
+Open any browser and go to the URL http://localhost:8000/
