@@ -32,7 +32,7 @@ article_collection = db.articles
 config = configparser.ConfigParser()
 
 # setting up openai
-config.read('/Users/shreesriadibhatla/ask-sai-baba/backend/openai.ini')
+config.read('openai.ini')
 
 app.config['JWT_SECRET_KEY'] = secret_key
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
