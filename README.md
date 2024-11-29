@@ -92,7 +92,13 @@ Download Postman from https://www.postman.com/downloads/
 You can now test the project's endpoints using Postman. Make sure the backend server is running, and use the appropriate endpoints to test the project's functionality.
 
 ---
+## Test the Project on your browser
+   ```
+   run localhost:8000
+   ```
+If you used a different port to run the flask server, then mention the correct port number in the URL. By default flask runs on port 5000
 
+---
 By following these steps, you can successfully set up and run the Ask-Sai-Baba project on your local machine. If you have any issues, please consult the project's documentation or seek assistance from the project maintainers.
 
 ## Test the Project on the Browser
