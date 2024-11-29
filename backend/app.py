@@ -15,7 +15,7 @@ from utils import handle_user_query, search_browse, get_full_article, model
 app = Flask(__name__)
 
 # CORS configuration
-cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+cors = CORS(app)
 
 # loading the env variables
 load_dotenv()
@@ -76,6 +76,7 @@ def search_endpoint():
         return jsonify({'error': 'Request must contain JSON data'}), 400
 
 
+
 @app.route('/query', methods=['POST'])
 def query_sai_baba():
     try:
@@ -108,18 +109,25 @@ def get_article(id):
 
 @app.route('/register', methods=['POST'])
 def register():
-    email = request.form.get('email')
-    if db.users.find_one({'email': email}):
-        return jsonify({'message': 'User already exists'}), 409
-    else:
-        user_data = {
-            'first_name': request.form.get('first_name'),
-            'last_name': request.form.get('last_name'),
-            'email': email,
-            'password': request.form.get('password')
-        }
-        db.users.insert_one(user_data)
-        return jsonify({'message': 'User registered successfully'}), 201
+    data = request.json  
+    if 'email' not in data:
+        return jsonify({"error": "Email is required"}), 400
+    if 'password' not in data:
+        return jsonify({"error": "Password is required"}), 400
+
+    # Check if user already exists in the MongoDB
+    if db.users.find_one({'email': data['email']}):
+        return jsonify({'error': 'User already exists'}), 409
+
+    # Register the user
+    user_data = {
+        'first_name': data.get('first_name'),
+        'last_name': data.get('last_name'),
+        'email': data['email'],
+        'password': data['password']
+    }
+    db.users.insert_one(user_data)
+    return jsonify({'message': 'User registered successfully'}), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -141,3 +149,4 @@ def login():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
