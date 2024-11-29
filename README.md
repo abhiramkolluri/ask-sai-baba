@@ -101,6 +101,3 @@ If you used a different port to run the flask server, then mention the correct p
 
 ---
 By following these steps, you can successfully set up and run the Ask-Sai-Baba project on your local machine. If you have any issues, please consult the project's documentation or seek assistance from the project maintainers.
-
-## Test the Project on the Browser
-Open any browser and go to the URL http://localhost:8000/
