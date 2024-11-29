@@ -93,8 +93,9 @@ You can now test the project's endpoints using Postman. Make sure the backend se
 
 ---
 ## Test the Project on your browser
+   Open any browser and type the URL
    ```
-   run localhost:8000
+   localhost:8000
    ```
 If you used a different port to run the flask server, then mention the correct port number in the URL. By default flask runs on port 5000
 
