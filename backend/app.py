@@ -46,6 +46,7 @@ def index():
 
 
 def store_user_query(query_text, query_embedding):
+    
     # Get current timestamp
     timestamp = datetime.now()
     # Construct query data
@@ -55,7 +56,7 @@ def store_user_query(query_text, query_embedding):
         'timestamp': timestamp
     }
     # Insert query data into MongoDB collection
-    db.user_queries.insert_one(query_data)
+    #db.user_queries.insert_one(query_data)
 
 
 @app.route('/search', methods=['POST'])
@@ -66,7 +67,7 @@ def search_endpoint():
             # Generate query embedding
             query_embedding = model(query)
             # Store user query and embedding in the collection
-            store_user_query(query, query_embedding)
+            #store_user_query(query, query_embedding)
             # Proceed with search and return results
             results = search_browse(query_embedding, article_collection)
             return jsonify(results)
@@ -79,12 +80,14 @@ def search_endpoint():
 
 @app.route('/query', methods=['POST'])
 def query_sai_baba():
+
     try:
         data = request.json
         if not data or 'query' not in data:
             return jsonify({'error': 'Invalid request. Missing or malformed JSON data.'}), 400
 
         query = data.get('query')
+        
         if not query.strip():
             return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
 
