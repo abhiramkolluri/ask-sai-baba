@@ -7,6 +7,7 @@ import configparser
 import pymongo
 from openai import OpenAI
 import logging
+from datetime import datetime
 
 from fine_tuning import load_fine_tuned_model_id_from_file
 
@@ -190,8 +191,35 @@ def handle_user_query(query, collection):
             {"role": "user", "content": "Answer this user query: " + query + " with the following context: " + search_result}
         ]
     )
-    return completion.choices[0].message.content, search_result
+    response = completion.choices[0].message.content
+    store_new_user_query(query,response,get_knowledge)
+    return response, search_result
 
+def store_new_user_query(query_text, response, get_knowledge):
+    print("*** Inside Store new user query method ***")
+    print(response)
+    timestamp = datetime.now()
+    
+    citationString = ''
+    for knowledge in get_knowledge:
+        citationString += f"{knowledge['_id']} -- {knowledge['title']} -- {knowledge['score']}\n"
+
+    try: 
+        score = get_knowledge[0]['score']
+        if(score<0.75):
+            query_data = {
+                'query_text': query_text,
+                #'query_embedding': query_embedding,
+                'timestamp': timestamp,
+                'score': score,
+                'citation':citationString,
+                'response': response
+            }
+             #Insert query data into MongoDB collection
+            db.user_queries.insert_one(query_data)
+    except Exception as exp:
+        logging.error(f"Error generating embedding: {exp}")
+        
 
 # Conduct query with retrieval of sources
 #query = "who is sai baba?"
