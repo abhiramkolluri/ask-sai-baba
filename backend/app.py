@@ -129,7 +129,13 @@ def register():
         'email': data['email'],
         'password': data['password']
     }
-    db.users.insert_one(user_data)
+
+    try: 
+        db.users.insert_one(user_data)
+    except Exception as e:
+       print(f"An error occurred: {e}")  
+       return jsonify({'message': 'Registration unsuccessful'}), 400  
+
     return jsonify({'message': 'User registered successfully'}), 201
 
 
