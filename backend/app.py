@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 
 import binascii
+from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 from openai import OpenAI
 from utils import handle_user_query, search_browse, get_full_article, model
@@ -15,7 +16,7 @@ from utils import handle_user_query, search_browse, get_full_article, model
 app = Flask(__name__)
 
 # CORS configuration
-cors = CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # loading the env variables
 load_dotenv()
@@ -46,8 +47,7 @@ def index():
 
 
 def store_user_query(query_text, query_embedding):
-    
-    # Get current timestamp
+    # Get current timestamap
     timestamp = datetime.now()
     # Construct query data
     query_data = {
@@ -56,7 +56,7 @@ def store_user_query(query_text, query_embedding):
         'timestamp': timestamp
     }
     # Insert query data into MongoDB collection
-    #db.user_queries.insert_one(query_data)
+    db.user_queries.insert_one(query_data)
 
 
 @app.route('/search', methods=['POST'])
@@ -67,7 +67,7 @@ def search_endpoint():
             # Generate query embedding
             query_embedding = model(query)
             # Store user query and embedding in the collection
-            #store_user_query(query, query_embedding)
+            store_user_query(query, query_embedding)
             # Proceed with search and return results
             results = search_browse(query_embedding, article_collection)
             return jsonify(results)
@@ -77,17 +77,14 @@ def search_endpoint():
         return jsonify({'error': 'Request must contain JSON data'}), 400
 
 
-
 @app.route('/query', methods=['POST'])
 def query_sai_baba():
-
     try:
         data = request.json
         if not data or 'query' not in data:
             return jsonify({'error': 'Invalid request. Missing or malformed JSON data.'}), 400
 
         query = data.get('query')
-        
         if not query.strip():
             return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
 
@@ -112,31 +109,25 @@ def get_article(id):
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.json  
-    if 'email' not in data:
-        return jsonify({"error": "Email is required"}), 400
-    if 'password' not in data:
-        return jsonify({"error": "Password is required"}), 400
+    email = request.form.get('email')
+    if db.users.find_one({'email': email}):
+        return jsonify({'message': 'User already exists'}), 409
+    else:
 
-    # Check if user already exists in the MongoDB
-    if db.users.find_one({'email': data['email']}):
-        return jsonify({'error': 'User already exists'}), 409
+        hashed_password = bcrypt.hashpw(
+            request.form.get('password').encode('utf-8'),
+            bcrypt.gensalt()
+        )  
 
-    # Register the user
-    user_data = {
-        'first_name': data.get('first_name'),
-        'last_name': data.get('last_name'),
-        'email': data['email'],
-        'password': data['password']
-    }
-
-    try: 
+        user_data = {
+            'first_name': request.form.get('first_name'),
+            'last_name': request.form.get('last_name'),
+            'email': email,
+            'password': request.form.get('password')
+            
+        }
         db.users.insert_one(user_data)
-    except Exception as e:
-       print(f"An error occurred: {e}")  
-       return jsonify({'message': 'Registration unsuccessful'}), 400  
-
-    return jsonify({'message': 'User registered successfully'}), 201
+        return jsonify({'message': 'User registered successfully'}), 201
 
 
 @app.route('/login', methods=['POST'])
@@ -149,7 +140,7 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
     user = db.users.find_one({'email': email, 'password': password})
-    if user:
+    if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
         access_token = create_access_token(identity=email)
         return jsonify({'access_token': access_token}), 200
     else:
@@ -158,4 +149,3 @@ def login():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
