@@ -109,30 +109,49 @@ def get_article(id):
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.json
-    if 'email' not in data:
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
+
+    if request.is_json:
+        first_name = request.json.get('first_name')
+        last_name = request.json.get('last_name')
+        email = request.json.get('email')
+        password = request.json.get('password')
+
+    else:        
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+    if first_name is None or first_name == '':
+        return jsonify({"error": "First Name is required"}), 400
+    if last_name is None or last_name == '':
+        return jsonify({"error": "Last Name is required"}), 400
+    if email is None or email == '':
         return jsonify({"error": "Email is required"}), 400
-    if 'password' not in data:
+    if password is None or password == '':
         return jsonify({"error": "Password is required"}), 400
 
-    email = request.form.get('email')
     if db.users.find_one({'email': email}):
         return jsonify({'message': 'User already exists'}), 409
     else:
         try:
             hashed_password = bcrypt.hashpw(
-                request.form.get('password').encode('utf-8'),
+                password.encode('utf-8'),
                 bcrypt.gensalt()
             )
-
             user_data = {
-                'first_name': request.form.get('first_name'),
-                'last_name': request.form.get('last_name'),
+                'first_name': first_name,
+                'last_name': last_name,
                 'email': email,
-                'password': request.form.get('password')
+                'password': hashed_password
 
             }
             db.users.insert_one(user_data)
+
         except Exception as e:
             print(f"An error occurred: {e}")
             return jsonify({'message': 'Registration unsuccessful'}), 400
@@ -148,8 +167,9 @@ def login():
     else:
         email = request.form.get('email')
         password = request.form.get('password')
-    user = db.users.find_one({'email': email, 'password': password})
-    if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+    user = db.users.find_one({'email': email})
+    
+    if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
         access_token = create_access_token(identity=email)
         return jsonify({'access_token': access_token}), 200
     else:
