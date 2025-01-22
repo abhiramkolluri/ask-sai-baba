@@ -168,6 +168,8 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
     user = db.users.find_one({'email': email})
+    if(user == None):
+        return jsonify({'message': 'Incorrect email'}), 401
     
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
         access_token = create_access_token(identity=email)
