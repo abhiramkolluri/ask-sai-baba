@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager, create_access_token
 from dotenv import load_dotenv
 import configparser
 import os
+import bcrypt
 from datetime import datetime
 
 import binascii
@@ -15,7 +16,7 @@ from utils import handle_user_query, search_browse, get_full_article, model
 app = Flask(__name__)
 
 # CORS configuration
-cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+cors = CORS(app)
 
 # loading the env variables
 load_dotenv()
@@ -46,7 +47,7 @@ def index():
 
 
 def store_user_query(query_text, query_embedding):
-    # Get current timestamp
+    # Get current timestamap
     timestamp = datetime.now()
     # Construct query data
     query_data = {
@@ -55,7 +56,7 @@ def store_user_query(query_text, query_embedding):
         'timestamp': timestamp
     }
     # Insert query data into MongoDB collection
-    db.user_queries.insert_one(query_data)
+    # db.user_queries.insert_one(query_data)
 
 
 @app.route('/search', methods=['POST'])
@@ -66,7 +67,7 @@ def search_endpoint():
             # Generate query embedding
             query_embedding = model(query)
             # Store user query and embedding in the collection
-            store_user_query(query, query_embedding)
+            # store_user_query(query, query_embedding)
             # Proceed with search and return results
             results = search_browse(query_embedding, article_collection)
             return jsonify(results)
@@ -108,17 +109,52 @@ def get_article(id):
 
 @app.route('/register', methods=['POST'])
 def register():
-    email = request.form.get('email')
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
+
+    if request.is_json:
+        first_name = request.json.get('first_name')
+        last_name = request.json.get('last_name')
+        email = request.json.get('email')
+        password = request.json.get('password')
+
+    else:        
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+    if first_name is None or first_name == '':
+        return jsonify({"error": "First Name is required"}), 400
+    if last_name is None or last_name == '':
+        return jsonify({"error": "Last Name is required"}), 400
+    if email is None or email == '':
+        return jsonify({"error": "Email is required"}), 400
+    if password is None or password == '':
+        return jsonify({"error": "Password is required"}), 400
+
     if db.users.find_one({'email': email}):
         return jsonify({'message': 'User already exists'}), 409
     else:
-        user_data = {
-            'first_name': request.form.get('first_name'),
-            'last_name': request.form.get('last_name'),
-            'email': email,
-            'password': request.form.get('password')
-        }
-        db.users.insert_one(user_data)
+        try:
+            hashed_password = bcrypt.hashpw(
+                password.encode('utf-8'),
+                bcrypt.gensalt()
+            )
+            user_data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'password': hashed_password
+
+            }
+            db.users.insert_one(user_data)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return jsonify({'message': 'Registration unsuccessful'}), 400
         return jsonify({'message': 'User registered successfully'}), 201
 
 
@@ -131,8 +167,11 @@ def login():
     else:
         email = request.form.get('email')
         password = request.form.get('password')
-    user = db.users.find_one({'email': email, 'password': password})
-    if user:
+    user = db.users.find_one({'email': email})
+    if(user == None):
+        return jsonify({'message': 'Incorrect email'}), 401
+    
+    if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
         access_token = create_access_token(identity=email)
         return jsonify({'access_token': access_token}), 200
     else:

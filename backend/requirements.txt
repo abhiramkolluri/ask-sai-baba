@@ -31,3 +31,4 @@ tqdm==4.66.4
 typing_extensions==4.12.2
 Werkzeug==3.0.3
 tiktoken==0.8.0
+bcrypt===4.2.1
