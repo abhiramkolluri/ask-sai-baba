@@ -35,34 +35,64 @@ def generate_questions(content):
     return questions
 
 
+# Function to generate follow-up questions based on the previous question and response
+def generate_follow_up_questions(question, response):
+    prompt = (
+        f"Based on this question: '{question}' and its response: '{response}', "
+        "generate 3 natural follow-up questions that someone might ask to deepen their understanding. "
+        "The questions should be related to Sathya Sai Baba's teachings and spiritual concepts mentioned in the response. "
+        "Make the questions conversational and avoid using phrases like 'Could you explain' or 'What does Sai Baba say about'. "
+        "Each question should explore a different aspect or go deeper into the topic."
+    )
+
+    response = openai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are an AI designed to generate natural follow-up questions about spiritual topics."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    follow_ups = response.choices[0].message.content.strip().split('\n')
+    return follow_ups
+
+
 # Function to get responses from ChatGPT
 def get_responses(questions):
     responses = []
+    follow_up_questions = []
 
     for question in questions:
         response = openai_client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Use the appropriate model
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system",
                  "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba.I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it. Please avoid using words like \"user\" or \"query\" in your response."},
                 {"role": "user", "content": question}
             ]
         )
-        responses.append(response.choices[0].message.content)
+        response_text = response.choices[0].message.content
+        responses.append(response_text)
+        
+        # Generate follow-up questions for each Q&A pair
+        follow_ups = generate_follow_up_questions(question, response_text)
+        follow_up_questions.append(follow_ups)
 
-    return responses
+    return responses, follow_up_questions
 
 
 # Function to save the questions and answers to a JSONL file
-def save_to_jsonl(questions, responses, output_file):
-    with open(output_file, 'a') as file:  # Append mode
-        for question, response in zip(questions, responses):
+def save_to_jsonl(questions, responses, follow_up_questions, output_file):
+    with open(output_file, 'a') as file:
+        for question, response, follow_ups in zip(questions, responses, follow_up_questions):
             entry = {
                 "messages": [
                     {"role": "system",
                      "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba.I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it. Please avoid using words like \"user\" or \"query\" in your response."},
                     {"role": "user", "content": question},
-                    {"role": "assistant", "content": response}
+                    {"role": "assistant", "content": response},
+                    {"role": "system", "content": "Suggested follow-up questions:"},
+                    {"role": "assistant", "content": "\n".join(follow_ups)}
                 ]
             }
             file.write(json.dumps(entry) + "\n")
@@ -77,5 +107,5 @@ if __name__ == "__main__":
     for article in articles:
         content = article['content']  # Extract content for each article
         questions = generate_questions(content)  # Generate questions for this article
-        responses = get_responses(questions)  # Get responses for these questions
-        save_to_jsonl(questions, responses, 'query_finetune_enhanced.jsonl')  # Save to JSONL
+        responses, follow_up_questions = get_responses(questions)  # Get responses for these questions
+        save_to_jsonl(questions, responses, follow_up_questions, 'query_finetune_enhanced.jsonl')  # Save to JSONL

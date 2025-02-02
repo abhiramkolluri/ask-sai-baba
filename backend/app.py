@@ -174,8 +174,48 @@ def login():
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
         access_token = create_access_token(identity=email)
         return jsonify({'access_token': access_token}), 200
-    else:
+    else:       
         return jsonify({'message': 'Invalid credentials'}), 401
+
+
+@app.route('/generate-followup', methods=['POST'])
+def generate_followup():
+    try:
+        data = request.json
+        if not data or 'question' not in data or 'response' not in data:
+            return jsonify({'error': 'Invalid request. Missing question or response.'}), 400
+
+        question = data.get('question')
+        response = data.get('response')
+
+        # Generate follow-up questions
+        prompt = (
+            f"Based on this question: '{question}' and its response: '{response}', "
+            "generate 3 natural follow-up questions that someone might ask to deepen their understanding. "
+            "The questions should be related to Sathya Sai Baba's teachings and spiritual concepts mentioned in the response. "
+            "Make the questions conversational and avoid using phrases like 'Could you explain' or 'What does Sai Baba say about'. "
+            "Each question should explore a different aspect or go deeper into the topic."
+        )
+
+        completion = openai_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an AI designed to generate natural follow-up questions about spiritual topics."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        follow_up_questions = completion.choices[0].message.content.strip().split('\n')
+        
+        # Clean up the questions (remove any numbering or extra spaces)
+        follow_up_questions = [q.strip().lstrip('123.)-') for q in follow_up_questions if q.strip()]
+
+        return jsonify({
+            'followup_questions': follow_up_questions
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == "__main__":
