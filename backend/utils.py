@@ -8,6 +8,16 @@ import pymongo
 from openai import OpenAI
 import logging
 from datetime import datetime
+from typing import List, Dict, Any
+
+# Modern LangChain imports
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_community.vectorstores import MongoDBAtlasVectorSearch
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
 
 from fine_tuning import load_fine_tuned_model_id_from_file
 
@@ -23,9 +33,23 @@ client = MongoClient(os.getenv("MONGO_URI"))
 db = client.saibabasayings
 article_collection = db.articles
 
-# Set up OpenAI client
+# Set up OpenAI client (for backward compatibility)
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
 
+# Initialize LangChain components
+embeddings = OpenAIEmbeddings(
+    model="text-embedding-3-large",
+    api_key=config['OpenAI']['api_key']
+)
+
+# Set up vector store
+vector_store = MongoDBAtlasVectorSearch(
+    collection=article_collection,
+    embedding=embeddings,
+    index_name="vector_index",
+    embedding_key="content_embedding",
+    text_key="content"
+)
 
 # Function to count tokens using the tiktoken library
 def count_tokens(text):
@@ -33,36 +57,40 @@ def count_tokens(text):
     tokens = encoding.encode(text)
     return len(tokens)
 
-
 # Function to split text if it exceeds the token limit
 def split_text(text, max_tokens=8192):
-    encoding = tiktoken.encoding_for_model("text-embedding-ada-002")
-    tokens = encoding.encode(text)
-    chunks = [tokens[i:i + max_tokens] for i in range(0, len(tokens), max_tokens)]
-    return [encoding.decode(chunk) for chunk in chunks]
-
+    if not text:
+        return []
+    
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=max_tokens,
+        chunk_overlap=200,
+        length_function=count_tokens,
+    )
+    return text_splitter.split_text(text)
 
 def model(text):
-    return openai_client.embeddings.create(input=[text], model="text-embedding-3-large").data[0].embedding
-
+    """Generate embeddings using LangChain's OpenAI embeddings."""
+    try:
+        return embeddings.embed_query(text)
+    except Exception as e:
+        logging.error(f"Error in model function: {e}")
+        return None
 
 def get_embedding(text):
-    """Generate an embedding for the given text using OpenAI's API."""
-    # Check for valid input
+    """Generate an embedding for the given text using LangChain."""
     if not text or not isinstance(text, str):
         return None
 
     try:
         if count_tokens(text) > 8192:
             print("Text too long for document splitting it...")
-            # Split the text into chunks if it exceeds the limit
             text_chunks = split_text(text)
-            embeddings = [model(chunk) for chunk in text_chunks]
-            # You can decide how to handle embeddings: sum, average, or keep them separately
-            embedding = np.mean(embeddings, axis=0)  # Averaging embeddings
+            embeddings_list = [model(chunk) for chunk in text_chunks]
+            embedding = np.mean(embeddings_list, axis=0)
         else:
             embedding = model(text)
-        # Update existing document with new embedding
+        
         if isinstance(embedding, np.ndarray):
             embedding = embedding.tolist()
         return embedding
@@ -70,85 +98,61 @@ def get_embedding(text):
         logging.error(f"Error generating embedding: {e}")
         return None
 
-
 def search_browse(embedding, collection):
-    # Define the vector search pipeline
-    pipeline = [
-        {
-            "$vectorSearch": {
-                'index': 'vector_index',
-                "path": "content_embedding",
-                'queryVector': embedding,
-                'numCandidates': 50,
-                'limit': 5
-            }
-        },
-        {
-            "$project": {
-                "_id": 1,
-                "collection": 1,
-                "title": 1,  # Include the plot field
-                "content": 1,  # Include the title field
-                "score": {
-                    "$meta": "vectorSearchScore"  # Include the search score
-                },
-                "location": 1,
-                "occasion": 1,
-                "link": 1  # Include the article source link
-            }
-        }
-    ]
-    results = list(collection.aggregate(pipeline))
-    return results
+    """Search for similar documents using LangChain vector store."""
+    try:
+        # Use LangChain's similarity search
+        docs = vector_store.similarity_search_by_vector(
+            embedding=embedding,
+            k=5
+        )
+        
+        results = []
+        for doc in docs:
+            # Extract metadata and content
+            metadata = doc.metadata
+            results.append({
+                "_id": metadata.get("_id"),
+                "collection": metadata.get("collection"),
+                "title": metadata.get("title"),
+                "content": doc.page_content,
+                "score": metadata.get("score", 0.0),
+                "location": metadata.get("location"),
+                "occasion": metadata.get("occasion"),
+                "link": metadata.get("link")
+            })
+        
+        return results
+    except Exception as e:
+        logging.error(f"Error in search_browse: {e}")
+        return []
 
-
-def search(user_query, collection):
-    """
-    Perform a vector search in the MongoDB collection based on the user query.
-
-    Args:
-    user_query (str): The user's query string.
-    collection (MongoCollection): The MongoDB collection to search.
-
-    Returns:
-    list: A list of matching documents.
-    """
-
-    # Generate embedding for the user query
-    query_embedding = get_embedding(user_query)
-    if query_embedding is None:
-        return "Invalid query or embedding generation failed."
-
-    # Define the vector search pipeline
-    pipeline = [
-        {
-            "$vectorSearch": {
-                'index': 'vector_index',
-                "path": "content_embedding",
-                'queryVector': query_embedding,
-                'numCandidates': 50,
-                'limit': 5
-            }
-        },
-        {
-            "$project": {
-                "_id": 1,
-                "title": 1,
-                "content": 1,
-                "score": {
-                    "$meta": "vectorSearchScore"  # Include the search score
-                },
-                "location": 1,
-                "occasion": 1,
-                "link": 1  # Include the article source link
-            }
-        }
-    ]
-
-    # Execute the search
-    results = list(collection.aggregate(pipeline))
-    return results
-
+def search(user_query: str, collection) -> List[Dict[str, Any]]:
+    """Search for documents similar to the query using LangChain."""
+    try:
+        # Use LangChain's similarity search with score
+        docs_with_scores = vector_store.similarity_search_with_score(
+            query=user_query,
+            k=5
+        )
+        
+        results = []
+        for doc, score in docs_with_scores:
+            metadata = doc.metadata
+            results.append({
+                "_id": metadata.get("_id"),
+                "title": metadata.get("title"),
+                "content": doc.page_content,
+                "score": float(score),
+                "location": metadata.get("location"),
+                "occasion": metadata.get("occasion"),
+                "link": metadata.get("link")
+            })
+        
+        return results
+    except Exception as e:
+        logging.error(f"Error in search: {e}")
+        return []
 
 def get_full_article(id, collection):
     article = collection.find_one(
@@ -163,37 +167,124 @@ def get_full_article(id, collection):
     article['markdown_format'] = markdown_article
     return article
 
+def format_docs(docs):
+    """Format documents for context."""
+    return "\n\n".join(f"From discourse '{doc.get('title', 'Untitled')}': {doc.get('content', 'N/A')}" for doc in docs)
 
-def handle_user_query(query, collection):
-    # Check if the collection is valid
+def handle_user_query(query: str, collection):
+    """Handle user query using LangChain RAG chain."""
     if not isinstance(collection, pymongo.collection.Collection):
         return "Invalid collection. Please provide a valid MongoDB collection.", ""
 
-    # Retrieve knowledge from the collection
-    get_knowledge = search(query, collection)
+    try:
+        # Create the system prompt
+        system_prompt = """You are an AI assistant that provides concise spiritual guidance based on Sathya Sai Baba's teachings.
 
-    # Check if the search process was successful
-    if not isinstance(get_knowledge, list):
-        return "Search failed. Please try again later.", ""
+        Provide a clear, summarized response that:
+        1. Directly answers the user's question
+        2. Includes the most relevant key teachings from Sai Baba
+        3. Provides practical guidance when applicable
+        4. Keeps the response concise and focused (2-4 sentences maximum)
+        5. Only includes the most essential information
 
-    search_result = ''
-    for result in get_knowledge:
-        search_result += f"Content: {result.get('content', 'N/A')}\\n"
+        Base your response on the provided discourses but summarize the key points rather than providing detailed explanations.
 
-    model_id = load_fine_tuned_model_id_from_file()
+        If the question is not related to Sathya Sai Baba's teachings, respond with:
+        "I'm here to offer spiritual guidance based on Sai Baba's teachings. Please ask questions related to spirituality, personal growth, or Sai Baba's wisdom. If your question falls into one of the categories above, please ask the question again."
+        """
 
-    # Generate AI response with search context
-    completion = openai_client.chat.completions.create(
-        model=model_id,
-        messages=[
-            {"role": "system",
-             "content": "You are an AI assistant designed to help users find spiritual guidance from the teachings of Sathya Sai Baba. I do not have to mention \"According to Sai Baba\" for you to give me an answer. If a question is relevant to the teachings of Sathya Sai Baba, you can answer it. Please avoid using words like \"user\" or \"query\" in your response. If a user asks an irrelevant or out of topic question, then please answer them with, \"It seems like there might be a misunderstanding with the question you provided. I'm here to offer spiritual guidance based on the teachings of Sathya Sai Baba. If you have any questions related to spirituality, personal growth, or Sai Baba's teachings, feel free to ask!\""},
-            {"role": "user", "content": "Answer this user query: " + query + " with the following context: " + search_result}
-        ]
-    )
-    response = completion.choices[0].message.content
-    store_new_user_query(query,response,get_knowledge)
-    return response, search_result
+        # Create the prompt template
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", "Answer this query: {question}\n\nBased on the following discourses: {context}")
+        ])
+
+        # Set up the LLM
+        model_id = load_fine_tuned_model_id_from_file()
+        llm = ChatOpenAI(
+            model=model_id,
+            api_key=config['OpenAI']['api_key']
+        )
+
+        # Create the retrieval chain
+        retriever = vector_store.as_retriever(
+            search_type="similarity",
+            search_kwargs={"k": 5}
+        )
+
+        # Create the RAG chain
+        rag_chain = (
+            {"context": retriever | format_docs, "question": RunnablePassthrough()}
+            | prompt
+            | llm
+            | StrOutputParser()
+        )
+
+        # Execute the chain
+        response = rag_chain.invoke(query)
+        
+        # Get search results for storing
+        search_results = search(query, collection)
+        
+        # Store the query
+        store_new_user_query(query, response, search_results)
+        
+        return response, format_docs(search_results)
+        
+    except Exception as e:
+        logging.error(f"Error in handle_user_query: {e}")
+        # Fallback to direct OpenAI API if LangChain fails
+        return handle_user_query_fallback(query, collection)
+
+def handle_user_query_fallback(query: str, collection):
+    """Fallback to direct OpenAI API if LangChain fails."""
+    try:
+        # Get search results
+        search_results = search(query, collection)
+        
+        # Format context from search results
+        context = format_docs(search_results)
+        
+        # Create the system message
+        system_message = """You are an AI assistant that provides concise spiritual guidance based on Sathya Sai Baba's teachings.
+
+        Provide a clear, summarized response that:
+        1. Directly answers the user's question
+        2. Includes the most relevant key teachings from Sai Baba
+        3. Provides practical guidance when applicable
+        4. Keeps the response concise and focused (2-4 sentences maximum)
+        5. Only includes the most essential information
+
+        Base your response on the provided discourses but summarize the key points rather than providing detailed explanations.
+
+        If the question is not related to Sathya Sai Baba's teachings, respond with:
+        "I'm here to offer spiritual guidance based on Sai Baba's teachings. Please ask questions related to spirituality, personal growth, or Sai Baba's wisdom. If your question falls into one of the categories above, please ask the question again."
+        """
+
+        # Get the model ID
+        model_id = load_fine_tuned_model_id_from_file()
+        
+        # Make the API call
+        response = openai_client.chat.completions.create(
+            model=model_id,
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": query},
+                {"role": "assistant", "content": "Let me search through Sai Baba's teachings to answer your question."},
+                {"role": "user", "content": f"Here are some relevant discourses: {context}"}
+            ]
+        )
+        
+        # Extract the response
+        answer = response.choices[0].message.content
+        
+        # Store the query
+        store_new_user_query(query, answer, search_results)
+        
+        return answer, format_docs(search_results)
+    except Exception as e:
+        logging.error(f"Error in fallback handler: {e}")
+        return "An error occurred while processing your query. Please try again.", ""
 
 def store_new_user_query(query_text, response, get_knowledge):
     print("*** Inside Store new user query method ***")
@@ -205,21 +296,20 @@ def store_new_user_query(query_text, response, get_knowledge):
         citationString += f"{knowledge['_id']} -- {knowledge['title']} -- {knowledge['score']}\n"
 
     try: 
-        score = get_knowledge[0]['score']
-        if(score<0.75):
-            query_data = {
-                'query_text': query_text,
-                #'query_embedding': query_embedding,
-                'timestamp': timestamp,
-                'score': score,
-                'citation':citationString,
-                'response': response
-            }
-             #Insert query data into MongoDB collection
-            db.user_queries.insert_one(query_data)
+        if get_knowledge:
+            score = get_knowledge[0]['score']
+            if(score<0.75):
+                query_data = {
+                    'query_text': query_text,
+                    'timestamp': timestamp,
+                    'score': score,
+                    'citation': citationString,
+                    'response': response
+                }
+                # Insert query data into MongoDB collection
+                db.user_queries.insert_one(query_data)
     except Exception as exp:
-        logging.error(f"Error generating embedding: {exp}")
-        
+        logging.error(f"Error storing user query: {exp}")
 
 # Conduct query with retrieval of sources
 #query = "who is sai baba?"
