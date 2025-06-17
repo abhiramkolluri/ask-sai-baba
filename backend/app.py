@@ -10,7 +10,7 @@ from datetime import datetime
 import binascii
 from pymongo import MongoClient
 from openai import OpenAI
-from utils import handle_user_query, search_browse, get_full_article, model
+from utils import handle_user_query, search_browse, get_full_article, model, clear_conversation_memory
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -88,9 +88,23 @@ def query_sai_baba():
         if not query.strip():
             return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
 
-        # Call handle_user_query function to get response and source information
-        response, source_information = handle_user_query(query, article_collection)
-        return jsonify({'response': response}), 200
+        # Get optional session and user parameters for memory
+        session_id = data.get('session_id')
+        user_id = data.get('user_id')
+
+        # Call handle_user_query function with memory support
+        response, source_information = handle_user_query(
+            query, 
+            article_collection, 
+            session_id=session_id, 
+            user_id=user_id
+        )
+        
+        return jsonify({
+            'response': response,
+            'session_id': session_id,
+            'sources': source_information
+        }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -176,6 +190,75 @@ def login():
         return jsonify({'access_token': access_token}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
+
+
+@app.route('/conversation/clear', methods=['POST'])
+def clear_conversation():
+    """Clear conversation memory for a session."""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request must contain JSON data'}), 400
+
+        session_id = data.get('session_id')
+        user_id = data.get('user_id')
+        
+        if not session_id:
+            return jsonify({'error': 'session_id is required'}), 400
+
+        success = clear_conversation_memory(session_id, user_id)
+        
+        if success:
+            return jsonify({'message': 'Conversation cleared successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to clear conversation'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/conversation/history', methods=['GET'])
+def get_conversation_history():
+    """Get conversation history for a session."""
+    try:
+        session_id = request.args.get('session_id')
+        user_id = request.args.get('user_id')
+        
+        if not session_id:
+            return jsonify({'error': 'session_id is required'}), 400
+
+        # Get conversation from MongoDB
+        conversation_doc = db.conversations.find_one({
+            "session_id": session_id,
+            "user_id": user_id
+        })
+        
+        if conversation_doc:
+            # Format messages for response
+            messages = []
+            for msg in conversation_doc.get("messages", []):
+                messages.append({
+                    "type": msg["type"],
+                    "content": msg["content"],
+                    "timestamp": msg["timestamp"].isoformat() if isinstance(msg["timestamp"], datetime) else str(msg["timestamp"])
+                })
+            
+            return jsonify({
+                'session_id': session_id,
+                'user_id': user_id,
+                'messages': messages,
+                'last_updated': conversation_doc["last_updated"].isoformat() if isinstance(conversation_doc["last_updated"], datetime) else str(conversation_doc["last_updated"])
+            }), 200
+        else:
+            return jsonify({
+                'session_id': session_id,
+                'user_id': user_id,
+                'messages': [],
+                'last_updated': None
+            }), 200
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == "__main__":

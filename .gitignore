@@ -9,3 +9,4 @@ venv/
 Database Vectorizer\.env
 /backend/embedding_generation.log
 /EmbeddingGenerator/embeddings.json
+.qodo

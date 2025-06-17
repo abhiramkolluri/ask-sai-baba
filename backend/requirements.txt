@@ -21,6 +21,7 @@ langchain==0.3.24
 langchain-community==0.3.12
 langchain-core==0.3.56
 langchain-openai==0.3.14
+langchain-mongodb==0.6.2
 MarkupSafe==2.1.5
 openai>=1.68.2,<2.0.0
 pycodestyle==2.11.1
