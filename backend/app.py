@@ -1,11 +1,13 @@
 from flask_cors import CORS
 from flask import Flask, render_template, request, jsonify
-from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from dotenv import load_dotenv
 import configparser
 import os
 import bcrypt
 from datetime import datetime
+from bson import ObjectId
+from generate_training import summarize_question as generate_summary
 
 import binascii
 from pymongo import MongoClient
@@ -29,6 +31,7 @@ client = MongoClient(os.getenv("MONGO_URI"))
 
 db = client.saibabasayings
 article_collection = db.articles
+chat_collection = db.chats  # New collection for storing chat threads
 
 config = configparser.ConfigParser()
 
@@ -178,5 +181,191 @@ def login():
         return jsonify({'message': 'Invalid credentials'}), 401
 
 
+# New endpoints for chat management
+@app.route('/chats', methods=['GET'])
+@jwt_required()
+def get_user_chats():
+    """Get all chat threads for the logged-in user"""
+    try:
+        user_email = get_jwt_identity()
+        
+        # Find all chat threads for this user
+        chat_threads = list(chat_collection.find(
+            {'user_email': user_email},
+            {'_id': 1, 'title': 1, 'timestamp': 1, 'messages': 1}
+        ).sort('timestamp', -1))
+        
+        # Convert ObjectId to string for JSON serialization
+        for thread in chat_threads:
+            thread['id'] = str(thread['_id'])
+            thread['_id'] = str(thread['_id'])
+            thread['timestamp'] = thread['timestamp'].isoformat()
+        
+        return jsonify(chat_threads), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<thread_id>', methods=['GET'])
+@jwt_required()
+def get_chat_thread(thread_id):
+    """Get a specific chat thread with all its messages"""
+    try:
+        user_email = get_jwt_identity()
+        
+        # Find the specific chat thread for this user
+        thread = chat_collection.find_one({
+            '_id': ObjectId(thread_id),
+            'user_email': user_email
+        })
+        
+        if not thread:
+            return jsonify({'error': 'Chat thread not found'}), 404
+        
+        # Convert ObjectId to string for JSON serialization
+        thread['id'] = str(thread['_id'])
+        thread['_id'] = str(thread['_id'])
+        thread['timestamp'] = thread['timestamp'].isoformat()
+        
+        return jsonify(thread), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats', methods=['POST'])
+@jwt_required()
+def create_chat_thread():
+    """Create a new chat thread"""
+    try:
+        user_email = get_jwt_identity()
+        data = request.json
+        
+        if not data or 'title' not in data:
+            return jsonify({'error': 'Title is required'}), 400
+        
+        thread_data = {
+            'user_email': user_email,
+            'title': data['title'],
+            'timestamp': datetime.now(),
+            'messages': []
+        }
+        
+        result = chat_collection.insert_one(thread_data)
+        thread_data['id'] = str(result.inserted_id)
+        thread_data['_id'] = str(result.inserted_id)
+        thread_data['timestamp'] = thread_data['timestamp'].isoformat()
+        
+        return jsonify(thread_data), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<thread_id>/messages', methods=['POST'])
+@jwt_required()
+def add_message_to_thread(thread_id):
+    """Add a new message to a chat thread"""
+    try:
+        user_email = get_jwt_identity()
+        data = request.json
+        
+        if not data or 'question' not in data or 'reply' not in data:
+            return jsonify({'error': 'Question and reply are required'}), 400
+        
+        # Verify the thread belongs to the user
+        thread = chat_collection.find_one({
+            '_id': ObjectId(thread_id),
+            'user_email': user_email
+        })
+        
+        if not thread:
+            return jsonify({'error': 'Chat thread not found'}), 404
+        
+        # Add the new message
+        message = {
+            'question': data['question'],
+            'reply': data['reply'],
+            'timestamp': datetime.now()
+        }
+        
+        # Update the thread with the new message
+        chat_collection.update_one(
+            {'_id': ObjectId(thread_id), 'user_email': user_email},
+            {
+                '$push': {'messages': message},
+                '$set': {'last_updated': datetime.now()}
+            }
+        )
+        
+        return jsonify({'message': 'Message added successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<thread_id>', methods=['PUT'])
+@jwt_required()
+def update_chat_thread(thread_id):
+    """Update a chat thread (e.g., title, messages)"""
+    try:
+        user_email = get_jwt_identity()
+        data = request.json
+        
+        # Verify the thread belongs to the user
+        thread = chat_collection.find_one({
+            '_id': ObjectId(thread_id),
+            'user_email': user_email
+        })
+        
+        if not thread:
+            return jsonify({'error': 'Chat thread not found'}), 404
+        
+        # Update fields
+        update_data = {}
+        if 'title' in data:
+            update_data['title'] = data['title']
+        if 'messages' in data:
+            update_data['messages'] = data['messages']
+        
+        update_data['last_updated'] = datetime.now()
+        
+        chat_collection.update_one(
+            {'_id': ObjectId(thread_id), 'user_email': user_email},
+            {'$set': update_data}
+        )
+        
+        return jsonify({'message': 'Chat thread updated successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<thread_id>', methods=['DELETE'])
+@jwt_required()
+def delete_chat_thread(thread_id):
+    """Delete a chat thread"""
+    try:
+        user_email = get_jwt_identity()
+        
+        # Verify the thread belongs to the user and delete it
+        result = chat_collection.delete_one({
+            '_id': ObjectId(thread_id),
+            'user_email': user_email
+        })
+        
+        if result.deleted_count == 0:
+            return jsonify({'error': 'Chat thread not found'}), 404
+        
+        return jsonify({'message': 'Chat thread deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/summarize-question', methods=['POST'])
+def summarize_question_endpoint():
+    data = request.json
+    if not data or 'question' not in data:
+        return jsonify({'error': 'Question is required'}), 400
+    
+    summary = generate_summary(data['question'])
+    return jsonify({'summary': summary}), 200
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
