@@ -11,8 +11,7 @@ openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
 def load_articles(file_path):
     with open(file_path, 'r') as file:
         return json.load(file)
-
-
+        
 # Function to generate questions based on the article content
 def generate_questions(content):
     # Use OpenAI to generate questions based on the context of the article
@@ -66,6 +65,22 @@ def save_to_jsonl(questions, responses, output_file):
                 ]
             }
             file.write(json.dumps(entry) + "\n")
+
+# Function to summarize the question for the saved chats of a user
+
+def summarize_question(question):
+    prompt = (
+        f"Summarize the following question in 6 words or less: {question}"
+    )
+
+    response = openai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are an AI designed to summarize questions for the saved chats of a user. The question is a question asked by the user to Sathya Sai Baba. The summary should be a single sentence that captures the essence of the question, and should be a declarative sentence. Do not punctuate the summary unless the format of the summary is a question. Summarize the question in 6 words or less."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response.choices[0].message.content.strip()
 
 
 # Main execution

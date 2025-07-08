@@ -206,7 +206,6 @@ def format_docs(docs):
     
     return "\n\n".join(formatted_docs)
 
-
 def get_or_create_conversation_memory(session_id: str, user_id: str = None) -> ConversationBufferWindowMemory:
     """Get existing conversation memory or create a new one."""
     try:
@@ -289,8 +288,9 @@ def clear_conversation_memory(session_id: str, user_id: str = None):
         logging.error(f"Error clearing conversation memory: {e}")
         return False
 
-def handle_user_query(query: str, collection, session_id: str = None, user_id: str = None):
+def handle_user_query(query: str, collection, session_id: str = None, user_id: str = None, user_email: str = None):
     """Handle user query using LangChain RAG chain with memory support."""
+    # Check if the collection is valid
     if not isinstance(collection, pymongo.collection.Collection):
         return "Invalid collection. Please provide a valid MongoDB collection.", ""
 
@@ -398,7 +398,7 @@ def handle_user_query(query: str, collection, session_id: str = None, user_id: s
         search_results = search(query, collection)
         
         # Store the query
-        store_new_user_query(query, response, search_results)
+        store_new_user_query(query, response, search_results, user_email)
         
         return response, format_docs(search_results)
         
@@ -450,14 +450,14 @@ def handle_user_query_fallback(query: str, collection):
         answer = response.choices[0].message.content
         
         # Store the query
-        store_new_user_query(query, answer, search_results)
+        store_new_user_query(query, answer, search_results, user_email)
         
         return answer, format_docs(search_results)
     except Exception as e:
         logging.error(f"Error in fallback handler: {e}")
         return "An error occurred while processing your query. Please try again.", ""
 
-def store_new_user_query(query_text, response, get_knowledge):
+def store_new_user_query(query_text, response, get_knowledge, user_email=None):
     print("*** Inside Store new user query method ***")
     print(response)
     timestamp = datetime.now()
@@ -477,6 +477,11 @@ def store_new_user_query(query_text, response, get_knowledge):
                     'citation': citationString,
                     'response': response
                 }
+                
+                # Add user email if provided
+                if user_email:
+                    query_data['user_email'] = user_email
+                
                 # Insert query data into MongoDB collection
                 db.user_queries.insert_one(query_data)
     except Exception as exp:
