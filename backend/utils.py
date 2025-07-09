@@ -3,6 +3,7 @@ import tiktoken
 from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
+from bson import ObjectId
 import configparser
 import pymongo
 from openai import OpenAI
@@ -32,7 +33,11 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
 # Configure logging
-logging.basicConfig(filename='embedding_generation.log', level=logging.ERROR)
+logging.basicConfig(
+    filename='embedding_generation.log', 
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 load_dotenv()
 config = configparser.ConfigParser()
@@ -68,6 +73,26 @@ vector_store = MongoDBAtlasVectorSearch(
     embedding_key="content_embedding",
     text_key="content"
 )
+
+def check_vector_store_health():
+    """Check if the vector store is properly initialized and has data."""
+    try:
+        # Check if collection has documents
+        doc_count = article_collection.count_documents({})
+        logging.info(f"Collection has {doc_count} documents")
+        
+        # Check if documents have embeddings
+        embedding_count = article_collection.count_documents({"content_embedding": {"$exists": True}})
+        logging.info(f"Collection has {embedding_count} documents with embeddings")
+        
+        # Try a simple search to test the vector store
+        test_docs = vector_store.similarity_search("test", k=1)
+        logging.info(f"Vector store test search returned {len(test_docs)} documents")
+        
+        return doc_count > 0 and embedding_count > 0 and len(test_docs) > 0
+    except Exception as e:
+        logging.error(f"Vector store health check failed: {e}")
+        return False
 
 # Function to count tokens using the tiktoken library
 def count_tokens(text):
@@ -117,13 +142,31 @@ def get_embedding(text):
         return None
 
 def search_browse(embedding, collection):
-    """Search for similar documents using LangChain vector store."""
+    """Search for similar documents using LangChain vector store with fallback mechanisms."""
     try:
-        # Use LangChain's similarity search
+        # Validate embedding
+        if embedding is None:
+            logging.error("Embedding is None, cannot perform vector search")
+            raise ValueError("Embedding is None")
+        
+        if not isinstance(embedding, (list, np.ndarray)):
+            logging.error(f"Invalid embedding type: {type(embedding)}")
+            raise ValueError(f"Invalid embedding type: {type(embedding)}")
+        
+        # Convert numpy array to list if needed
+        if isinstance(embedding, np.ndarray):
+            embedding = embedding.tolist()
+        
+        logging.info(f"Attempting vector search with embedding length: {len(embedding)}")
+        
+        # Use LangChain's similarity search with better parameters
         docs = vector_store.similarity_search_by_vector(
             embedding=embedding,
-            k=5
+            k=10,  # Get more results initially
+            search_kwargs={"k": 20}  # Search more candidates
         )
+        
+        logging.info(f"Vector search returned {len(docs)} documents")
         
         results = []
         for doc in docs:
@@ -140,19 +183,124 @@ def search_browse(embedding, collection):
                 "link": metadata.get("link")
             })
         
+        # If we got results, return them
+        if results:
+            logging.info(f"Vector search successful, returning {len(results)} results")
+            return results[:5]  # Return top 5 results
+        
+        # Fallback 1: Try with different search parameters
+        logging.info("Vector search returned no results, trying with different parameters")
+        try:
+            docs = vector_store.similarity_search_by_vector(
+                embedding=embedding,
+                k=5,
+                search_kwargs={"k": 50, "score_threshold": 0.1}  # Lower threshold
+            )
+            
+            results = []
+            for doc in docs:
+                metadata = doc.metadata
+                results.append({
+                    "_id": metadata.get("_id"),
+                    "collection": metadata.get("collection"),
+                    "title": metadata.get("title"),
+                    "content": doc.page_content,
+                    "score": metadata.get("score", 0.0),
+                    "location": metadata.get("location"),
+                    "occasion": metadata.get("occasion"),
+                    "link": metadata.get("link")
+                })
+            
+            if results:
+                logging.info(f"Fallback search successful, returning {len(results)} results")
+                return results
+        except Exception as fallback1_error:
+            logging.error(f"Fallback 1 failed: {fallback1_error}")
+        
+        # Fallback 2: Get random articles from the database
+        logging.info("Vector search by embedding failed, getting random articles as fallback")
+        random_articles = list(collection.aggregate([
+            {"$sample": {"size": 5}},
+            {"$project": {
+                "_id": 1,
+                "title": 1,
+                "content": 1,
+                "location": 1,
+                "occasion": 1,
+                "link": 1,
+                "collection": 1
+            }}
+        ]))
+        
+        for article in random_articles:
+            results.append({
+                "_id": article.get("_id"),
+                "collection": article.get("collection", ""),
+                "title": article.get("title", "Untitled"),
+                "content": article.get("content", "")[:500],  # Limit content length
+                "score": 0.5,  # Default score for fallback results
+                "location": article.get("location", ""),
+                "occasion": article.get("occasion", ""),
+                "link": article.get("link", "")
+            })
+        
         return results
+        
     except Exception as e:
         logging.error(f"Error in search_browse: {e}")
-        return []
+        
+        # Final fallback: Get random articles directly from MongoDB
+        try:
+            logging.info("All search_browse methods failed, using direct MongoDB fallback")
+            random_articles = list(collection.aggregate([
+                {"$sample": {"size": 5}},
+                {"$project": {
+                    "_id": 1,
+                    "title": 1,
+                    "content": 1,
+                    "location": 1,
+                    "occasion": 1,
+                    "link": 1,
+                    "collection": 1
+                }}
+            ]))
+            
+            results = []
+            for article in random_articles:
+                results.append({
+                    "_id": article.get("_id"),
+                    "collection": article.get("collection", ""),
+                    "title": article.get("title", "Untitled"),
+                    "content": article.get("content", "")[:500],
+                    "score": 0.5,
+                    "location": article.get("location", ""),
+                    "occasion": article.get("occasion", ""),
+                    "link": article.get("link", "")
+                })
+            
+            return results
+        except Exception as fallback_error:
+            logging.error(f"Final search_browse fallback also failed: {fallback_error}")
+            return []
 
 def search(user_query: str, collection) -> List[Dict[str, Any]]:
-    """Search for documents similar to the query using LangChain."""
+    """Search for documents similar to the query using LangChain with fallback mechanisms."""
     try:
-        # Use LangChain's similarity search with score
+        # Validate query
+        if not user_query or not isinstance(user_query, str):
+            logging.error(f"Invalid query: {user_query}")
+            raise ValueError(f"Invalid query: {user_query}")
+        
+        logging.info(f"Attempting vector search for query: {user_query[:50]}...")
+        
+        # Use LangChain's similarity search with score and better parameters
         docs_with_scores = vector_store.similarity_search_with_score(
             query=user_query,
-            k=5
+            k=10,  # Get more results initially
+            search_kwargs={"k": 20}  # Search more candidates
         )
+        
+        logging.info(f"Vector search returned {len(docs_with_scores)} documents")
         
         results = []
         for doc, score in docs_with_scores:
@@ -167,10 +315,123 @@ def search(user_query: str, collection) -> List[Dict[str, Any]]:
                 "link": metadata.get("link")
             })
         
+        # If we got results, return them
+        if results:
+            logging.info(f"Vector search successful, returning {len(results)} results")
+            return results[:5]  # Return top 5 results
+        
+        # Fallback 1: Try with different search parameters
+        logging.info(f"No results for query: {user_query}, trying with different parameters")
+        try:
+            docs_with_scores = vector_store.similarity_search_with_score(
+                query=user_query,
+                k=5,
+                search_kwargs={"k": 50, "score_threshold": 0.1}  # Lower threshold
+            )
+            
+            for doc, score in docs_with_scores:
+                metadata = doc.metadata
+                results.append({
+                    "_id": metadata.get("_id"),
+                    "title": metadata.get("title"),
+                    "content": doc.page_content,
+                    "score": float(score),
+                    "location": metadata.get("location"),
+                    "occasion": metadata.get("occasion"),
+                    "link": metadata.get("link")
+                })
+            
+            if results:
+                logging.info(f"Fallback search successful, returning {len(results)} results")
+                return results
+        except Exception as fallback1_error:
+            logging.error(f"Fallback 1 failed: {fallback1_error}")
+        
+        # Fallback 2: Try with a more generic search
+        logging.info(f"No results for query: {user_query}, trying generic fallback search")
+        fallback_query = "spiritual guidance teachings wisdom"
+        docs_with_scores = vector_store.similarity_search_with_score(
+            query=fallback_query,
+            k=5
+        )
+        
+        for doc, score in docs_with_scores:
+            metadata = doc.metadata
+            results.append({
+                "_id": metadata.get("_id"),
+                "title": metadata.get("title"),
+                "content": doc.page_content,
+                "score": float(score),
+                "location": metadata.get("location"),
+                "occasion": metadata.get("occasion"),
+                "link": metadata.get("link")
+            })
+        
+        if results:
+            return results
+        
+        # Fallback 3: Get random articles from the database
+        logging.info("Vector search failed, getting random articles as fallback")
+        random_articles = list(collection.aggregate([
+            {"$sample": {"size": 5}},
+            {"$project": {
+                "_id": 1,
+                "title": 1,
+                "content": 1,
+                "location": 1,
+                "occasion": 1,
+                "link": 1,
+                "collection": 1
+            }}
+        ]))
+        
+        for article in random_articles:
+            results.append({
+                "_id": article.get("_id"),
+                "title": article.get("title", "Untitled"),
+                "content": article.get("content", "")[:500],  # Limit content length
+                "score": 0.5,  # Default score for fallback results
+                "location": article.get("location", ""),
+                "occasion": article.get("occasion", ""),
+                "link": article.get("link", "")
+            })
+        
         return results
+        
     except Exception as e:
         logging.error(f"Error in search: {e}")
-        return []
+        
+        # Final fallback: Get random articles directly from MongoDB
+        try:
+            logging.info("All search methods failed, using direct MongoDB fallback")
+            random_articles = list(collection.aggregate([
+                {"$sample": {"size": 5}},
+                {"$project": {
+                    "_id": 1,
+                    "title": 1,
+                    "content": 1,
+                    "location": 1,
+                    "occasion": 1,
+                    "link": 1
+                }}
+            ]))
+            
+            results = []
+            for article in random_articles:
+                results.append({
+                    "_id": article.get("_id"),
+                    "title": article.get("title", "Untitled"),
+                    "content": article.get("content", "")[:500],
+                    "score": 0.5,
+                    "location": article.get("location", ""),
+                    "occasion": article.get("occasion", ""),
+                    "link": article.get("link", "")
+                })
+            
+            return results
+        except Exception as fallback_error:
+            logging.error(f"Final search fallback also failed: {fallback_error}")
+            return []
 
 def get_full_article(id, collection):
     article = collection.find_one(
@@ -188,6 +449,12 @@ def get_full_article(id, collection):
 def format_docs(docs):
     """Format documents for context."""
     formatted_docs = []
+    
+    # Handle empty or None docs
+    if not docs:
+        logging.warning("No documents provided to format_docs, returning default message")
+        return "From discourse 'General Spiritual Guidance': This discourse provides general spiritual guidance and wisdom from Sai Baba's teachings."
+    
     for doc in docs:
         if hasattr(doc, 'page_content') and hasattr(doc, 'metadata'):
             # LangChain Document object
@@ -203,6 +470,10 @@ def format_docs(docs):
             # Generate a descriptive sentence about how this source answers the query
             description = f"This discourse '{title}' provides insights about the topic by discussing {content[:100]}..."
             formatted_docs.append(f"From discourse '{title}': {description}")
+    
+    # Ensure we always return something meaningful
+    if not formatted_docs:
+        return "From discourse 'General Spiritual Guidance': This discourse provides general spiritual guidance and wisdom from Sai Baba's teachings."
     
     return "\n\n".join(formatted_docs)
 
@@ -288,7 +559,7 @@ def clear_conversation_memory(session_id: str, user_id: str = None):
         logging.error(f"Error clearing conversation memory: {e}")
         return False
 
-def handle_user_query(query: str, collection, session_id: str = None, user_id: str = None, user_email: str = None):
+def handle_user_query(query: str, collection, session_id: str = None, user_id: str = None, user_email: str = None, search_results: List[Dict[str, Any]] = None):
     """Handle user query using LangChain RAG chain with memory support."""
     # Check if the collection is valid
     if not isinstance(collection, pymongo.collection.Collection):
@@ -315,27 +586,19 @@ def handle_user_query(query: str, collection, session_id: str = None, user_id: s
             memory = get_or_create_conversation_memory(session_id, user_id)
 
         # Create the system prompt with memory awareness
-        system_prompt = """You are an AI assistant that provides concise spiritual guidance based on Sathya Sai Baba's teachings.
+        system_prompt = """You are an AI assistant that provides spiritual guidance based on Sathya Sai Baba's teachings.
 
-        Provide a clear, summarized response that:
-        1. Directly answers the user's question
-        2. Includes the most relevant key teachings from Sai Baba
-        3. Provides practical guidance when applicable
-        4. Keeps the response concise and focused (2-4 sentences maximum)
-        5. Only includes the most essential information
-        6. If there's conversation history, acknowledge previous discussions when relevant
+        Your response should be simple and direct:
+        "Here are some discourses where you can start learning about the topic:"
 
-        For each source provided, include:
-        1. A descriptive sentence explaining how that source answers the user's question
-        2. The title of the discourse
+        Then list ONLY the actual titles of the discourses provided to you, one per line with a dash, like this:
+        - [actual title from the provided discourses]
+        - [actual title from the provided discourses]
+        - [actual title from the provided discourses]
 
-        Format each source as:
-        "From discourse '[title]': [description of how this source answers the question]"
+        Do not provide any descriptions, summaries, or quotes. Do not use placeholder text like "[title of discourse 1]". Use the real titles from the discourses provided.
 
-        Base your response on the provided discourses but summarize the key points rather than providing detailed explanations.
-
-        If the question is not related to Sathya Sai Baba's teachings, respond with:
-        "I'm here to offer spiritual guidance based on Sai Baba's teachings. Please ask questions related to spirituality, personal growth, or Sai Baba's wisdom. If your question falls into one of the categories above, please ask the question again."
+        Always provide spiritual guidance based on the provided discourses, even if the question seems unrelated. Use the discourses to offer relevant wisdom and insights that can help the user in their spiritual journey.
         """
 
         # Create the prompt template with memory support
@@ -357,36 +620,51 @@ def handle_user_query(query: str, collection, session_id: str = None, user_id: s
             api_key=config['OpenAI']['api_key']
         )
 
-        # Create the retrieval chain
-        retriever = vector_store.as_retriever(
-            search_type="similarity",
-            search_kwargs={"k": 5}
-        )
-
-        # Create the RAG chain with memory support
+        # Use provided search results or generate them if not provided
+        if search_results is None:
+            query_embedding = model(query)
+            search_results = search_browse(query_embedding, collection)
+        
+        # Ensure we have at least 5 results
+        search_results = ensure_minimum_results(search_results, collection, min_count=5)
+        
+        # Format the search results for the prompt
+        context = format_docs(search_results)
+        
+        # Create the prompt template with memory support
         if memory and memory.chat_memory.messages:
             # Format chat history for the prompt
             chat_history = memory.buffer
-            rag_chain = (
-                {
-                    "context": retriever | format_docs, 
-                    "question": RunnablePassthrough(),
-                    "chat_history": lambda x: chat_history
-                }
-                | prompt
-                | llm
-                | StrOutputParser()
-            )
+            prompt = ChatPromptTemplate.from_messages([
+                ("system", system_prompt),
+                ("human", "Previous conversation:\n{chat_history}\n\nNow answer this query: {question}\n\nBased on the following discourses: {context}")
+            ])
+            
+            # Execute the chain with memory
+            response = prompt.invoke({
+                "question": query,
+                "context": context,
+                "chat_history": chat_history
+            })
         else:
-            rag_chain = (
-                {"context": retriever | format_docs, "question": RunnablePassthrough()}
-                | prompt
-                | llm
-                | StrOutputParser()
-            )
-
-        # Execute the chain
-        response = rag_chain.invoke(query)
+            prompt = ChatPromptTemplate.from_messages([
+                ("system", system_prompt),
+                ("human", "Answer this query: {question}\n\nBased on the following discourses: {context}")
+            ])
+            
+            # Execute the chain without memory
+            response = prompt.invoke({
+                "question": query,
+                "context": context
+            })
+        
+        # Get the response from the LLM
+        response = llm.invoke(response).content
+        
+        # Post-process response to remove misunderstanding messages
+        if "misunderstanding" in response.lower() or "seems like there might be" in response.lower():
+            # Replace with spiritual guidance based on the discourses
+            response = "Based on Sai Baba's teachings, here is spiritual guidance that can help you: " + response.split(".")[-1] if "." in response else response
         
         # Save conversation to memory if session_id is provided
         if memory and session_id:
@@ -394,13 +672,10 @@ def handle_user_query(query: str, collection, session_id: str = None, user_id: s
             memory.chat_memory.add_ai_message(response)
             save_conversation_memory(session_id, memory, user_id)
         
-        # Get search results for storing
-        search_results = search(query, collection)
-        
-        # Store the query
+        # Store the query (search_results already obtained above)
         store_new_user_query(query, response, search_results, user_email)
         
-        return response, format_docs(search_results)
+        return response
         
     except Exception as e:
         logging.error(f"Error in handle_user_query: {e}")
@@ -413,23 +688,26 @@ def handle_user_query_fallback(query: str, collection):
         # Get search results
         search_results = search(query, collection)
         
+        # Ensure we have at least 5 results
+        search_results = ensure_minimum_results(search_results, collection, min_count=5)
+        
         # Format context from search results
         context = format_docs(search_results)
         
         # Create the system message
-        system_message = """You are an AI assistant that provides concise spiritual guidance based on Sathya Sai Baba's teachings.
+        system_message = """You are an AI assistant that provides spiritual guidance based on Sathya Sai Baba's teachings.
 
-        Provide a clear, summarized response that:
-        1. Directly answers the user's question
-        2. Includes the most relevant key teachings from Sai Baba
-        3. Provides practical guidance when applicable
-        4. Keeps the response concise and focused (2-4 sentences maximum)
-        5. Only includes the most essential information
+        Your response should be simple and direct:
+        "Here are some discourses where you can start learning about the topic:"
 
-        Base your response on the provided discourses but summarize the key points rather than providing detailed explanations.
+        Then list ONLY the actual titles of the discourses provided to you, one per line with a dash, like this:
+        - [actual title from the provided discourses]
+        - [actual title from the provided discourses]
+        - [actual title from the provided discourses]
 
-        If the question is not related to Sathya Sai Baba's teachings, respond with:
-        "I'm here to offer spiritual guidance based on Sai Baba's teachings. Please ask questions related to spirituality, personal growth, or Sai Baba's wisdom. If your question falls into one of the categories above, please ask the question again."
+        Do not provide any descriptions, summaries, or quotes. Do not use placeholder text like "[title of discourse 1]". Use the real titles from the discourses provided.
+
+        Always provide spiritual guidance based on the provided discourses, even if the question seems unrelated. Use the discourses to offer relevant wisdom and insights that can help the user in their spiritual journey.
         """
 
         # Get the model ID
@@ -449,13 +727,60 @@ def handle_user_query_fallback(query: str, collection):
         # Extract the response
         answer = response.choices[0].message.content
         
+        # Post-process response to remove misunderstanding messages
+        if "misunderstanding" in answer.lower() or "seems like there might be" in answer.lower():
+            # Replace with spiritual guidance based on the discourses
+            answer = "Based on Sai Baba's teachings, here is spiritual guidance that can help you: " + answer.split(".")[-1] if "." in answer else answer
+        
         # Store the query
         store_new_user_query(query, answer, search_results, user_email)
         
-        return answer, format_docs(search_results)
+        return answer
     except Exception as e:
         logging.error(f"Error in fallback handler: {e}")
         return "An error occurred while processing your query. Please try again.", ""
+
+def ensure_minimum_results(results, collection, min_count=5):
+    """Ensure we have at least min_count results, adding random articles if needed."""
+    if len(results) >= min_count:
+        return results
+    
+    logging.info(f"Only {len(results)} results found, adding random articles to reach {min_count}")
+    
+    # Get existing IDs to avoid duplicates
+    existing_ids = {str(result.get('_id', '')) for result in results}
+    
+    # Get additional random articles
+    try:
+        additional_articles = list(collection.aggregate([
+            {"$match": {"_id": {"$nin": [ObjectId(oid) for oid in existing_ids if oid]}}},
+            {"$sample": {"size": min_count - len(results)}},
+            {"$project": {
+                "_id": 1,
+                "title": 1,
+                "content": 1,
+                "location": 1,
+                "occasion": 1,
+                "link": 1,
+                "collection": 1
+            }}
+        ]))
+        
+        for article in additional_articles:
+            results.append({
+                "_id": article.get("_id"),
+                "title": article.get("title", "Untitled"),
+                "content": article.get("content", "")[:500],
+                "score": 0.5,  # Default score for additional results
+                "location": article.get("location", ""),
+                "occasion": article.get("occasion", ""),
+                "link": article.get("link", ""),
+                "collection": article.get("collection", "")
+            })
+    except Exception as e:
+        logging.error(f"Error adding additional results: {e}")
+    
+    return results
 
 def store_new_user_query(query_text, response, get_knowledge, user_email=None):
     print("*** Inside Store new user query method ***")

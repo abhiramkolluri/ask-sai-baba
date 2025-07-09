@@ -10,7 +10,7 @@ import jwt
 
 from pymongo import MongoClient
 from openai import OpenAI
-from utils import handle_user_query, search_browse, get_full_article, model, clear_conversation_memory
+from utils import handle_user_query, search_browse, get_full_article, model, clear_conversation_memory, check_vector_store_health
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -34,6 +34,14 @@ config = configparser.ConfigParser()
 config.read('openai.ini')
 
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
+
+# Check vector store health on startup
+print("Checking vector store health...")
+vector_store_healthy = check_vector_store_health()
+if vector_store_healthy:
+    print("✅ Vector store is healthy and ready for searches")
+else:
+    print("⚠️  Vector store health check failed - searches may fall back to random results")
 
 def get_user_email_from_auth0_token(token):
     """Extract user email from Auth0 token"""
@@ -243,19 +251,23 @@ def query_sai_baba():
                 # If JWT validation fails, continue without user email
                 pass
 
-        # Call handle_user_query function with memory support and user email
-        response, source_information = handle_user_query(
+        # First get the search results using the same method as search endpoint
+        query_embedding = model(query)
+        search_results = search_browse(query_embedding, article_collection)
+        
+        # Call handle_user_query function with memory support and user email, passing the search results
+        response = handle_user_query(
             query, 
             article_collection, 
             session_id=session_id, 
             user_id=user_id,
-            user_email=user_email
+            user_email=user_email,
+            search_results=search_results
         )
         
         return jsonify({
             'response': response,
-            'session_id': session_id,
-            'sources': source_information
+            'session_id': session_id
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
