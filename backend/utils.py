@@ -164,7 +164,7 @@ def get_full_article(id, collection):
     return article
 
 
-def handle_user_query(query, collection):
+def handle_user_query(query, collection, user_email=None):
     # Check if the collection is valid
     if not isinstance(collection, pymongo.collection.Collection):
         return "Invalid collection. Please provide a valid MongoDB collection.", ""
@@ -192,10 +192,10 @@ def handle_user_query(query, collection):
         ]
     )
     response = completion.choices[0].message.content
-    store_new_user_query(query,response,get_knowledge)
+    store_new_user_query(query, response, get_knowledge, user_email)
     return response, search_result
 
-def store_new_user_query(query_text, response, get_knowledge):
+def store_new_user_query(query_text, response, get_knowledge, user_email=None):
     print("*** Inside Store new user query method ***")
     print(response)
     timestamp = datetime.now()
@@ -215,6 +215,11 @@ def store_new_user_query(query_text, response, get_knowledge):
                 'citation':citationString,
                 'response': response
             }
+            
+            # Add user email if provided
+            if user_email:
+                query_data['user_email'] = user_email
+            
              #Insert query data into MongoDB collection
             db.user_queries.insert_one(query_data)
     except Exception as exp:
