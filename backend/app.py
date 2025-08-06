@@ -10,13 +10,19 @@ import jwt
 
 from pymongo import MongoClient
 from openai import OpenAI
-from utils import handle_user_query, search_browse, get_full_article, model
+from utils import handle_user_query, search_browse, get_full_article, model, clear_conversation_memory, check_vector_store_health
 
 # Initialize Flask app
 app = Flask(__name__)
 
 # CORS configuration
-cors = CORS(app)
+cors = CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 # loading the env variables
 load_dotenv()
@@ -34,6 +40,14 @@ config = configparser.ConfigParser()
 config.read('openai.ini')
 
 openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
+
+# Check vector store health on startup
+print("Checking vector store health...")
+vector_store_healthy = check_vector_store_health()
+if vector_store_healthy:
+    print("✅ Vector store is healthy and ready for searches")
+else:
+    print("⚠️  Vector store health check failed - searches may fall back to random results")
 
 def get_user_email_from_auth0_token(token):
     """Extract user email from Auth0 token"""
@@ -224,6 +238,10 @@ def query_sai_baba():
         if not query.strip():
             return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
 
+        # Get optional session and user parameters for memory
+        session_id = data.get('session_id')
+        user_id = data.get('user_id')
+        
         # Get user email from request body first, then fallback to token
         user_email = data.get('user_email')
         
@@ -239,9 +257,24 @@ def query_sai_baba():
                 # If JWT validation fails, continue without user email
                 pass
 
-        # Call handle_user_query function to get response and source information
-        response, source_information = handle_user_query(query, article_collection, user_email)
-        return jsonify({'response': response}), 200
+        # First get the search results using the same method as search endpoint
+        query_embedding = model(query)
+        search_results = search_browse(query_embedding, article_collection)
+        
+        # Call handle_user_query function with memory support and user email, passing the search results
+        response = handle_user_query(
+            query, 
+            article_collection, 
+            session_id=session_id, 
+            user_id=user_id,
+            user_email=user_email,
+            search_results=search_results
+        )
+        
+        return jsonify({
+            'response': response,
+            'session_id': session_id
+        }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -491,5 +524,85 @@ def summarize_question_endpoint():
     return jsonify({'summary': summary}), 200
 
 
+@app.route('/conversation/clear', methods=['POST'])
+def clear_conversation():
+    """Clear conversation memory for a session."""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request must contain JSON data'}), 400
+
+        session_id = data.get('session_id')
+        user_id = data.get('user_id')
+        
+        if not session_id:
+            return jsonify({'error': 'session_id is required'}), 400
+
+        success = clear_conversation_memory(session_id, user_id)
+        
+        if success:
+            return jsonify({'message': 'Conversation cleared successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to clear conversation'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/conversation/history', methods=['GET'])
+def get_conversation_history():
+    """Get conversation history for a session."""
+    try:
+        session_id = request.args.get('session_id')
+        user_id = request.args.get('user_id')
+        
+        if not session_id:
+            return jsonify({'error': 'session_id is required'}), 400
+
+        # Get conversation from MongoDB
+        conversation_doc = db.conversations.find_one({
+            "session_id": session_id,
+            "user_id": user_id
+        })
+        
+        if conversation_doc:
+            # Format messages for response
+            messages = []
+            for msg in conversation_doc.get("messages", []):
+                messages.append({
+                    "type": msg["type"],
+                    "content": msg["content"],
+                    "timestamp": msg["timestamp"].isoformat() if isinstance(msg["timestamp"], datetime) else str(msg["timestamp"])
+                })
+            
+            return jsonify({
+                'session_id': session_id,
+                'user_id': user_id,
+                'messages': messages,
+                'last_updated': conversation_doc["last_updated"].isoformat() if isinstance(conversation_doc["last_updated"], datetime) else str(conversation_doc["last_updated"])
+            }), 200
+        else:
+            return jsonify({
+                'session_id': session_id,
+                'user_id': user_id,
+                'messages': [],
+                'last_updated': None
+            }), 200
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# Configure the Flask app
+port = int(os.getenv('FLASK_RUN_PORT', 8000))
+host = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
+debug = os.getenv('FLASK_DEBUG', '0') == '1'
+
 if __name__ == "__main__":
-    app.run(debug=True, port=8000)
+    print(f"\n🚀 Starting Flask server on http://{host}:{port}")
+    print("Press CTRL+C to quit\n")
+    app.run(
+        host=host,
+        port=port,
+        debug=debug
+    )
