@@ -16,7 +16,13 @@ from utils import handle_user_query, search_browse, get_full_article, model, cle
 app = Flask(__name__)
 
 # CORS configuration
-cors = CORS(app)
+cors = CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
 # loading the env variables
 load_dotenv()
@@ -587,5 +593,16 @@ def get_conversation_history():
         return jsonify({'error': str(e)}), 500
 
 
+# Configure the Flask app
+port = int(os.getenv('FLASK_RUN_PORT', 8000))
+host = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
+debug = os.getenv('FLASK_DEBUG', '0') == '1'
+
 if __name__ == "__main__":
-    app.run(debug=True, port=8000)
+    print(f"\n🚀 Starting Flask server on http://{host}:{port}")
+    print("Press CTRL+C to quit\n")
+    app.run(
+        host=host,
+        port=port,
+        debug=debug
+    )
