@@ -19,6 +19,9 @@ fi
 if ! railway whoami &> /dev/null; then
     echo "🔐 Please login to Railway first:"
     echo "   railway login"
+    echo ""
+    echo "📝 Note: Railway CLI v4+ requires web-based authentication."
+    echo "   The login process will open your browser."
     exit 1
 fi
 
