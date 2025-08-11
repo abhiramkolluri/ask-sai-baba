@@ -1,5 +1,5 @@
 from flask_cors import CORS
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import configparser
 import os
@@ -36,10 +36,13 @@ chat_collection = db.chats  # New collection for storing chat threads
 
 config = configparser.ConfigParser()
 
-# setting up openai
-config.read('openai.ini')
+# setting up openai - use environment variable first, fallback to config file
+openai_api_key = os.getenv('OPENAI_API_KEY')
+if not openai_api_key:
+    config.read('openai.ini')
+    openai_api_key = config['OpenAI']['api_key']
 
-openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
+openai_client = OpenAI(api_key=openai_api_key)
 
 # Check vector store health on startup
 print("Checking vector store health...")
@@ -193,7 +196,12 @@ def require_auth(f):
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template("index.html")
+    return jsonify({
+        "status": "healthy",
+        "service": "ask-sai-baba-backend",
+        "version": "1.0.0",
+        "vector_store_healthy": vector_store_healthy
+    })
 
 
 def store_user_query(query_text, query_embedding):

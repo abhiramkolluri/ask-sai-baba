@@ -95,18 +95,37 @@ Your Railway project should have this structure:
 backend/
 ├── app.py                 # Main Flask application
 ├── requirements.txt       # Python dependencies
-├── Dockerfile            # Docker configuration
 ├── railway.json          # Railway configuration
-├── .dockerignore         # Docker ignore file
+├── Dockerfile            # Docker configuration (optional)
+├── .dockerignore         # Docker ignore file (optional)
 └── ...                   # Other backend files
 ```
 
 ## 🔍 Railway Configuration
 
-The `railway.json` file configures how Railway builds and deploys your app:
+The `railway.json` file configures how Railway builds and deploys your app. We recommend using **NIXPACKS** for automatic Python detection:
 
+### Recommended Configuration (NIXPACKS)
 ```json
 {
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "python app.py",
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
+
+### Alternative Configuration (Docker)
+```json
+{
+  "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile"
@@ -120,6 +139,11 @@ The `railway.json` file configures how Railway builds and deploys your app:
   }
 }
 ```
+
+### Build Options Explained
+
+- **NIXPACKS** (Recommended): Railway's automatic build system that detects Python applications and handles the build process automatically. No Dockerfile required.
+- **DOCKERFILE**: Uses your custom Dockerfile for building. Requires a `Dockerfile` in your project root.
 
 ## 🚀 Deployment Commands
 
@@ -205,19 +229,40 @@ railway up --message "Deploying new features"
 
 ### Common Issues
 
-1. **Build Failures**
-   - Check Dockerfile syntax
-   - Verify requirements.txt
-   - Check build logs: `railway logs --build`
+1. **Dockerfile Not Found Error**
+   - **Problem**: `Dockerfile 'Dockerfile' does not exist` during deployment
+   - **Solution**: Switch to NIXPACKS builder in `railway.json`:
+     ```json
+     {
+       "build": {
+         "builder": "NIXPACKS"
+       }
+     }
+     ```
+   - **Why**: NIXPACKS automatically detects Python apps without requiring a Dockerfile
 
-2. **Runtime Errors**
-   - Check application logs: `railway logs`
-   - Verify environment variables: `railway variables`
-   - Check health check endpoint
+2. **Build Failures**
+   - Check Dockerfile syntax (if using Docker builder)
+   - Verify requirements.txt exists and has correct dependencies
+   - Check build logs in Railway dashboard
+   - Try switching from DOCKERFILE to NIXPACKS builder
 
-3. **Port Issues**
+3. **Runtime Errors**
+   - Check application logs in Railway dashboard
+   - Verify environment variables are set correctly
+   - Check health check endpoint responds correctly
+
+4. **Port Issues**
    - Ensure `FLASK_RUN_PORT` is set to `8000`
    - Verify `FLASK_RUN_HOST` is set to `0.0.0.0`
+   - Railway automatically assigns the correct PORT environment variable
+
+5. **Service Linking Issues**
+   - If you see "No service found", specify the service name:
+     ```bash
+     railway up --service your-service-name
+     ```
+   - Use `railway status` to see available services
 
 ### Debug Commands
 
