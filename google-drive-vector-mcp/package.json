@@ -1,0 +1,31 @@
+{
+  "name": "google-drive-vector-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Google Drive with vector search capabilities for slides",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "auth": "node dist/index.js auth"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "google-auth-library": "^9.0.0",
+    "googleapis": "^144.0.0",
+    "openai": "^4.0.0",
+    "chromadb": "^1.8.0",
+    "dotenv": "^16.0.0",
+    "fs-extra": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/fs-extra": "^11.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
