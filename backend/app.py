@@ -602,7 +602,7 @@ def get_conversation_history():
 
 
 # Configure the Flask app
-port = int(os.getenv('FLASK_RUN_PORT', 8000))
+port = int(os.getenv('PORT') or os.getenv('FLASK_RUN_PORT', 8000))
 host = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
 debug = os.getenv('FLASK_DEBUG', '0') == '1'
 

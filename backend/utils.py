@@ -41,7 +41,12 @@ logging.basicConfig(
 
 load_dotenv()
 config = configparser.ConfigParser()
-config.read('openai.ini')
+
+# setting up openai - use environment variable first, fallback to config file
+openai_api_key = os.getenv('OPENAI_API_KEY')
+if not openai_api_key:
+    config.read('openai.ini')
+    openai_api_key = config['OpenAI']['api_key']
 
 # Set up MongoDB connection
 client = MongoClient(os.getenv("MONGO_URI"))
@@ -50,19 +55,19 @@ article_collection = db.articles
 conversation_collection = db.conversations  # New collection for storing conversations
 
 # Set up OpenAI client (for backward compatibility)
-openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
+openai_client = OpenAI(api_key=openai_api_key)
 
 # Initialize LangChain components
 embeddings = OpenAIEmbeddings(
     model="text-embedding-3-large",
-    api_key=config['OpenAI']['api_key']
+    api_key=openai_api_key
 )
 
 # Initialize ChatOpenAI for memory functionality
 chat_model = ChatOpenAI(
     model="gpt-3.5-turbo",
     temperature=0.7,
-    api_key=config['OpenAI']['api_key']
+    api_key=openai_api_key
 )
 
 # Set up vector store
@@ -617,7 +622,7 @@ def handle_user_query(query: str, collection, session_id: str = None, user_id: s
         model_id = load_fine_tuned_model_id_from_file()
         llm = ChatOpenAI(
             model=model_id,
-            api_key=config['OpenAI']['api_key']
+            api_key=openai_api_key
         )
 
         # Use provided search results or generate them if not provided

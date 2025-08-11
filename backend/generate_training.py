@@ -1,11 +1,17 @@
 import json
 import configparser
+import os
 from openai import OpenAI
 
 config = configparser.ConfigParser()
-# setting up openai
-config.read('openai.ini')
-openai_client = OpenAI(api_key=config['OpenAI']['api_key'])
+
+# setting up openai - use environment variable first, fallback to config file
+openai_api_key = os.getenv('OPENAI_API_KEY')
+if not openai_api_key:
+    config.read('openai.ini')
+    openai_api_key = config['OpenAI']['api_key']
+
+openai_client = OpenAI(api_key=openai_api_key)
 
 # Function to load articles from data.json
 def load_articles(file_path):
