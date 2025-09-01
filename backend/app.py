@@ -5,12 +5,11 @@ import configparser
 import os
 from datetime import datetime
 from bson import ObjectId
-from generate_training import summarize_question as generate_summary
 import jwt
 
 from pymongo import MongoClient
 from openai import OpenAI
-from utils import handle_user_query, search_browse, get_full_article, model, clear_conversation_memory, check_vector_store_health
+from utils import handle_user_query, get_full_article, clear_conversation_memory, check_vector_store_health
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -28,11 +27,32 @@ cors = CORS(app, resources={
 load_dotenv()
 
 # setting up open ai and mongodb
-client = MongoClient(os.getenv("MONGO_URI"))
-
-db = client.saibabasayings
-article_collection = db.articles
-chat_collection = db.chats  # New collection for storing chat threads
+try:
+    client = MongoClient(os.getenv("MONGO_URI"))
+    db = client.saibabasayings
+    article_collection = db.articles
+    chat_collection = db.chats  # New collection for storing chat threads
+    mongodb_available = True
+    print("✅ MongoDB connection established successfully in app.py")
+except Exception as e:
+    print(f"⚠️  MongoDB connection failed in app.py: {e}")
+    print("⚠️  Application will run with limited functionality")
+    mongodb_available = False
+    # Create dummy collections to prevent import errors
+    class DummyCollection:
+        def count_documents(self, *args, **kwargs):
+            return 0
+        def find(self, *args, **kwargs):
+            return []
+        def insert_one(self, *args, **kwargs):
+            return None
+        def update_one(self, *args, **kwargs):
+            return None
+        def find_one(self, *args, **kwargs):
+            return None
+    
+    article_collection = DummyCollection()
+    chat_collection = DummyCollection()
 
 config = configparser.ConfigParser()
 
@@ -222,12 +242,9 @@ def search_endpoint():
     if request.is_json:
         query = request.json.get('query')
         if query:
-            # Generate query embedding
-            query_embedding = model(query)
-            # Store user query and embedding in the collection
-            # store_user_query(query, query_embedding)
-            # Proceed with search and return results
-            results = search_browse(query_embedding, article_collection)
+            # Use Weaviate hybrid search directly
+            from utils import weaviate_hybrid_search
+            results = weaviate_hybrid_search(query, article_collection)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -265,9 +282,9 @@ def query_sai_baba():
                 # If JWT validation fails, continue without user email
                 pass
 
-        # First get the search results using the same method as search endpoint
-        query_embedding = model(query)
-        search_results = search_browse(query_embedding, article_collection)
+        # First get the search results using Weaviate hybrid search
+        from utils import weaviate_hybrid_search
+        search_results = weaviate_hybrid_search(query, article_collection)
         
         # Call handle_user_query function with memory support and user email, passing the search results
         response = handle_user_query(
@@ -522,14 +539,6 @@ def delete_chat_thread(thread_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/summarize-question', methods=['POST'])
-def summarize_question_endpoint():
-    data = request.json
-    if not data or 'question' not in data:
-        return jsonify({'error': 'Question is required'}), 400
-    
-    summary = generate_summary(data['question'])
-    return jsonify({'summary': summary}), 200
 
 
 @app.route('/conversation/clear', methods=['POST'])

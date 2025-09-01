@@ -21,6 +21,9 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 
+# Weaviate imports
+from weaviate_client import get_weaviate_manager
+
 # Memory imports
 from langchain.memory import ConversationBufferWindowMemory, ConversationSummaryBufferMemory
 from langchain_core.messages import HumanMessage, AIMessage
@@ -49,10 +52,32 @@ if not openai_api_key:
     openai_api_key = config['OpenAI']['api_key']
 
 # Set up MongoDB connection
-client = MongoClient(os.getenv("MONGO_URI"))
-db = client.saibabasayings
-article_collection = db.articles
-conversation_collection = db.conversations  # New collection for storing conversations
+try:
+    client = MongoClient(os.getenv("MONGO_URI"))
+    db = client.saibabasayings
+    article_collection = db.articles
+    conversation_collection = db.conversations  # New collection for storing conversations
+    mongodb_available = True
+    print("✅ MongoDB connection established successfully")
+except Exception as e:
+    print(f"⚠️  MongoDB connection failed: {e}")
+    print("⚠️  Application will run with limited functionality")
+    mongodb_available = False
+    # Create dummy collections to prevent import errors
+    class DummyCollection:
+        def count_documents(self, *args, **kwargs):
+            return 0
+        def find(self, *args, **kwargs):
+            return []
+        def insert_one(self, *args, **kwargs):
+            return None
+        def update_one(self, *args, **kwargs):
+            return None
+        def find_one(self, *args, **kwargs):
+            return None
+    
+    article_collection = DummyCollection()
+    conversation_collection = DummyCollection()
 
 # Set up OpenAI client (for backward compatibility)
 openai_client = OpenAI(api_key=openai_api_key)
@@ -70,31 +95,24 @@ chat_model = ChatOpenAI(
     api_key=openai_api_key
 )
 
-# Set up vector store
-vector_store = MongoDBAtlasVectorSearch(
-    collection=article_collection,
-    embedding=embeddings,
-    index_name="vector_index",
-    embedding_key="content_embedding",
-    text_key="content"
-)
+# Initialize Weaviate for vector search operations only
+weaviate_manager = None
+try:
+    weaviate_manager = get_weaviate_manager()
+    print("✅ Weaviate manager initialized successfully for vector search")
+except Exception as e:
+    print(f"⚠️  Weaviate initialization failed: {e}")
+    weaviate_manager = None
 
 def check_vector_store_health():
-    """Check if the vector store is properly initialized and has data."""
+    """Check if Weaviate is properly initialized and has data."""
+    if not weaviate_manager:
+        print("⚠️  Vector store health check skipped - Weaviate not available")
+        return False
+        
     try:
-        # Check if collection has documents
-        doc_count = article_collection.count_documents({})
-        logging.info(f"Collection has {doc_count} documents")
-        
-        # Check if documents have embeddings
-        embedding_count = article_collection.count_documents({"content_embedding": {"$exists": True}})
-        logging.info(f"Collection has {embedding_count} documents with embeddings")
-        
-        # Try a simple search to test the vector store
-        test_docs = vector_store.similarity_search("test", k=1)
-        logging.info(f"Vector store test search returned {len(test_docs)} documents")
-        
-        return doc_count > 0 and embedding_count > 0 and len(test_docs) > 0
+        # Use Weaviate's health check
+        return weaviate_manager.check_health()
     except Exception as e:
         logging.error(f"Vector store health check failed: {e}")
         return False
@@ -146,86 +164,76 @@ def get_embedding(text):
         logging.error(f"Error generating embedding: {e}")
         return None
 
-def search_browse(embedding, collection):
-    """Search for similar documents using LangChain vector store with fallback mechanisms."""
+def weaviate_hybrid_search(query: str, collection, limit: int = 5, alpha: float = 0.5) -> List[Dict[str, Any]]:
+    """
+    Perform hybrid search using Weaviate's native hybrid search functionality.
+    
+    Args:
+        query: Search query string
+        collection: MongoDB collection (kept for fallback compatibility)
+        limit: Number of results to return
+        alpha: Weighting factor (0 = keyword only, 1 = vector only, 0.5 = balanced 50/50)
+    """
     try:
-        # Validate embedding
-        if embedding is None:
-            logging.error("Embedding is None, cannot perform vector search")
-            raise ValueError("Embedding is None")
+        if not weaviate_manager:
+            logging.error("Weaviate manager not available, using MongoDB fallback")
+            return mongodb_fallback_search(collection, limit)
         
-        if not isinstance(embedding, (list, np.ndarray)):
-            logging.error(f"Invalid embedding type: {type(embedding)}")
-            raise ValueError(f"Invalid embedding type: {type(embedding)}")
+        logging.info(f"Performing Weaviate hybrid search for: '{query[:50]}...'")
         
-        # Convert numpy array to list if needed
-        if isinstance(embedding, np.ndarray):
-            embedding = embedding.tolist()
+        # Get the collection and perform hybrid search using v4 API
+        collection = weaviate_manager.client.collections.get(weaviate_manager.class_name)
         
-        logging.info(f"Attempting vector search with embedding length: {len(embedding)}")
+        # Generate embedding for the query since we disabled auto-vectorization
+        query_embedding = get_embedding(query)
+        if not query_embedding:
+            logging.warning("Failed to generate query embedding, using keyword-only search")
+            # Fall back to keyword-only search
+            response = collection.query.bm25(
+                query=query,
+                limit=limit,
+                return_metadata=["score"]
+            )
+        else:
+            response = collection.query.hybrid(
+                query=query,
+                vector=query_embedding,
+                alpha=alpha,
+                limit=limit,
+                return_metadata=["score"]
+            )
         
-        # Use LangChain's similarity search with better parameters
-        docs = vector_store.similarity_search_by_vector(
-            embedding=embedding,
-            k=10,  # Get more results initially
-            search_kwargs={"k": 20}  # Search more candidates
-        )
-        
-        logging.info(f"Vector search returned {len(docs)} documents")
-        
+        # Process results
         results = []
-        for doc in docs:
-            # Extract metadata and content
-            metadata = doc.metadata
+        for item in response.objects:
             results.append({
-                "_id": metadata.get("_id"),
-                "collection": metadata.get("collection"),
-                "title": metadata.get("title"),
-                "content": doc.page_content,
-                "score": metadata.get("score", 0.0),
-                "location": metadata.get("location"),
-                "occasion": metadata.get("occasion"),
-                "link": metadata.get("link")
+                "_id": item.properties.get("mongodb_id"),
+                "title": item.properties.get("title", "Untitled"),
+                "content": item.properties.get("content", ""),
+                "score": item.metadata.score if item.metadata.score else 0.0,
+                "location": item.properties.get("location", ""),
+                "occasion": item.properties.get("occasion", ""),
+                "link": item.properties.get("link", ""),
+                "collection": item.properties.get("collection", "")
             })
         
-        # If we got results, return them
         if results:
-            logging.info(f"Vector search successful, returning {len(results)} results")
-            return results[:5]  # Return top 5 results
-        
-        # Fallback 1: Try with different search parameters
-        logging.info("Vector search returned no results, trying with different parameters")
-        try:
-            docs = vector_store.similarity_search_by_vector(
-                embedding=embedding,
-                k=5,
-                search_kwargs={"k": 50, "score_threshold": 0.1}  # Lower threshold
-            )
+            logging.info(f"✅ Weaviate hybrid search returned {len(results)} results")
+            return results
+        else:
+            logging.warning("Weaviate search returned no results, using MongoDB fallback")
+            return mongodb_fallback_search(collection, limit)
             
-            results = []
-            for doc in docs:
-                metadata = doc.metadata
-                results.append({
-                    "_id": metadata.get("_id"),
-                    "collection": metadata.get("collection"),
-                    "title": metadata.get("title"),
-                    "content": doc.page_content,
-                    "score": metadata.get("score", 0.0),
-                    "location": metadata.get("location"),
-                    "occasion": metadata.get("occasion"),
-                    "link": metadata.get("link")
-                })
-            
-            if results:
-                logging.info(f"Fallback search successful, returning {len(results)} results")
-                return results
-        except Exception as fallback1_error:
-            logging.error(f"Fallback 1 failed: {fallback1_error}")
-        
-        # Fallback 2: Get random articles from the database
-        logging.info("Vector search by embedding failed, getting random articles as fallback")
+    except Exception as e:
+        logging.error(f"❌ Weaviate hybrid search failed: {e}")
+        return mongodb_fallback_search(collection, limit)
+
+def mongodb_fallback_search(collection, limit: int = 5) -> List[Dict[str, Any]]:
+    """Fallback to MongoDB random search when Weaviate fails."""
+    try:
+        logging.info("Using MongoDB fallback search")
         random_articles = list(collection.aggregate([
-            {"$sample": {"size": 5}},
+            {"$sample": {"size": limit}},
             {"$project": {
                 "_id": 1,
                 "title": 1,
@@ -237,12 +245,13 @@ def search_browse(embedding, collection):
             }}
         ]))
         
+        results = []
         for article in random_articles:
             results.append({
                 "_id": article.get("_id"),
                 "collection": article.get("collection", ""),
                 "title": article.get("title", "Untitled"),
-                "content": article.get("content", "")[:500],  # Limit content length
+                "content": article.get("content", "")[:500],
                 "score": 0.5,  # Default score for fallback results
                 "location": article.get("location", ""),
                 "occasion": article.get("occasion", ""),
@@ -250,193 +259,40 @@ def search_browse(embedding, collection):
             })
         
         return results
+    except Exception as e:
+        logging.error(f"MongoDB fallback search also failed: {e}")
+        return []
+
+def search_browse(embedding, collection):
+    """
+    Legacy function that now uses Weaviate hybrid search instead of embedding-based search.
+    Converts embedding-based search to query-based hybrid search.
+    """
+    try:
+        # For backward compatibility, we'll use a generic query since we can't reverse an embedding to text
+        # In practice, this function should be replaced with direct calls to weaviate_hybrid_search
+        generic_query = "spiritual guidance teachings wisdom"
+        logging.info("Converting embedding search to Weaviate hybrid search with generic query")
+        return weaviate_hybrid_search(generic_query, collection)
         
     except Exception as e:
         logging.error(f"Error in search_browse: {e}")
-        
-        # Final fallback: Get random articles directly from MongoDB
-        try:
-            logging.info("All search_browse methods failed, using direct MongoDB fallback")
-            random_articles = list(collection.aggregate([
-                {"$sample": {"size": 5}},
-                {"$project": {
-                    "_id": 1,
-                    "title": 1,
-                    "content": 1,
-                    "location": 1,
-                    "occasion": 1,
-                    "link": 1,
-                    "collection": 1
-                }}
-            ]))
-            
-            results = []
-            for article in random_articles:
-                results.append({
-                    "_id": article.get("_id"),
-                    "collection": article.get("collection", ""),
-                    "title": article.get("title", "Untitled"),
-                    "content": article.get("content", "")[:500],
-                    "score": 0.5,
-                    "location": article.get("location", ""),
-                    "occasion": article.get("occasion", ""),
-                    "link": article.get("link", "")
-                })
-            
-            return results
-        except Exception as fallback_error:
-            logging.error(f"Final search_browse fallback also failed: {fallback_error}")
-            return []
+        return mongodb_fallback_search(collection)
 
 def search(user_query: str, collection) -> List[Dict[str, Any]]:
-    """Search for documents similar to the query using LangChain with fallback mechanisms."""
+    """Search for documents using Weaviate hybrid search."""
     try:
         # Validate query
         if not user_query or not isinstance(user_query, str):
             logging.error(f"Invalid query: {user_query}")
             raise ValueError(f"Invalid query: {user_query}")
         
-        logging.info(f"Attempting vector search for query: {user_query[:50]}...")
-        
-        # Use LangChain's similarity search with score and better parameters
-        docs_with_scores = vector_store.similarity_search_with_score(
-            query=user_query,
-            k=10,  # Get more results initially
-            search_kwargs={"k": 20}  # Search more candidates
-        )
-        
-        logging.info(f"Vector search returned {len(docs_with_scores)} documents")
-        
-        results = []
-        for doc, score in docs_with_scores:
-            metadata = doc.metadata
-            results.append({
-                "_id": metadata.get("_id"),
-                "title": metadata.get("title"),
-                "content": doc.page_content,
-                "score": float(score),
-                "location": metadata.get("location"),
-                "occasion": metadata.get("occasion"),
-                "link": metadata.get("link")
-            })
-        
-        # If we got results, return them
-        if results:
-            logging.info(f"Vector search successful, returning {len(results)} results")
-            return results[:5]  # Return top 5 results
-        
-        # Fallback 1: Try with different search parameters
-        logging.info(f"No results for query: {user_query}, trying with different parameters")
-        try:
-            docs_with_scores = vector_store.similarity_search_with_score(
-                query=user_query,
-                k=5,
-                search_kwargs={"k": 50, "score_threshold": 0.1}  # Lower threshold
-            )
-            
-            for doc, score in docs_with_scores:
-                metadata = doc.metadata
-                results.append({
-                    "_id": metadata.get("_id"),
-                    "title": metadata.get("title"),
-                    "content": doc.page_content,
-                    "score": float(score),
-                    "location": metadata.get("location"),
-                    "occasion": metadata.get("occasion"),
-                    "link": metadata.get("link")
-                })
-            
-            if results:
-                logging.info(f"Fallback search successful, returning {len(results)} results")
-                return results
-        except Exception as fallback1_error:
-            logging.error(f"Fallback 1 failed: {fallback1_error}")
-        
-        # Fallback 2: Try with a more generic search
-        logging.info(f"No results for query: {user_query}, trying generic fallback search")
-        fallback_query = "spiritual guidance teachings wisdom"
-        docs_with_scores = vector_store.similarity_search_with_score(
-            query=fallback_query,
-            k=5
-        )
-        
-        for doc, score in docs_with_scores:
-            metadata = doc.metadata
-            results.append({
-                "_id": metadata.get("_id"),
-                "title": metadata.get("title"),
-                "content": doc.page_content,
-                "score": float(score),
-                "location": metadata.get("location"),
-                "occasion": metadata.get("occasion"),
-                "link": metadata.get("link")
-            })
-        
-        if results:
-            return results
-        
-        # Fallback 3: Get random articles from the database
-        logging.info("Vector search failed, getting random articles as fallback")
-        random_articles = list(collection.aggregate([
-            {"$sample": {"size": 5}},
-            {"$project": {
-                "_id": 1,
-                "title": 1,
-                "content": 1,
-                "location": 1,
-                "occasion": 1,
-                "link": 1,
-                "collection": 1
-            }}
-        ]))
-        
-        for article in random_articles:
-            results.append({
-                "_id": article.get("_id"),
-                "title": article.get("title", "Untitled"),
-                "content": article.get("content", "")[:500],  # Limit content length
-                "score": 0.5,  # Default score for fallback results
-                "location": article.get("location", ""),
-                "occasion": article.get("occasion", ""),
-                "link": article.get("link", "")
-            })
-        
-        return results
+        # Use Weaviate hybrid search directly
+        return weaviate_hybrid_search(user_query, collection)
         
     except Exception as e:
         logging.error(f"Error in search: {e}")
-        
-        # Final fallback: Get random articles directly from MongoDB
-        try:
-            logging.info("All search methods failed, using direct MongoDB fallback")
-            random_articles = list(collection.aggregate([
-                {"$sample": {"size": 5}},
-                {"$project": {
-                    "_id": 1,
-                    "title": 1,
-                    "content": 1,
-                    "location": 1,
-                    "occasion": 1,
-                    "link": 1
-                }}
-            ]))
-            
-            results = []
-            for article in random_articles:
-                results.append({
-                    "_id": article.get("_id"),
-                    "title": article.get("title", "Untitled"),
-                    "content": article.get("content", "")[:500],
-                    "score": 0.5,
-                    "location": article.get("location", ""),
-                    "occasion": article.get("occasion", ""),
-                    "link": article.get("link", "")
-                })
-            
-            return results
-        except Exception as fallback_error:
-            logging.error(f"Final search fallback also failed: {fallback_error}")
-            return []
+        return mongodb_fallback_search(collection)
 
 def get_full_article(id, collection):
     article = collection.find_one(
@@ -627,8 +483,8 @@ def handle_user_query(query: str, collection, session_id: str = None, user_id: s
 
         # Use provided search results or generate them if not provided
         if search_results is None:
-            query_embedding = model(query)
-            search_results = search_browse(query_embedding, collection)
+            # Use Weaviate hybrid search directly with the query
+            search_results = weaviate_hybrid_search(query, collection)
         
         # Ensure we have at least 5 results
         search_results = ensure_minimum_results(search_results, collection, min_count=5)
@@ -690,8 +546,8 @@ def handle_user_query(query: str, collection, session_id: str = None, user_id: s
 def handle_user_query_fallback(query: str, collection):
     """Fallback to direct OpenAI API if LangChain fails."""
     try:
-        # Get search results
-        search_results = search(query, collection)
+        # Get search results using Weaviate hybrid search
+        search_results = weaviate_hybrid_search(query, collection)
         
         # Ensure we have at least 5 results
         search_results = ensure_minimum_results(search_results, collection, min_count=5)
@@ -737,8 +593,8 @@ def handle_user_query_fallback(query: str, collection):
             # Replace with spiritual guidance based on the discourses
             answer = "Based on Sai Baba's teachings, here is spiritual guidance that can help you: " + answer.split(".")[-1] if "." in answer else answer
         
-        # Store the query
-        store_new_user_query(query, answer, search_results, user_email)
+        # Store the query (user_email not available in fallback)
+        store_new_user_query(query, answer, search_results)
         
         return answer
     except Exception as e:
