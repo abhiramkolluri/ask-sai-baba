@@ -252,58 +252,6 @@ def search_endpoint():
         return jsonify({'error': 'Request must contain JSON data'}), 400
 
 
-@app.route('/query', methods=['POST'])
-def query_sai_baba():
-    try:
-        data = request.json
-        if not data or 'query' not in data:
-            return jsonify({'error': 'Invalid request. Missing or malformed JSON data.'}), 400
-
-        query = data.get('query')
-        if not query.strip():
-            return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
-
-        # Get optional session and user parameters for memory
-        session_id = data.get('session_id')
-        user_id = data.get('user_id')
-        
-        # Get user email from request body first, then fallback to token
-        user_email = data.get('user_email')
-        
-        # If no email in body, try to get from token
-        if not user_email:
-            try:
-                # Try to get user email from JWT token if Authorization header is present
-                auth_header = request.headers.get('Authorization')
-                if auth_header and auth_header.startswith('Bearer '):
-                    token = auth_header.split(' ')[1]
-                    user_email = get_user_email_from_auth0_token(token)
-            except Exception:
-                # If JWT validation fails, continue without user email
-                pass
-
-        # First get the search results using Weaviate hybrid search
-        from utils import weaviate_hybrid_search
-        search_results = weaviate_hybrid_search(query, article_collection)
-        
-        # Call handle_user_query function with memory support and user email, passing the search results
-        response = handle_user_query(
-            query, 
-            article_collection, 
-            session_id=session_id, 
-            user_id=user_id,
-            user_email=user_email,
-            search_results=search_results
-        )
-        
-        return jsonify({
-            'response': response,
-            'session_id': session_id
-        }), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
 @app.route('/blog/<id>', methods=['GET'])
 def get_article(id):
     if id:

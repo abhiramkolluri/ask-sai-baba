@@ -2,6 +2,7 @@ import os
 import weaviate
 import weaviate.classes as wvc
 import logging
+import configparser
 from dotenv import load_dotenv
 from typing import List, Dict, Any
 
@@ -24,7 +25,16 @@ class WeaviateManager:
             weaviate_url = os.getenv('WEAVIATE_URL', 'http://localhost:8080')
             weaviate_api_key = os.getenv('WEAVIATE_API_KEY')
             openai_api_key = os.getenv('OPENAI_API_KEY')
-            
+
+            # If not found in environment, try reading from openai.ini file
+            if not openai_api_key:
+                try:
+                    config = configparser.ConfigParser()
+                    config.read('openai.ini')
+                    openai_api_key = config['OpenAI']['api_key']
+                except Exception as e:
+                    logger.warning(f"Could not read from openai.ini: {e}")
+
             if not openai_api_key:
                 raise ValueError("OPENAI_API_KEY environment variable is required")
             

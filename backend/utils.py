@@ -297,6 +297,11 @@ def search(user_query: str, collection) -> List[Dict[str, Any]]:
 def get_full_article(id, collection):
     article = collection.find_one(
         {"_id": id}, {"_id": 1, "title": 1, "content": 1, "location":1, "occasion": 1, "link": 1, "collection": 1})
+
+    # Check if article exists
+    if not article:
+        return None
+
     # Convert to markdown format
     markdown_article = f"# {article['title']}\n\n"
     markdown_article += f"**Location:** {article['location']}\n\n"
