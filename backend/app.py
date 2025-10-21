@@ -1,11 +1,13 @@
 from flask_cors import CORS
 from flask import Flask, request, jsonify
+from flask_jwt_extended import JWTManager, create_access_token
 from dotenv import load_dotenv
 import configparser
 import os
 from datetime import datetime
 from bson import ObjectId
 import jwt
+import bcrypt
 
 from pymongo import MongoClient
 from openai import OpenAI
@@ -13,6 +15,10 @@ from utils import handle_user_query, get_full_article, clear_conversation_memory
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# JWT configuration
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-this')  # Change this in production
+jwt_manager = JWTManager(app)
 
 # CORS configuration
 cors = CORS(app, resources={
@@ -32,6 +38,7 @@ try:
     db = client.saibabasayings
     article_collection = db.articles
     chat_collection = db.chats  # New collection for storing chat threads
+    users_collection = db.users  # Collection for storing user data
     mongodb_available = True
     print("✅ MongoDB connection established successfully in app.py")
 except Exception as e:
@@ -53,6 +60,7 @@ except Exception as e:
     
     article_collection = DummyCollection()
     chat_collection = DummyCollection()
+    users_collection = DummyCollection()
 
 config = configparser.ConfigParser()
 
@@ -188,7 +196,7 @@ def get_user_email_from_request():
     return None
 
 def require_auth(f):
-    """Custom decorator to require Auth0 authentication"""
+    """Custom decorator to require Auth0 authenticati   on"""
     def decorated_function(*args, **kwargs):
         # Check if Authorization header is present
         auth_header = request.headers.get('Authorization')
@@ -556,6 +564,86 @@ def get_conversation_history():
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+
+# register and login routes from # 9fae9b759d4511d1af3bd8338ee687ef09883d02
+@app.route('/register', methods=['POST'])
+def register():
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
+
+    if request.is_json:
+        first_name = request.json.get('first_name')
+        last_name = request.json.get('last_name')
+        email = request.json.get('email')
+        password = request.json.get('password')
+
+    else:        
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+    if first_name is None or first_name == '':
+        return jsonify({"error": "First Name is required"}), 400
+    if last_name is None or last_name == '':
+        return jsonify({"error": "Last Name is required"}), 400
+    if email is None or email == '':
+        return jsonify({"error": "Email is required"}), 400
+    if password is None or password == '':
+        return jsonify({"error": "Password is required"}), 400
+
+    if users_collection.find_one({'email': email}):
+        return jsonify({'message': 'User already exists'}), 409
+    else:
+        try:
+            hashed_password = bcrypt.hashpw(
+                password.encode('utf-8'),
+                bcrypt.gensalt()
+            )
+            user_data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'password': hashed_password
+
+            }
+            users_collection.insert_one(user_data)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return jsonify({'message': 'Registration unsuccessful'}), 400
+        return jsonify({'message': 'User registered successfully'}), 201
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.is_json:
+        email = request.json.get('email')
+        password = request.json.get('password')
+
+    else:
+        email = request.form.get('email')
+        password = request.form.get('password')
+    user = users_collection.find_one({'email': email})
+    if(user == None):
+        return jsonify({'message': 'Incorrect email'}), 401
+    
+    if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
+        access_token = create_access_token(identity=email)
+        return jsonify({
+            'access_token': access_token,
+            'user': {
+                'email': user['email'],
+                'first_name': user['first_name'],
+                'last_name': user['last_name']
+            }
+        }), 200
+    else:
+        return jsonify({'message': 'Invalid credentials'}), 401
 
 
 # Configure the Flask app
