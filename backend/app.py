@@ -1,13 +1,16 @@
 from flask_cors import CORS
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token
+from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import configparser
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from bson import ObjectId
 import jwt
 import bcrypt
+import secrets
+import hashlib
 
 from pymongo import MongoClient
 from openai import OpenAI
@@ -71,6 +74,16 @@ if not openai_api_key:
     openai_api_key = config['OpenAI']['api_key']
 
 openai_client = OpenAI(api_key=openai_api_key)
+
+# Email configuration for password reset
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('MAIL_USERNAME'))
+
+mail = Mail(app)
 
 # Check vector store health on startup
 print("Checking vector store health...")
@@ -644,6 +657,352 @@ def login():
         }), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
+
+
+# Password Reset Functions and Endpoints
+def send_reset_email(email, token):
+    """Send password reset email to user"""
+    try:
+        reset_url = f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/password/newpassword?token={token}"
+        
+        msg = Message(
+            subject='Password Reset Request - Ask Sai Vidya',
+            recipients=[email],
+            html=f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h2 style="color: #fb923c;">Password Reset Request</h2>
+                        <p>Hello,</p>
+                        <p>You have requested to reset your password for Ask Sai Vidya. Click the button below to reset your password:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="{reset_url}" 
+                               style="background-color: #fb923c; color: white; padding: 12px 30px; 
+                                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Reset Password
+                            </a>
+                        </div>
+                        <p>Or copy and paste this link into your browser:</p>
+                        <p style="word-break: break-all; color: #666;">{reset_url}</p>
+                        <p><strong>This link will expire in 1 hour.</strong></p>
+                        <p>If you did not request a password reset, please ignore this email and your password will remain unchanged.</p>
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+                        <p style="color: #666; font-size: 12px;">
+                            This is an automated message from Ask Sai Vidya. Please do not reply to this email.
+                        </p>
+                    </div>
+                </body>
+            </html>
+            """
+        )
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
+
+
+@app.route('/password/reset/request', methods=['POST'])
+def request_password_reset():
+    """Request a password reset token"""
+    try:
+        if request.is_json:
+            email = request.json.get('email')
+        else:
+            email = request.form.get('email')
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        # Check if user exists
+        user = users_collection.find_one({'email': email})
+        
+        # Always return success to prevent email enumeration
+        if not user:
+            return jsonify({'message': 'If an account exists with this email, a password reset link has been sent.'}), 200
+        
+        # Generate secure token
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        
+        # Set expiration time (1 hour from now)
+        expires_at = datetime.now() + timedelta(hours=1)
+        
+        # Store reset token in database
+        reset_data = {
+            'user_email': email,
+            'token_hash': token_hash,
+            'created_at': datetime.now(),
+            'expires_at': expires_at,
+            'used': False
+        }
+        
+        # Remove any existing unused tokens for this user
+        db.password_resets.delete_many({'user_email': email, 'used': False})
+        
+        # Insert new token
+        db.password_resets.insert_one(reset_data)
+        
+        # Send email
+        email_sent = send_reset_email(email, token)
+        
+        if not email_sent:
+            return jsonify({'error': 'Failed to send reset email. Please try again later.'}), 500
+        
+        return jsonify({'message': 'If an account exists with this email, a password reset link has been sent.'}), 200
+        
+    except Exception as e:
+        print(f"Error in password reset request: {e}")
+        return jsonify({'error': 'An error occurred. Please try again later.'}), 500
+
+
+@app.route('/password/reset/verify', methods=['POST'])
+def verify_reset_token():
+    """Verify if a reset token is valid"""
+    try:
+        if request.is_json:
+            token = request.json.get('token')
+        else:
+            token = request.form.get('token')
+        
+        if not token:
+            return jsonify({'valid': False, 'error': 'Token is required'}), 400
+        
+        # Hash the token to compare with stored hash
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        
+        # Find the token in database
+        reset_record = db.password_resets.find_one({
+            'token_hash': token_hash,
+            'used': False
+        })
+        
+        if not reset_record:
+            return jsonify({'valid': False, 'error': 'Invalid or expired reset token'}), 400
+        
+        # Check if token has expired
+        if datetime.now() > reset_record['expires_at']:
+            return jsonify({'valid': False, 'error': 'Reset token has expired'}), 400
+        
+        return jsonify({
+            'valid': True,
+            'email': reset_record['user_email']
+        }), 200
+        
+    except Exception as e:
+        print(f"Error verifying token: {e}")
+        return jsonify({'valid': False, 'error': 'An error occurred'}), 500
+
+
+@app.route('/password/reset/confirm', methods=['POST'])
+def confirm_password_reset():
+    """Reset password with valid token"""
+    try:
+        if request.is_json:
+            token = request.json.get('token')
+            new_password = request.json.get('password')
+        else:
+            token = request.form.get('token')
+            new_password = request.form.get('password')
+        
+        if not token or not new_password:
+            return jsonify({'error': 'Token and new password are required'}), 400
+        
+        # Validate password strength
+        if len(new_password) < 6:
+            return jsonify({'error': 'Password must be at least 6 characters long'}), 400
+        
+        # Hash the token
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        
+        # Find the token
+        reset_record = db.password_resets.find_one({
+            'token_hash': token_hash,
+            'used': False
+        })
+        
+        if not reset_record:
+            return jsonify({'error': 'Invalid or expired reset token'}), 400
+        
+        # Check if token has expired
+        if datetime.now() > reset_record['expires_at']:
+            return jsonify({'error': 'Reset token has expired'}), 400
+        
+        # Hash the new password
+        hashed_password = bcrypt.hashpw(
+            new_password.encode('utf-8'),
+            bcrypt.gensalt()
+        )
+        
+        # Update user's password
+        result = users_collection.update_one(
+            {'email': reset_record['user_email']},
+            {'$set': {'password': hashed_password}}
+        )
+        
+        if result.modified_count == 0:
+            return jsonify({'error': 'Failed to update password'}), 500
+        
+        # Mark token as used
+        db.password_resets.update_one(
+            {'_id': reset_record['_id']},
+            {'$set': {'used': True, 'used_at': datetime.now()}}
+        )
+        
+        return jsonify({'message': 'Password has been reset successfully'}), 200
+        
+    except Exception as e:
+        print(f"Error resetting password: {e}")
+        return jsonify({'error': 'An error occurred. Please try again.'}), 500
+
+
+# Chat Management Endpoints
+@app.route('/chats/<user_email>', methods=['GET'])
+def get_user_chats(user_email):
+    """Get all chat threads for a user"""
+    try:
+        # Validate email
+        if not user_email or '@' not in user_email:
+            return jsonify({'error': 'Invalid user email'}), 400
+        
+        # Find all chat threads for this user
+        chat_threads = list(chat_collection.find(
+            {'user_email': user_email},
+            {'_id': 1, 'title': 1, 'timestamp': 1, 'messages': 1}
+        ).sort('timestamp', -1))
+        
+        # Convert ObjectId to string for JSON serialization
+        for thread in chat_threads:
+            thread['id'] = str(thread['_id'])
+            del thread['_id']
+            # Ensure timestamp is serializable
+            if 'timestamp' in thread and thread['timestamp']:
+                thread['timestamp'] = thread['timestamp'].isoformat()
+        
+        return jsonify(chat_threads), 200
+    except Exception as e:
+        print(f"Error getting user chats: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<user_email>', methods=['POST'])
+def create_chat_thread(user_email):
+    """Create a new chat thread"""
+    try:
+        if not user_email or '@' not in user_email:
+            return jsonify({'error': 'Invalid user email'}), 400
+        
+        data = request.get_json()
+        title = data.get('title', 'New Chat')
+        
+        new_thread = {
+            'user_email': user_email,
+            'title': title,
+            'timestamp': datetime.now(),
+            'messages': []
+        }
+        
+        result = chat_collection.insert_one(new_thread)
+        new_thread['id'] = str(result.inserted_id)
+        del new_thread['_id']
+        new_thread['timestamp'] = new_thread['timestamp'].isoformat()
+        
+        return jsonify(new_thread), 201
+    except Exception as e:
+        print(f"Error creating chat thread: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<thread_id>', methods=['GET'])
+def get_chat_thread(thread_id):
+    """Get a specific chat thread with all its messages"""
+    try:
+        thread = chat_collection.find_one({'_id': ObjectId(thread_id)})
+        
+        if not thread:
+            return jsonify({'error': 'Chat thread not found'}), 404
+        
+        thread['id'] = str(thread['_id'])
+        del thread['_id']
+        if 'timestamp' in thread and thread['timestamp']:
+            thread['timestamp'] = thread['timestamp'].isoformat()
+        
+        return jsonify(thread), 200
+    except Exception as e:
+        print(f"Error getting chat thread: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<thread_id>', methods=['PUT'])
+def update_chat_thread(thread_id):
+    """Update a chat thread"""
+    try:
+        data = request.get_json()
+        
+        update_data = {}
+        if 'title' in data:
+            update_data['title'] = data['title']
+        if 'messages' in data:
+            update_data['messages'] = data['messages']
+        
+        result = chat_collection.update_one(
+            {'_id': ObjectId(thread_id)},
+            {'$set': update_data}
+        )
+        
+        if result.modified_count == 0:
+            return jsonify({'error': 'Chat thread not found or no changes made'}), 404
+        
+        return jsonify({'message': 'Chat thread updated successfully'}), 200
+    except Exception as e:
+        print(f"Error updating chat thread: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<thread_id>', methods=['DELETE'])
+def delete_chat_thread(thread_id):
+    """Delete a chat thread"""
+    try:
+        result = chat_collection.delete_one({'_id': ObjectId(thread_id)})
+        
+        if result.deleted_count == 0:
+            return jsonify({'error': 'Chat thread not found'}), 404
+        
+        return jsonify({'message': 'Chat thread deleted successfully'}), 200
+    except Exception as e:
+        print(f"Error deleting chat thread: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/chats/<user_email>/<thread_id>/messages', methods=['POST'])
+def add_message_to_thread(user_email, thread_id):
+    """Add a message to a chat thread"""
+    try:
+        data = request.get_json()
+        question = data.get('question')
+        reply = data.get('reply')
+        
+        if not question:
+            return jsonify({'error': 'Question is required'}), 400
+        
+        message = {
+            'question': question,
+            'reply': reply,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        result = chat_collection.update_one(
+            {'_id': ObjectId(thread_id), 'user_email': user_email},
+            {'$push': {'messages': message}}
+        )
+        
+        if result.modified_count == 0:
+            return jsonify({'error': 'Chat thread not found'}), 404
+        
+        return jsonify({'message': 'Message added successfully'}), 200
+    except Exception as e:
+        print(f"Error adding message to thread: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 # Configure the Flask app

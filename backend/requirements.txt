@@ -38,3 +38,4 @@ tiktoken==0.8.0
 bcrypt==4.2.1
 weaviate-client==4.9.3
 langchain-weaviate==0.0.3
+Flask-Mail==0.10.0
