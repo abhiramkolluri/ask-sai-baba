@@ -1,5 +1,5 @@
 from flask_cors import CORS
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
 from flask_jwt_extended import JWTManager, create_access_token
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
@@ -15,6 +15,12 @@ import hashlib
 from pymongo import MongoClient
 from openai import OpenAI
 from utils import handle_user_query, get_full_article, clear_conversation_memory, check_vector_store_health
+
+# Google OAuth imports
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from google_auth_oauthlib.flow import Flow
+import json
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -659,6 +665,186 @@ def login():
         return jsonify({'message': 'Invalid credentials'}), 401
 
 
+@app.route('/auth/google/authorize', methods=['GET'])
+def google_authorize():
+    """Initiate Google OAuth flow - Step 1: Redirect user to Google"""
+    try:
+        google_client_id = os.getenv('GOOGLE_CLIENT_ID')
+        google_client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        
+        if not google_client_id or not google_client_secret:
+            return jsonify({'error': 'Google OAuth not configured'}), 500
+        
+        # Create OAuth2 flow
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": google_client_id,
+                    "client_secret": google_client_secret,
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [f"{request.host_url}auth/google/callback"]
+                }
+            },
+            scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+        )
+        
+        flow.redirect_uri = f"{request.host_url}auth/google/callback"
+        
+        # Generate authorization URL
+        authorization_url, state = flow.authorization_url(
+            access_type='offline',
+            include_granted_scopes='true'
+        )
+        
+        # Store state in session or database (for security)
+        # For now, we'll pass it through the OAuth flow
+        
+        return redirect(authorization_url)
+        
+    except Exception as e:
+        print(f"❌ Error in Google authorize: {e}")
+        import traceback
+        traceback.print_exc()
+        return redirect(f"{frontend_url}/signin?error=oauth_failed")
+
+
+@app.route('/auth/google/callback', methods=['GET'])
+def google_callback():
+    """Handle Google OAuth callback - Step 2: Exchange code for user info"""
+    try:
+        google_client_id = os.getenv('GOOGLE_CLIENT_ID')
+        google_client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        
+        # Get authorization code from query params
+        code = request.args.get('code')
+        
+        if not code:
+            return redirect(f"{frontend_url}/signin?error=no_code")
+        
+        # Exchange code for tokens
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": google_client_id,
+                    "client_secret": google_client_secret,
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [f"{request.host_url}auth/google/callback"]
+                }
+            },
+            scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+        )
+        
+        flow.redirect_uri = f"{request.host_url}auth/google/callback"
+        
+        # Fetch tokens
+        flow.fetch_token(code=code)
+        credentials = flow.credentials
+        
+        # Get user info from Google
+        import requests as req
+        userinfo_response = req.get(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            headers={'Authorization': f'Bearer {credentials.token}'}
+        )
+        
+        userinfo = userinfo_response.json()
+        
+        email = userinfo.get('email')
+        given_name = userinfo.get('given_name', '')
+        family_name = userinfo.get('family_name', '')
+        picture = userinfo.get('picture', '')
+        
+        if not email:
+            return redirect(f"{frontend_url}/signin?error=no_email")
+        
+        print(f"✅ Google OAuth successful for user: {email}")
+        
+        # Check if user exists in database
+        user = users_collection.find_one({'email': email})
+        
+        if user:
+            existing_provider = user.get('auth_provider', 'email')
+            
+            # Auto-link accounts if user signed up with email/password
+            if existing_provider == 'email':
+                users_collection.update_one(
+                    {'email': email},
+                    {
+                        '$set': {
+                            'auth_provider': 'both',
+                            'google_profile_picture': picture,
+                            'google_linked_at': datetime.now(),
+                            'last_login': datetime.now()
+                        }
+                    }
+                )
+                print(f"🔗 Auto-linked Google account to existing email account: {email}")
+            
+            else:
+                # Already using Google or both - just update last login
+                users_collection.update_one(
+                    {'email': email},
+                    {'$set': {'last_login': datetime.now()}}
+                )
+                print(f"✅ Existing Google/both user logged in: {email}")
+            
+            # Get updated user data
+            user = users_collection.find_one({'email': email})
+        
+        else:
+            # New user - create with Google
+            user_data = {
+                'email': email,
+                'first_name': given_name,
+                'last_name': family_name,
+                'profile_picture': picture,
+                'auth_provider': 'google',
+                'password': None,
+                'created_at': datetime.now(),
+                'last_login': datetime.now()
+            }
+            users_collection.insert_one(user_data)
+            user = user_data
+            print(f"✅ New Google user created: {email}")
+        
+        # Generate JWT token (same as regular login)
+        access_token = create_access_token(identity=email)
+        
+        # Redirect to frontend with token
+        # The frontend will extract the token from URL and store it
+        user_data = {
+            'email': user['email'],
+            'first_name': user.get('first_name', ''),
+            'last_name': user.get('last_name', ''),
+            'profile_picture': user.get('profile_picture') or user.get('google_profile_picture', ''),
+            'auth_provider': user.get('auth_provider', 'google')
+        }
+        
+        # Encode user data for URL
+        import urllib.parse
+        user_json = json.dumps(user_data)
+        user_encoded = urllib.parse.quote(user_json)
+        
+        return redirect(f"{frontend_url}/signin?token={access_token}&user={user_encoded}&success=true")
+        
+    except Exception as e:
+        print(f"❌ Error in Google callback: {e}")
+        import traceback
+        traceback.print_exc()
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        return redirect(f"{frontend_url}/signin?error=oauth_failed")
+
+
+@app.route('/auth/google/login', methods=['POST'])
+def google_login():
+    """Legacy endpoint - kept for backward compatibility"""
+    return jsonify({'error': 'This endpoint is deprecated. Use /auth/google/authorize instead.'}), 400
+
+
 # Password Reset Functions and Endpoints
 def send_reset_email(email, token):
     """Send password reset email to user"""
@@ -854,155 +1040,6 @@ def confirm_password_reset():
     except Exception as e:
         print(f"Error resetting password: {e}")
         return jsonify({'error': 'An error occurred. Please try again.'}), 500
-
-
-# Chat Management Endpoints
-@app.route('/chats/<user_email>', methods=['GET'])
-def get_user_chats(user_email):
-    """Get all chat threads for a user"""
-    try:
-        # Validate email
-        if not user_email or '@' not in user_email:
-            return jsonify({'error': 'Invalid user email'}), 400
-        
-        # Find all chat threads for this user
-        chat_threads = list(chat_collection.find(
-            {'user_email': user_email},
-            {'_id': 1, 'title': 1, 'timestamp': 1, 'messages': 1}
-        ).sort('timestamp', -1))
-        
-        # Convert ObjectId to string for JSON serialization
-        for thread in chat_threads:
-            thread['id'] = str(thread['_id'])
-            del thread['_id']
-            # Ensure timestamp is serializable
-            if 'timestamp' in thread and thread['timestamp']:
-                thread['timestamp'] = thread['timestamp'].isoformat()
-        
-        return jsonify(chat_threads), 200
-    except Exception as e:
-        print(f"Error getting user chats: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/chats/<user_email>', methods=['POST'])
-def create_chat_thread(user_email):
-    """Create a new chat thread"""
-    try:
-        if not user_email or '@' not in user_email:
-            return jsonify({'error': 'Invalid user email'}), 400
-        
-        data = request.get_json()
-        title = data.get('title', 'New Chat')
-        
-        new_thread = {
-            'user_email': user_email,
-            'title': title,
-            'timestamp': datetime.now(),
-            'messages': []
-        }
-        
-        result = chat_collection.insert_one(new_thread)
-        new_thread['id'] = str(result.inserted_id)
-        del new_thread['_id']
-        new_thread['timestamp'] = new_thread['timestamp'].isoformat()
-        
-        return jsonify(new_thread), 201
-    except Exception as e:
-        print(f"Error creating chat thread: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/chats/<thread_id>', methods=['GET'])
-def get_chat_thread(thread_id):
-    """Get a specific chat thread with all its messages"""
-    try:
-        thread = chat_collection.find_one({'_id': ObjectId(thread_id)})
-        
-        if not thread:
-            return jsonify({'error': 'Chat thread not found'}), 404
-        
-        thread['id'] = str(thread['_id'])
-        del thread['_id']
-        if 'timestamp' in thread and thread['timestamp']:
-            thread['timestamp'] = thread['timestamp'].isoformat()
-        
-        return jsonify(thread), 200
-    except Exception as e:
-        print(f"Error getting chat thread: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/chats/<thread_id>', methods=['PUT'])
-def update_chat_thread(thread_id):
-    """Update a chat thread"""
-    try:
-        data = request.get_json()
-        
-        update_data = {}
-        if 'title' in data:
-            update_data['title'] = data['title']
-        if 'messages' in data:
-            update_data['messages'] = data['messages']
-        
-        result = chat_collection.update_one(
-            {'_id': ObjectId(thread_id)},
-            {'$set': update_data}
-        )
-        
-        if result.modified_count == 0:
-            return jsonify({'error': 'Chat thread not found or no changes made'}), 404
-        
-        return jsonify({'message': 'Chat thread updated successfully'}), 200
-    except Exception as e:
-        print(f"Error updating chat thread: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/chats/<thread_id>', methods=['DELETE'])
-def delete_chat_thread(thread_id):
-    """Delete a chat thread"""
-    try:
-        result = chat_collection.delete_one({'_id': ObjectId(thread_id)})
-        
-        if result.deleted_count == 0:
-            return jsonify({'error': 'Chat thread not found'}), 404
-        
-        return jsonify({'message': 'Chat thread deleted successfully'}), 200
-    except Exception as e:
-        print(f"Error deleting chat thread: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/chats/<user_email>/<thread_id>/messages', methods=['POST'])
-def add_message_to_thread(user_email, thread_id):
-    """Add a message to a chat thread"""
-    try:
-        data = request.get_json()
-        question = data.get('question')
-        reply = data.get('reply')
-        
-        if not question:
-            return jsonify({'error': 'Question is required'}), 400
-        
-        message = {
-            'question': question,
-            'reply': reply,
-            'timestamp': datetime.now().isoformat()
-        }
-        
-        result = chat_collection.update_one(
-            {'_id': ObjectId(thread_id), 'user_email': user_email},
-            {'$push': {'messages': message}}
-        )
-        
-        if result.modified_count == 0:
-            return jsonify({'error': 'Chat thread not found'}), 404
-        
-        return jsonify({'message': 'Message added successfully'}), 200
-    except Exception as e:
-        print(f"Error adding message to thread: {e}")
-        return jsonify({'error': str(e)}), 500
 
 
 # Configure the Flask app
