@@ -48,6 +48,7 @@ try:
     article_collection = db.articles
     chat_collection = db.chats  # New collection for storing chat threads
     users_collection = db.users  # Collection for storing user data
+    saved_discourses_collection = db.saved_discourses  # Collection for saved discourses
     mongodb_available = True
     print("✅ MongoDB connection established successfully in app.py")
 except Exception as e:
@@ -511,6 +512,176 @@ def delete_chat_thread(thread_id):
             return jsonify({'error': 'Chat thread not found'}), 404
         
         return jsonify({'message': 'Chat thread deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ============================================
+# Saved Discourses Endpoints
+# ============================================
+
+@app.route('/saved-discourses/<user_email>', methods=['POST'])
+@require_auth
+def save_discourse(user_email):
+    """Save a discourse for the logged-in user"""
+    try:
+        request_user_email = get_user_email_from_request()
+        if not request_user_email:
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        # Verify the user is saving to their own collection
+        if request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        data = request.json
+        
+        if not data or 'discourse' not in data:
+            return jsonify({'error': 'Discourse data is required'}), 400
+        
+        discourse = data.get('discourse')
+        
+        # Validate discourse has required fields
+        if not discourse.get('title') or not discourse.get('content'):
+            return jsonify({'error': 'Discourse title and content are required'}), 400
+        
+        # Check if this discourse is already saved by this user (avoid duplicates)
+        existing = saved_discourses_collection.find_one({
+            'user_email': user_email,
+            'discourse.title': discourse.get('title')
+        })
+        
+        if existing:
+            return jsonify({
+                'message': 'Discourse already saved',
+                'saved_discourse_id': str(existing['_id']),
+                'already_exists': True
+            }), 200
+        
+        # Create saved discourse document
+        saved_discourse = {
+            'user_email': user_email,
+            'discourse': {
+                'title': discourse.get('title'),
+                'content': discourse.get('content'),
+                'source_url': discourse.get('source_url', ''),
+                'source_citation': discourse.get('source_citation', '')
+            },
+            'question_context': data.get('question_context', ''),
+            'saved_at': datetime.now(),
+            'tags': data.get('tags', []),
+            'notes': data.get('notes', '')
+        }
+        
+        # Insert into database
+        result = saved_discourses_collection.insert_one(saved_discourse)
+        
+        return jsonify({
+            'message': 'Discourse saved successfully',
+            'saved_discourse_id': str(result.inserted_id)
+        }), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/saved-discourses/<user_email>', methods=['GET'])
+@require_auth
+def get_saved_discourses(user_email):
+    """Get all saved discourses for the logged-in user"""
+    try:
+        request_user_email = get_user_email_from_request()
+        if not request_user_email:
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        # Verify the user is accessing their own saved discourses
+        if request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        # Find all saved discourses for this user
+        saved_discourses = list(saved_discourses_collection.find(
+            {'user_email': user_email}
+        ).sort('saved_at', -1))  # Most recent first
+        
+        # Convert ObjectId to string for JSON serialization
+        for discourse in saved_discourses:
+            discourse['id'] = str(discourse['_id'])
+            discourse['_id'] = str(discourse['_id'])
+            discourse['saved_at'] = discourse['saved_at'].isoformat()
+        
+        return jsonify(saved_discourses), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/saved-discourses/<discourse_id>', methods=['DELETE'])
+@require_auth
+def delete_saved_discourse(discourse_id):
+    """Delete a saved discourse"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        user_email = data.get('user_email')
+        if not user_email:
+            return jsonify({'error': 'User email required in request body'}), 400
+        
+        request_user_email = get_user_email_from_request()
+        if not request_user_email or request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        # Verify the discourse belongs to the user and delete it
+        result = saved_discourses_collection.delete_one({
+            '_id': ObjectId(discourse_id),
+            'user_email': user_email
+        })
+        
+        if result.deleted_count == 0:
+            return jsonify({'error': 'Saved discourse not found'}), 404
+        
+        return jsonify({'message': 'Saved discourse deleted successfully'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/saved-discourses/check', methods=['POST'])
+@require_auth
+def check_discourse_saved(user_email):
+    """Check if a discourse is already saved by the user"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        user_email = data.get('user_email')
+        discourse_title = data.get('discourse_title')
+        
+        if not user_email or not discourse_title:
+            return jsonify({'error': 'User email and discourse title are required'}), 400
+        
+        request_user_email = get_user_email_from_request()
+        if not request_user_email or request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        # Check if discourse exists
+        existing = saved_discourses_collection.find_one({
+            'user_email': user_email,
+            'discourse.title': discourse_title
+        })
+        
+        if existing:
+            return jsonify({
+                'is_saved': True,
+                'saved_discourse_id': str(existing['_id'])
+            }), 200
+        else:
+            return jsonify({
+                'is_saved': False,
+                'saved_discourse_id': None
+            }), 200
+            
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
