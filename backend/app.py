@@ -1,19 +1,33 @@
 from flask_cors import CORS
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
+from flask_jwt_extended import JWTManager, create_access_token
+from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import configparser
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from bson import ObjectId
-from generate_training import summarize_question as generate_summary
 import jwt
+import bcrypt
+import secrets
+import hashlib
 
 from pymongo import MongoClient
 from openai import OpenAI
-from utils import handle_user_query, search_browse, get_full_article, model, clear_conversation_memory, check_vector_store_health
+from utils import handle_user_query, get_full_article, clear_conversation_memory, check_vector_store_health
+
+# Google OAuth imports
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from google_auth_oauthlib.flow import Flow
+import json
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# JWT configuration
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-this')  # Change this in production
+jwt_manager = JWTManager(app)
 
 # CORS configuration
 cors = CORS(app, resources={
@@ -28,11 +42,35 @@ cors = CORS(app, resources={
 load_dotenv()
 
 # setting up open ai and mongodb
-client = MongoClient(os.getenv("MONGO_URI"))
-
-db = client.saibabasayings
-article_collection = db.articles
-chat_collection = db.chats  # New collection for storing chat threads
+try:
+    client = MongoClient(os.getenv("MONGO_URI"))
+    db = client.saibabasayings
+    article_collection = db.articles
+    chat_collection = db.chats  # New collection for storing chat threads
+    users_collection = db.users  # Collection for storing user data
+    saved_discourses_collection = db.saved_discourses  # Collection for saved discourses
+    mongodb_available = True
+    print("✅ MongoDB connection established successfully in app.py")
+except Exception as e:
+    print(f"⚠️  MongoDB connection failed in app.py: {e}")
+    print("⚠️  Application will run with limited functionality")
+    mongodb_available = False
+    # Create dummy collections to prevent import errors
+    class DummyCollection:
+        def count_documents(self, *args, **kwargs):
+            return 0
+        def find(self, *args, **kwargs):
+            return []
+        def insert_one(self, *args, **kwargs):
+            return None
+        def update_one(self, *args, **kwargs):
+            return None
+        def find_one(self, *args, **kwargs):
+            return None
+    
+    article_collection = DummyCollection()
+    chat_collection = DummyCollection()
+    users_collection = DummyCollection()
 
 config = configparser.ConfigParser()
 
@@ -43,6 +81,16 @@ if not openai_api_key:
     openai_api_key = config['OpenAI']['api_key']
 
 openai_client = OpenAI(api_key=openai_api_key)
+
+# Email configuration for password reset
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('MAIL_USERNAME'))
+
+mail = Mail(app)
 
 # Check vector store health on startup
 print("Checking vector store health...")
@@ -168,7 +216,7 @@ def get_user_email_from_request():
     return None
 
 def require_auth(f):
-    """Custom decorator to require Auth0 authentication"""
+    """Custom decorator to require Auth0 authenticati   on"""
     def decorated_function(*args, **kwargs):
         # Check if Authorization header is present
         auth_header = request.headers.get('Authorization')
@@ -222,69 +270,14 @@ def search_endpoint():
     if request.is_json:
         query = request.json.get('query')
         if query:
-            # Generate query embedding
-            query_embedding = model(query)
-            # Store user query and embedding in the collection
-            # store_user_query(query, query_embedding)
-            # Proceed with search and return results
-            results = search_browse(query_embedding, article_collection)
+            # Use Weaviate hybrid search directly
+            from utils import weaviate_hybrid_search
+            results = weaviate_hybrid_search(query, article_collection)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
     else:
         return jsonify({'error': 'Request must contain JSON data'}), 400
-
-
-@app.route('/query', methods=['POST'])
-def query_sai_baba():
-    try:
-        data = request.json
-        if not data or 'query' not in data:
-            return jsonify({'error': 'Invalid request. Missing or malformed JSON data.'}), 400
-
-        query = data.get('query')
-        if not query.strip():
-            return jsonify({'error': 'Invalid query. Query cannot be empty.'}), 400
-
-        # Get optional session and user parameters for memory
-        session_id = data.get('session_id')
-        user_id = data.get('user_id')
-        
-        # Get user email from request body first, then fallback to token
-        user_email = data.get('user_email')
-        
-        # If no email in body, try to get from token
-        if not user_email:
-            try:
-                # Try to get user email from JWT token if Authorization header is present
-                auth_header = request.headers.get('Authorization')
-                if auth_header and auth_header.startswith('Bearer '):
-                    token = auth_header.split(' ')[1]
-                    user_email = get_user_email_from_auth0_token(token)
-            except Exception:
-                # If JWT validation fails, continue without user email
-                pass
-
-        # First get the search results using the same method as search endpoint
-        query_embedding = model(query)
-        search_results = search_browse(query_embedding, article_collection)
-        
-        # Call handle_user_query function with memory support and user email, passing the search results
-        response = handle_user_query(
-            query, 
-            article_collection, 
-            session_id=session_id, 
-            user_id=user_id,
-            user_email=user_email,
-            search_results=search_results
-        )
-        
-        return jsonify({
-            'response': response,
-            'session_id': session_id
-        }), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/blog/<id>', methods=['GET'])
@@ -522,14 +515,176 @@ def delete_chat_thread(thread_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/summarize-question', methods=['POST'])
-def summarize_question_endpoint():
-    data = request.json
-    if not data or 'question' not in data:
-        return jsonify({'error': 'Question is required'}), 400
-    
-    summary = generate_summary(data['question'])
-    return jsonify({'summary': summary}), 200
+
+# ============================================
+# Saved Discourses Endpoints
+# ============================================
+
+@app.route('/saved-discourses/<user_email>', methods=['POST'])
+@require_auth
+def save_discourse(user_email):
+    """Save a discourse for the logged-in user"""
+    try:
+        request_user_email = get_user_email_from_request()
+        if not request_user_email:
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        # Verify the user is saving to their own collection
+        if request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        data = request.json
+        
+        if not data or 'discourse' not in data:
+            return jsonify({'error': 'Discourse data is required'}), 400
+        
+        discourse = data.get('discourse')
+        
+        # Validate discourse has required fields
+        if not discourse.get('title') or not discourse.get('content'):
+            return jsonify({'error': 'Discourse title and content are required'}), 400
+        
+        # Check if this discourse is already saved by this user (avoid duplicates)
+        existing = saved_discourses_collection.find_one({
+            'user_email': user_email,
+            'discourse.title': discourse.get('title')
+        })
+        
+        if existing:
+            return jsonify({
+                'message': 'Discourse already saved',
+                'saved_discourse_id': str(existing['_id']),
+                'already_exists': True
+            }), 200
+        
+        # Create saved discourse document
+        saved_discourse = {
+            'user_email': user_email,
+            'discourse': {
+                'title': discourse.get('title'),
+                'content': discourse.get('content'),
+                'source_url': discourse.get('source_url', ''),
+                'source_citation': discourse.get('source_citation', '')
+            },
+            'question_context': data.get('question_context', ''),
+            'saved_at': datetime.now(),
+            'tags': data.get('tags', []),
+            'notes': data.get('notes', '')
+        }
+        
+        # Insert into database
+        result = saved_discourses_collection.insert_one(saved_discourse)
+        
+        return jsonify({
+            'message': 'Discourse saved successfully',
+            'saved_discourse_id': str(result.inserted_id)
+        }), 201
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/saved-discourses/<user_email>', methods=['GET'])
+@require_auth
+def get_saved_discourses(user_email):
+    """Get all saved discourses for the logged-in user"""
+    try:
+        request_user_email = get_user_email_from_request()
+        if not request_user_email:
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        # Verify the user is accessing their own saved discourses
+        if request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        # Find all saved discourses for this user
+        saved_discourses = list(saved_discourses_collection.find(
+            {'user_email': user_email}
+        ).sort('saved_at', -1))  # Most recent first
+        
+        # Convert ObjectId to string for JSON serialization
+        for discourse in saved_discourses:
+            discourse['id'] = str(discourse['_id'])
+            discourse['_id'] = str(discourse['_id'])
+            discourse['saved_at'] = discourse['saved_at'].isoformat()
+        
+        return jsonify(saved_discourses), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/saved-discourses/<discourse_id>', methods=['DELETE'])
+@require_auth
+def delete_saved_discourse(discourse_id):
+    """Delete a saved discourse"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        user_email = data.get('user_email')
+        if not user_email:
+            return jsonify({'error': 'User email required in request body'}), 400
+        
+        request_user_email = get_user_email_from_request()
+        if not request_user_email or request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        # Verify the discourse belongs to the user and delete it
+        result = saved_discourses_collection.delete_one({
+            '_id': ObjectId(discourse_id),
+            'user_email': user_email
+        })
+        
+        if result.deleted_count == 0:
+            return jsonify({'error': 'Saved discourse not found'}), 404
+        
+        return jsonify({'message': 'Saved discourse deleted successfully'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/saved-discourses/check', methods=['POST'])
+@require_auth
+def check_discourse_saved(user_email):
+    """Check if a discourse is already saved by the user"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        user_email = data.get('user_email')
+        discourse_title = data.get('discourse_title')
+        
+        if not user_email or not discourse_title:
+            return jsonify({'error': 'User email and discourse title are required'}), 400
+        
+        request_user_email = get_user_email_from_request()
+        if not request_user_email or request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        # Check if discourse exists
+        existing = saved_discourses_collection.find_one({
+            'user_email': user_email,
+            'discourse.title': discourse_title
+        })
+        
+        if existing:
+            return jsonify({
+                'is_saved': True,
+                'saved_discourse_id': str(existing['_id'])
+            }), 200
+        else:
+            return jsonify({
+                'is_saved': False,
+                'saved_discourse_id': None
+            }), 200
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 
 @app.route('/conversation/clear', methods=['POST'])
@@ -599,6 +754,463 @@ def get_conversation_history():
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+
+# register and login routes from # 9fae9b759d4511d1af3bd8338ee687ef09883d02
+@app.route('/register', methods=['POST'])
+def register():
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
+
+    if request.is_json:
+        first_name = request.json.get('first_name')
+        last_name = request.json.get('last_name')
+        email = request.json.get('email')
+        password = request.json.get('password')
+
+    else:        
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+    if first_name is None or first_name == '':
+        return jsonify({"error": "First Name is required"}), 400
+    if last_name is None or last_name == '':
+        return jsonify({"error": "Last Name is required"}), 400
+    if email is None or email == '':
+        return jsonify({"error": "Email is required"}), 400
+    if password is None or password == '':
+        return jsonify({"error": "Password is required"}), 400
+
+    if users_collection.find_one({'email': email}):
+        return jsonify({'message': 'User already exists'}), 409
+    else:
+        try:
+            hashed_password = bcrypt.hashpw(
+                password.encode('utf-8'),
+                bcrypt.gensalt()
+            )
+            user_data = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'password': hashed_password
+
+            }
+            users_collection.insert_one(user_data)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return jsonify({'message': 'Registration unsuccessful'}), 400
+        return jsonify({'message': 'User registered successfully'}), 201
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.is_json:
+        email = request.json.get('email')
+        password = request.json.get('password')
+
+    else:
+        email = request.form.get('email')
+        password = request.form.get('password')
+    user = users_collection.find_one({'email': email})
+    if(user == None):
+        return jsonify({'message': 'Incorrect email'}), 401
+    
+    if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
+        access_token = create_access_token(identity=email)
+        return jsonify({
+            'access_token': access_token,
+            'user': {
+                'email': user['email'],
+                'first_name': user['first_name'],
+                'last_name': user['last_name']
+            }
+        }), 200
+    else:
+        return jsonify({'message': 'Invalid credentials'}), 401
+
+
+@app.route('/auth/google/authorize', methods=['GET'])
+def google_authorize():
+    """Initiate Google OAuth flow - Step 1: Redirect user to Google"""
+    try:
+        google_client_id = os.getenv('GOOGLE_CLIENT_ID')
+        google_client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        
+        if not google_client_id or not google_client_secret:
+            return jsonify({'error': 'Google OAuth not configured'}), 500
+        
+        # Create OAuth2 flow
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": google_client_id,
+                    "client_secret": google_client_secret,
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [f"{request.host_url}auth/google/callback"]
+                }
+            },
+            scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+        )
+        
+        flow.redirect_uri = f"{request.host_url}auth/google/callback"
+        
+        # Generate authorization URL
+        authorization_url, state = flow.authorization_url(
+            access_type='offline',
+            include_granted_scopes='true'
+        )
+        
+        # Store state in session or database (for security)
+        # For now, we'll pass it through the OAuth flow
+        
+        return redirect(authorization_url)
+        
+    except Exception as e:
+        print(f"❌ Error in Google authorize: {e}")
+        import traceback
+        traceback.print_exc()
+        return redirect(f"{frontend_url}/signin?error=oauth_failed")
+
+
+@app.route('/auth/google/callback', methods=['GET'])
+def google_callback():
+    """Handle Google OAuth callback - Step 2: Exchange code for user info"""
+    try:
+        google_client_id = os.getenv('GOOGLE_CLIENT_ID')
+        google_client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        
+        # Get authorization code from query params
+        code = request.args.get('code')
+        
+        if not code:
+            return redirect(f"{frontend_url}/signin?error=no_code")
+        
+        # Exchange code for tokens
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": google_client_id,
+                    "client_secret": google_client_secret,
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [f"{request.host_url}auth/google/callback"]
+                }
+            },
+            scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+        )
+        
+        flow.redirect_uri = f"{request.host_url}auth/google/callback"
+        
+        # Fetch tokens
+        flow.fetch_token(code=code)
+        credentials = flow.credentials
+        
+        # Get user info from Google
+        import requests as req
+        userinfo_response = req.get(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            headers={'Authorization': f'Bearer {credentials.token}'}
+        )
+        
+        userinfo = userinfo_response.json()
+        
+        email = userinfo.get('email')
+        given_name = userinfo.get('given_name', '')
+        family_name = userinfo.get('family_name', '')
+        picture = userinfo.get('picture', '')
+        
+        if not email:
+            return redirect(f"{frontend_url}/signin?error=no_email")
+        
+        print(f"✅ Google OAuth successful for user: {email}")
+        
+        # Check if user exists in database
+        user = users_collection.find_one({'email': email})
+        
+        if user:
+            existing_provider = user.get('auth_provider', 'email')
+            
+            # Auto-link accounts if user signed up with email/password
+            if existing_provider == 'email':
+                users_collection.update_one(
+                    {'email': email},
+                    {
+                        '$set': {
+                            'auth_provider': 'both',
+                            'google_profile_picture': picture,
+                            'google_linked_at': datetime.now(),
+                            'last_login': datetime.now()
+                        }
+                    }
+                )
+                print(f"🔗 Auto-linked Google account to existing email account: {email}")
+            
+            else:
+                # Already using Google or both - just update last login
+                users_collection.update_one(
+                    {'email': email},
+                    {'$set': {'last_login': datetime.now()}}
+                )
+                print(f"✅ Existing Google/both user logged in: {email}")
+            
+            # Get updated user data
+            user = users_collection.find_one({'email': email})
+        
+        else:
+            # New user - create with Google
+            user_data = {
+                'email': email,
+                'first_name': given_name,
+                'last_name': family_name,
+                'profile_picture': picture,
+                'auth_provider': 'google',
+                'password': None,
+                'created_at': datetime.now(),
+                'last_login': datetime.now()
+            }
+            users_collection.insert_one(user_data)
+            user = user_data
+            print(f"✅ New Google user created: {email}")
+        
+        # Generate JWT token (same as regular login)
+        access_token = create_access_token(identity=email)
+        
+        # Redirect to frontend with token
+        # The frontend will extract the token from URL and store it
+        user_data = {
+            'email': user['email'],
+            'first_name': user.get('first_name', ''),
+            'last_name': user.get('last_name', ''),
+            'profile_picture': user.get('profile_picture') or user.get('google_profile_picture', ''),
+            'auth_provider': user.get('auth_provider', 'google')
+        }
+        
+        # Encode user data for URL
+        import urllib.parse
+        user_json = json.dumps(user_data)
+        user_encoded = urllib.parse.quote(user_json)
+        
+        return redirect(f"{frontend_url}/signin?token={access_token}&user={user_encoded}&success=true")
+        
+    except Exception as e:
+        print(f"❌ Error in Google callback: {e}")
+        import traceback
+        traceback.print_exc()
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        return redirect(f"{frontend_url}/signin?error=oauth_failed")
+
+
+@app.route('/auth/google/login', methods=['POST'])
+def google_login():
+    """Legacy endpoint - kept for backward compatibility"""
+    return jsonify({'error': 'This endpoint is deprecated. Use /auth/google/authorize instead.'}), 400
+
+
+# Password Reset Functions and Endpoints
+def send_reset_email(email, token):
+    """Send password reset email to user"""
+    try:
+        reset_url = f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/password/newpassword?token={token}"
+        
+        msg = Message(
+            subject='Password Reset Request - Ask Sai Vidya',
+            recipients=[email],
+            html=f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h2 style="color: #fb923c;">Password Reset Request</h2>
+                        <p>Hello,</p>
+                        <p>You have requested to reset your password for Ask Sai Vidya. Click the button below to reset your password:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="{reset_url}" 
+                               style="background-color: #fb923c; color: white; padding: 12px 30px; 
+                                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Reset Password
+                            </a>
+                        </div>
+                        <p>Or copy and paste this link into your browser:</p>
+                        <p style="word-break: break-all; color: #666;">{reset_url}</p>
+                        <p><strong>This link will expire in 1 hour.</strong></p>
+                        <p>If you did not request a password reset, please ignore this email and your password will remain unchanged.</p>
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+                        <p style="color: #666; font-size: 12px;">
+                            This is an automated message from Ask Sai Vidya. Please do not reply to this email.
+                        </p>
+                    </div>
+                </body>
+            </html>
+            """
+        )
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
+
+
+@app.route('/password/reset/request', methods=['POST'])
+def request_password_reset():
+    """Request a password reset token"""
+    try:
+        if request.is_json:
+            email = request.json.get('email')
+        else:
+            email = request.form.get('email')
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        # Check if user exists
+        user = users_collection.find_one({'email': email})
+        
+        # Always return success to prevent email enumeration
+        if not user:
+            return jsonify({'message': 'If an account exists with this email, a password reset link has been sent.'}), 200
+        
+        # Generate secure token
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        
+        # Set expiration time (1 hour from now)
+        expires_at = datetime.now() + timedelta(hours=1)
+        
+        # Store reset token in database
+        reset_data = {
+            'user_email': email,
+            'token_hash': token_hash,
+            'created_at': datetime.now(),
+            'expires_at': expires_at,
+            'used': False
+        }
+        
+        # Remove any existing unused tokens for this user
+        db.password_resets.delete_many({'user_email': email, 'used': False})
+        
+        # Insert new token
+        db.password_resets.insert_one(reset_data)
+        
+        # Send email
+        email_sent = send_reset_email(email, token)
+        
+        if not email_sent:
+            return jsonify({'error': 'Failed to send reset email. Please try again later.'}), 500
+        
+        return jsonify({'message': 'If an account exists with this email, a password reset link has been sent.'}), 200
+        
+    except Exception as e:
+        print(f"Error in password reset request: {e}")
+        return jsonify({'error': 'An error occurred. Please try again later.'}), 500
+
+
+@app.route('/password/reset/verify', methods=['POST'])
+def verify_reset_token():
+    """Verify if a reset token is valid"""
+    try:
+        if request.is_json:
+            token = request.json.get('token')
+        else:
+            token = request.form.get('token')
+        
+        if not token:
+            return jsonify({'valid': False, 'error': 'Token is required'}), 400
+        
+        # Hash the token to compare with stored hash
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        
+        # Find the token in database
+        reset_record = db.password_resets.find_one({
+            'token_hash': token_hash,
+            'used': False
+        })
+        
+        if not reset_record:
+            return jsonify({'valid': False, 'error': 'Invalid or expired reset token'}), 400
+        
+        # Check if token has expired
+        if datetime.now() > reset_record['expires_at']:
+            return jsonify({'valid': False, 'error': 'Reset token has expired'}), 400
+        
+        return jsonify({
+            'valid': True,
+            'email': reset_record['user_email']
+        }), 200
+        
+    except Exception as e:
+        print(f"Error verifying token: {e}")
+        return jsonify({'valid': False, 'error': 'An error occurred'}), 500
+
+
+@app.route('/password/reset/confirm', methods=['POST'])
+def confirm_password_reset():
+    """Reset password with valid token"""
+    try:
+        if request.is_json:
+            token = request.json.get('token')
+            new_password = request.json.get('password')
+        else:
+            token = request.form.get('token')
+            new_password = request.form.get('password')
+        
+        if not token or not new_password:
+            return jsonify({'error': 'Token and new password are required'}), 400
+        
+        # Validate password strength
+        if len(new_password) < 6:
+            return jsonify({'error': 'Password must be at least 6 characters long'}), 400
+        
+        # Hash the token
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        
+        # Find the token
+        reset_record = db.password_resets.find_one({
+            'token_hash': token_hash,
+            'used': False
+        })
+        
+        if not reset_record:
+            return jsonify({'error': 'Invalid or expired reset token'}), 400
+        
+        # Check if token has expired
+        if datetime.now() > reset_record['expires_at']:
+            return jsonify({'error': 'Reset token has expired'}), 400
+        
+        # Hash the new password
+        hashed_password = bcrypt.hashpw(
+            new_password.encode('utf-8'),
+            bcrypt.gensalt()
+        )
+        
+        # Update user's password
+        result = users_collection.update_one(
+            {'email': reset_record['user_email']},
+            {'$set': {'password': hashed_password}}
+        )
+        
+        if result.modified_count == 0:
+            return jsonify({'error': 'Failed to update password'}), 500
+        
+        # Mark token as used
+        db.password_resets.update_one(
+            {'_id': reset_record['_id']},
+            {'$set': {'used': True, 'used_at': datetime.now()}}
+        )
+        
+        return jsonify({'message': 'Password has been reset successfully'}), 200
+        
+    except Exception as e:
+        print(f"Error resetting password: {e}")
+        return jsonify({'error': 'An error occurred. Please try again.'}), 500
 
 
 # Configure the Flask app

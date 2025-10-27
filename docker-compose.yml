@@ -1,4 +1,17 @@
 services:
+  mongodb:
+    image: mongo:6.0
+    container_name: ask-sai-baba-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=ask-sai-baba
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    networks:
+      - ask-sai-baba-network
+
   backend:
     build:
       context: ./backend
@@ -12,13 +25,16 @@ services:
       - FLASK_DEBUG=0
       - FLASK_RUN_PORT=8000
       - FLASK_RUN_HOST=0.0.0.0
-      - MONGO_URI=${MONGO_URI}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - WEAVIATE_URL=${WEAVIATE_URL}
+      - WEAVIATE_API_KEY=${WEAVIATE_API_KEY}
     env_file:
-      - .env
+      - backend/.env
     volumes:
       - ./backend/logs:/app/logs
     restart: unless-stopped
+    depends_on:
+      - mongodb
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
@@ -30,4 +46,7 @@ services:
 
 networks:
   ask-sai-baba-network:
-    driver: bridge 
+    driver: bridge
+
+volumes:
+  mongodb_data: 
