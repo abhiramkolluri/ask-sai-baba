@@ -564,7 +564,8 @@ def save_discourse(user_email):
                 'title': discourse.get('title'),
                 'content': discourse.get('content'),
                 'source_url': discourse.get('source_url', ''),
-                'source_citation': discourse.get('source_citation', '')
+                'source_citation': discourse.get('source_citation', ''),
+                'highlights': discourse.get('highlights', [])  # Add highlights support
             },
             'question_context': data.get('question_context', ''),
             'saved_at': datetime.now(),
@@ -641,6 +642,53 @@ def delete_saved_discourse(discourse_id):
             return jsonify({'error': 'Saved discourse not found'}), 404
         
         return jsonify({'message': 'Saved discourse deleted successfully'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/saved-discourses/<discourse_id>', methods=['PUT'])
+@require_auth
+def update_saved_discourse(discourse_id):
+    """Update a saved discourse (e.g., add/remove highlights)"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+        
+        user_email = data.get('user_email')
+        if not user_email:
+            return jsonify({'error': 'User email required'}), 400
+        
+        request_user_email = get_user_email_from_request()
+        if not request_user_email or request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        # Prepare update data
+        update_data = {}
+        if 'highlights' in data:
+            update_data['discourse.highlights'] = data['highlights']
+        if 'notes' in data:
+            update_data['notes'] = data['notes']
+        if 'tags' in data:
+            update_data['tags'] = data['tags']
+        
+        if not update_data:
+            return jsonify({'error': 'No update data provided'}), 400
+        
+        # Update the document
+        result = saved_discourses_collection.update_one(
+            {
+                '_id': ObjectId(discourse_id),
+                'user_email': user_email
+            },
+            {'$set': update_data}
+        )
+        
+        if result.matched_count == 0:
+            return jsonify({'error': 'Saved discourse not found'}), 404
+        
+        return jsonify({'message': 'Saved discourse updated successfully'}), 200
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
