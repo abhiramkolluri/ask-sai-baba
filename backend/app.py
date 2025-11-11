@@ -32,7 +32,11 @@ jwt_manager = JWTManager(app)
 # CORS configuration
 cors = CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+        "origins": [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "https://develop.d1zpscp56yzv1s.amplifyapp.com"
+        ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
