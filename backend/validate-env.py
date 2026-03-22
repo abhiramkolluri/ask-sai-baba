@@ -43,10 +43,7 @@ def main():
 
     all_good = True
 
-    # Check MongoDB connection
-    if not check_env_var("MONGO_URI", required=True):
-        all_good = False
-        print("   💡 Set MONGO_URI to your MongoDB connection string")
+    # MongoDB validation removed.
 
     # Check OpenAI API key with fallback to openai.ini
     if not check_env_var("OPENAI_API_KEY", required=True,
