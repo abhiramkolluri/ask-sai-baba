@@ -1,0 +1,74 @@
+{
+  "/AskSaiVidyaApiGateway/ApiUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiUrl"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/ApiId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiId"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AskSaiVidyaApi60624B8C"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/Account": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AskSaiVidyaApiAccountCC686FBA"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/Endpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AskSaiVidyaApiEndpointC2CE932A"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/CDKMetadata/Condition": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadataAvailable"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/CloudWatchRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AskSaiVidyaApiCloudWatchRole9CB52BE1"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/Deployment/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AskSaiVidyaApiDeployment469C96CEede762da280c0c7f9df21feae52e490f"
+    }
+  ],
+  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/DeploymentStage.staging/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AskSaiVidyaApiDeploymentStagestaging69E52452"
+    }
+  ]
+}
