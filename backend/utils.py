@@ -11,6 +11,7 @@ import weaviate
 
 from fine_tuning import load_fine_tuned_model_id_from_file
 from weaviate_client import get_client
+from weaviate.classes.query import Filter
 
 # Configure logging
 logging.basicConfig(
@@ -89,6 +90,63 @@ def search_browse(query: str, limit: int = 5) -> List[Dict[str, Any]]:
         logging.error(f"Weaviate search failed: {e}")
         return []
 
+def search_exact(
+    query: str,
+    limit: int = 5,
+    full_match_score: float = 1.0,
+    partial_match_score: float = 0.9
+) -> List[Dict[str, Any]]:
+    """Search articles using exact string matching in title or content."""
+    try:
+        client = get_client()
+        if not client:
+            logging.error("Weaviate client not available for exact search.")
+            return []
+            
+        articles = client.collections.get("Article")
+        # First try exact match in title
+        response = articles.query.fetch_objects(
+            filters=Filter.by_property("title").equal(query),
+            limit=limit
+        )
+        
+        results = []
+        for obj in response.objects:
+            results.append({
+                "_id": str(obj.uuid),
+                "title": obj.properties.get("title", "Untitled"),
+                "content": obj.properties.get("content", ""),
+                "score": full_match_score,  # Exact match gets perfect score
+                "location": obj.properties.get("location", ""),
+                "occasion": obj.properties.get("occasion", ""),
+                "link": obj.properties.get("link", ""),
+                "collection": obj.properties.get("collection_name", ""),
+            })
+        
+        # If no exact title matches, search for substring in content
+        if not results:
+            response = articles.query.fetch_objects(
+                filters=Filter.by_property("content").contains_any([query]),
+                limit=limit
+            )
+            
+            for obj in response.objects:
+                results.append({
+                    "_id": str(obj.uuid),
+                    "title": obj.properties.get("title", "Untitled"),
+                    "content": obj.properties.get("content", ""),
+                    "score": partial_match_score,  # Substring match gets high score
+                    "location": obj.properties.get("location", ""),
+                    "occasion": obj.properties.get("occasion", ""),
+                    "link": obj.properties.get("link", ""),
+                    "collection": obj.properties.get("collection_name", ""),
+                })
+        
+        return results[:limit]  # Ensure we don't exceed limit
+    except Exception as e:
+        logging.error(f"Weaviate exact search failed: {e}")
+        return []
+
 def search(user_query: str, collection=None) -> List[Dict[str, Any]]:
     """Search for documents."""
     return search_browse(user_query)
@@ -159,7 +217,6 @@ def load_conversation_history(session_id: str, user_id: str = None) -> list:
     try:
         client = get_client()
         conv_col = client.collections.get("Conversation")
-        from weaviate.classes.query import Filter
         response = conv_col.query.fetch_objects(
             filters=Filter.by_property("session_id").equal(session_id),
             limit=1
@@ -183,7 +240,6 @@ def save_conversation_turn(session_id: str, user_id: str, query: str, answer: st
     try:
         client = get_client()
         conv_col = client.collections.get("Conversation")
-        from weaviate.classes.query import Filter
         response = conv_col.query.fetch_objects(
             filters=Filter.by_property("session_id").equal(session_id),
             limit=1
@@ -223,7 +279,6 @@ def clear_conversation_memory(session_id: str, user_id: str = None):
     try:
         client = get_client()
         conv_col = client.collections.get("Conversation")
-        from weaviate.classes.query import Filter
         conv_col.data.delete_many(where=Filter.by_property("session_id").equal(session_id))
         return True
     except Exception as e:
@@ -307,8 +362,15 @@ def handle_user_query(query: str, collection=None, session_id: str = None, user_
                 ""
             )
 
-        if search_results is None:
-            search_results = search_browse(query, limit=5)
+        # Check if query is in quotes for exact search
+        is_exact_search = query.startswith('"') and query.endswith('"')
+        if is_exact_search:
+            query_text = query[1:-1]  # Remove quotes
+            if search_results is None:
+                search_results = search_exact(query_text, limit=5)
+        else:
+            if search_results is None:
+                search_results = search_browse(query, limit=5)
             
         # Ensure we have at least 5 results (by grabbing random docs if search fails)
         # Assuming we aren't performing random augmentation here anymore due to semantic search efficiency,
