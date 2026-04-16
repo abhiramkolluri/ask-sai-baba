@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import logging
 from datetime import datetime
@@ -44,6 +45,32 @@ def check_vector_store_health():
         logging.error(f"Vector store health check failed: {e}")
         return False
 
+def extract_quoted_phrase(query: str):
+    """
+    Extract the first double-quoted phrase from a user query string.
+
+    If the user's message contains a phrase wrapped in double quotes,
+    this function returns that phrase in lowercase with surrounding
+    whitespace stripped. If no quoted phrase is found, returns None.
+
+    Examples:
+        'retrieve the discourse on "Love and Truth"' -> 'love and truth'
+        '"Duty and Devotion"'                        -> 'duty and devotion'
+        'tell me about love and truth'               -> None
+
+    Args:
+        query: The raw user query string, which may contain quoted substrings.
+
+    Returns:
+        The first quoted phrase as a lowercase string, or None if not found.
+    """
+    if not query or not isinstance(query, str):
+        return None
+    match = re.search(r'"([^"]+)"', query)
+    if match:
+        return match.group(1).strip().lower()
+    return None
+
 def get_embedding(text):
     """Generate an embedding for the given text using OpenAI directly."""
     if not text or not isinstance(text, str):
@@ -58,8 +85,20 @@ def get_embedding(text):
         logging.error(f"Error generating embedding: {e}")
         return None
 
-def search_browse(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+def search_browse(query: str, limit: int = 5, exact_phrase: str = None) -> List[Dict[str, Any]]:
     """Search articles using Weaviate's native near_text capabilities."""
+    # If an exact phrase was extracted from a quoted user query, attempt exact
+    # matching first (title priority, then content). Only fall through to
+    # semantic search if no exact results are found, in which case we search
+    # on just the phrase rather than the full raw query sentence.
+    if exact_phrase:
+        exact_results = search_exact(exact_phrase, limit=limit)
+        if exact_results:
+            return exact_results
+        # No exact matches found — run semantic search on the phrase alone,
+        # not the full raw query, so the vector search is focused.
+        query = exact_phrase
+
     try:
         client = get_client()
         if not client:
@@ -362,12 +401,13 @@ def handle_user_query(query: str, collection=None, session_id: str = None, user_
                 ""
             )
 
-        # Check if query is in quotes for exact search
-        is_exact_search = query.startswith('"') and query.endswith('"')
-        if is_exact_search:
-            query_text = query[1:-1]  # Remove quotes
+        # Extract any quoted phrase from the user's query for exact/title-priority search.
+        # This handles natural language queries like: retrieve the discourse on "Love and Truth"
+        # as well as fully-quoted queries like: "Love and Truth"
+        exact_phrase = extract_quoted_phrase(query)
+        if exact_phrase:
             if search_results is None:
-                search_results = search_exact(query_text, limit=5)
+                search_results = search_exact(exact_phrase, limit=5)
         else:
             if search_results is None:
                 search_results = search_browse(query, limit=5)
