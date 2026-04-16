@@ -132,6 +132,36 @@ def init_schema():
             )
             print("Created collection 'SavedDiscourse'")
 
+        # Create UserAccount collection for manual auth
+        if not client.collections.exists("UserAccount"):
+            client.collections.create(
+                name="UserAccount",
+                properties=[
+                    wcd.Property(name="first_name", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="last_name", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="email", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="password_hash", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="auth_provider", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="created_at", data_type=wcd.DataType.DATE)
+                ]
+            )
+            print("Created collection 'UserAccount'")
+
+        # Create PasswordResetToken collection for manual password reset
+        if not client.collections.exists("PasswordResetToken"):
+            client.collections.create(
+                name="PasswordResetToken",
+                properties=[
+                    wcd.Property(name="user_email", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="token_hash", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="created_at", data_type=wcd.DataType.DATE),
+                    wcd.Property(name="expires_at", data_type=wcd.DataType.DATE),
+                    wcd.Property(name="used", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="used_at", data_type=wcd.DataType.DATE)
+                ]
+            )
+            print("Created collection 'PasswordResetToken'")
+
     except Exception as e:
         print(f"Error initializing schema: {e}")
 
