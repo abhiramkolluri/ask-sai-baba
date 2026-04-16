@@ -66,6 +66,17 @@ def main():
     check_env_var("LANGSMITH_API_KEY", required=False)
     check_env_var("GOOGLE_CLIENT_ID", required=False)
     check_env_var("GOOGLE_CLIENT_SECRET", required=False)
+    check_env_var("GOOGLE_REDIRECT_URI", required=False)
+    check_env_var("BACKEND_BASE_URL", required=False)
+    check_env_var("FRONTEND_SIGNIN_URL", required=False)
+    check_env_var("JWT_SECRET_KEY", required=False)
+    check_env_var("MAIL_SERVER", required=False)
+    check_env_var("MAIL_PORT", required=False)
+    check_env_var("MAIL_USE_TLS", required=False)
+    check_env_var("MAIL_USERNAME", required=False)
+    check_env_var("MAIL_PASSWORD", required=False)
+    check_env_var("MAIL_DEFAULT_SENDER", required=False)
+    check_env_var("FRONTEND_PASSWORD_RESET_URL", required=False)
 
     print("=" * 50)
 
