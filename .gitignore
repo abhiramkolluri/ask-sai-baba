@@ -4,6 +4,7 @@
 openai.ini
 venv/
 
+.vscode/
 /.idea
 /backend/__pycache__
 /Web scraper/__pycache__
@@ -11,3 +12,5 @@ Database Vectorizer\.env
 /backend/embedding_generation.log
 /EmbeddingGenerator/embeddings.json
 .qodo
+
+/claude_instructions

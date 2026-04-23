@@ -17,12 +17,13 @@ import requests
 from openai import OpenAI
 from weaviate_client import get_client, init_schema
 from utils import (
-    handle_user_query, 
-    get_full_article, 
-    clear_conversation_memory, 
+    handle_user_query,
+    get_full_article,
+    clear_conversation_memory,
     check_vector_store_health,
     search_browse,
-    load_conversation_history
+    load_conversation_history,
+    extract_quoted_phrase
 )
 
 from google.oauth2 import id_token
@@ -566,7 +567,8 @@ def search_endpoint():
     if request.is_json:
         query = request.json.get('query')
         if query:
-            results = search_browse(query)
+            exact_phrase = extract_quoted_phrase(query)
+            results = search_browse(query, exact_phrase=exact_phrase)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -585,7 +587,8 @@ def query_endpoint():
             return jsonify({'error': 'Query parameter is required'}), 400
         
         try:
-            search_results = search_browse(query)
+            exact_phrase = extract_quoted_phrase(query)
+            search_results = search_browse(query, exact_phrase=exact_phrase)
             answer = handle_user_query(
                 query=query,
                 collection=None,
