@@ -1,5 +1,6 @@
 from flask_cors import CORS
 from flask import Flask, request, jsonify, redirect
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
@@ -32,6 +33,10 @@ from google.auth.transport import requests as google_requests
 # Initialize Flask app
 app = Flask(__name__)
 
+# Apply ProxyFix middleware to handle headers from AWS load balancers
+# This allows request.host_url and related functions to use the correct domain/protocol
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
+
 # loading the env variables
 load_dotenv()
 
@@ -45,9 +50,11 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('
 
 mail = Mail(app)
 
-# Setup CORS
+# Setup CORS and Redirection URLs
 frontend_urls_raw = os.getenv("FRONTEND_URL", "http://localhost:3000,http://127.0.0.1:3000,https://asksaividya.com,https://develop.d1zpscp56yzv1s.amplifyapp.com")
 frontend_urls = [url.strip() for url in frontend_urls_raw.split(',')]
+# Use the first configured frontend URL as the default for redirections
+PRIMARY_FRONTEND_URL = frontend_urls[0].rstrip('/') if frontend_urls else "http://localhost:3000"
 
 cors = CORS(app, resources={
     r"/*": {
@@ -120,7 +127,7 @@ def require_auth(f):
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
             return jsonify({'error': 'Authentication required'}), 401
-        
+
         token = auth_header.split(' ')[1]
         if not token:
             return jsonify({'error': 'Authentication required'}), 401
@@ -128,18 +135,33 @@ def require_auth(f):
         identity = get_verified_identity(token)
         if not identity:
             return jsonify({'error': 'Invalid or expired token'}), 401
-            
+
         return f(*args, **kwargs)
     return decorated_function
 
 def get_frontend_password_reset_url(token):
+    """Return the full URL for the frontend password reset page."""
     explicit_reset_url = os.getenv("FRONTEND_PASSWORD_RESET_URL")
     if explicit_reset_url:
         separator = '&' if '?' in explicit_reset_url else '?'
         return f"{explicit_reset_url}{separator}token={quote(token)}"
 
-    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000").split(",")[0].strip()
-    return f"{frontend_url.rstrip('/')}/password/newpassword?token={quote(token)}"
+    return f"{PRIMARY_FRONTEND_URL}/password/newpassword?token={quote(token)}"
+
+def get_base_url():
+    """Return the base URL of the current request or from environment."""
+    backend_base = os.getenv("BACKEND_BASE_URL")
+    if backend_base:
+        return backend_base.rstrip('/')
+
+    # Fallback to current request host if available (useful for AWS/Cloud deployment)
+    try:
+        if request:
+            return request.host_url.rstrip('/')
+    except Exception:
+        pass
+
+    return "http://localhost:8000"
 
 def send_reset_email(email, token):
     if not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
@@ -204,8 +226,7 @@ def get_frontend_signin_url():
     if frontend_signin_url:
         return frontend_signin_url
 
-    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000").split(",")[0].strip()
-    return f"{frontend_url.rstrip('/')}/signin"
+    return f"{PRIMARY_FRONTEND_URL}/signin"
 
 def get_google_redirect_uri():
     """Return backend callback URI registered in Google Console."""
@@ -213,11 +234,7 @@ def get_google_redirect_uri():
     if explicit_redirect:
         return explicit_redirect
 
-    backend_base = os.getenv("BACKEND_BASE_URL")
-    if backend_base:
-        return f"{backend_base.rstrip('/')}/auth/google/callback"
-
-    return "http://localhost:8000/auth/google/callback"
+    return f"{get_base_url()}/auth/google/callback"
 
 @app.route('/', methods=['GET'])
 def index():
@@ -582,10 +599,10 @@ def query_endpoint():
         session_id = request.json.get('session_id')
         user_id = request.json.get('user_id')
         user_email = request.json.get('user_email')
-        
+
         if not query:
             return jsonify({'error': 'Query parameter is required'}), 400
-        
+
         try:
             exact_phrase = extract_quoted_phrase(query)
             search_results = search_browse(query, exact_phrase=exact_phrase)
@@ -597,7 +614,7 @@ def query_endpoint():
                 user_email=user_email,
                 search_results=search_results
             )
-            
+
             return jsonify({
                 'response': answer,
                 'session_id': session_id
@@ -653,16 +670,16 @@ def get_saved_discourses(user_email):
         request_user_email = get_user_email_from_request()
         if not request_user_email or request_user_email != user_email:
             return jsonify({'error': 'Unauthorized access'}), 403
-            
+
         client = get_client()
         saved_col = client.collections.get("SavedDiscourse")
         from weaviate.classes.query import Filter, Sort
-        
+
         response = saved_col.query.fetch_objects(
             filters=Filter.by_property("user_email").equal(user_email),
             sort=Sort.by_property("saved_at", ascending=False)
         )
-        
+
         results = []
         for obj in response.objects:
             results.append({
@@ -674,7 +691,7 @@ def get_saved_discourses(user_email):
                 "collection_name": obj.properties.get("collection_name", ""),
                 "saved_at": obj.properties.get("saved_at", datetime.now()).isoformat()
             })
-            
+
         return jsonify(results), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -686,14 +703,14 @@ def create_saved_discourse(user_email):
         request_user_email = get_user_email_from_request()
         if not request_user_email or request_user_email != user_email:
             return jsonify({'error': 'Unauthorized access'}), 403
-            
+
         data = request.json
         if not data or not data.get('article_uuid') or not data.get('title'):
             return jsonify({'error': 'article_uuid and title are required'}), 400
-            
+
         client = get_client()
         saved_col = client.collections.get("SavedDiscourse")
-        
+
         now = datetime.now()
         uuid = saved_col.data.insert(properties={
             "user_email": user_email,
@@ -704,7 +721,7 @@ def create_saved_discourse(user_email):
             "collection_name": data.get("collection_name", ""),
             "saved_at": now
         })
-        
+
         return jsonify({
             "id": str(uuid),
             "user_email": user_email,
@@ -725,20 +742,20 @@ def delete_saved_discourse(user_email, discourse_id):
         request_user_email = get_user_email_from_request()
         if not request_user_email or request_user_email != user_email:
             return jsonify({'error': 'Unauthorized access'}), 403
-            
+
         client = get_client()
         saved_col = client.collections.get("SavedDiscourse")
-        
+
         import uuid
         try:
             uuid_obj = uuid.UUID(discourse_id)
         except ValueError:
             return jsonify({'error': 'Invalid discourse ID'}), 400
-            
+
         obj = saved_col.query.fetch_object_by_id(uuid_obj)
         if not obj or obj.properties.get("user_email") != user_email:
             return jsonify({'error': 'Saved discourse not found'}), 404
-            
+
         saved_col.data.delete_by_id(uuid=uuid_obj)
         return jsonify({'message': 'Discourse removed successfully'}), 200
     except Exception as e:
@@ -752,16 +769,16 @@ def get_user_chats(user_email):
         request_user_email = user_email
         if not request_user_email or '@' not in request_user_email:
             return jsonify({'error': 'Invalid user email'}), 400
-            
+
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
         from weaviate.classes.query import Filter, Sort
-        
+
         response = chat_threads.query.fetch_objects(
             filters=Filter.by_property("user_email").equal(request_user_email),
             sort=Sort.by_property("created_at", ascending=False)
         )
-        
+
         results = []
         for obj in response.objects:
             thread = {
@@ -773,7 +790,7 @@ def get_user_chats(user_email):
             messages_json = obj.properties.get("messages_json", "[]")
             thread["messages"] = json.loads(messages_json)
             results.append(thread)
-            
+
         return jsonify(results), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -785,20 +802,20 @@ def get_chat_thread(thread_id):
         user_email = get_user_email_from_request()
         if not user_email:
             return jsonify({'error': 'Authentication required'}), 401
-            
+
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
-        
+
         import uuid
         try:
             uuid_obj = uuid.UUID(thread_id)
         except ValueError:
             return jsonify({'error': 'Invalid thread ID'}), 400
-            
+
         obj = chat_threads.query.fetch_object_by_id(uuid_obj)
         if not obj or obj.properties.get("user_email") != user_email:
             return jsonify({'error': 'Chat thread not found'}), 404
-            
+
         thread = {
             "id": str(obj.uuid),
             "_id": str(obj.uuid),
@@ -806,7 +823,7 @@ def get_chat_thread(thread_id):
             "timestamp": obj.properties.get("created_at", datetime.now()).isoformat()
         }
         thread["messages"] = json.loads(obj.properties.get("messages_json", "[]"))
-        
+
         return jsonify(thread), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -817,19 +834,19 @@ def create_chat_thread(user_email):
     try:
         data = request.json
         request_user_email = data.get('user_email') if data else None
-        
+
         if not request_user_email:
             return jsonify({'error': 'User email required in request body'}), 400
-            
+
         if request_user_email != user_email:
             return jsonify({'error': 'Unauthorized access'}), 403
-            
+
         if not data or 'title' not in data:
             return jsonify({'error': 'Title is required'}), 400
-            
+
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
-        
+
         now = datetime.now()
         uuid = chat_threads.data.insert(properties={
             "user_email": user_email,
@@ -838,7 +855,7 @@ def create_chat_thread(user_email):
             "last_updated": now,
             "messages_json": "[]"
         })
-        
+
         thread_data = {
             "id": str(uuid),
             "_id": str(uuid),
@@ -858,31 +875,31 @@ def add_message_to_thread(user_email, thread_id):
         request_user_email = get_user_email_from_request()
         if not request_user_email:
             return jsonify({'error': 'Authentication required'}), 401
-            
+
         if request_user_email != user_email:
             return jsonify({'error': 'Unauthorized access'}), 403
-            
+
         data = request.json
         if not data or 'question' not in data or 'reply' not in data:
             return jsonify({'error': 'Question and reply are required'}), 400
-            
+
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
-        
+
         import uuid
         uuid_obj = uuid.UUID(thread_id)
         obj = chat_threads.query.fetch_object_by_id(uuid_obj)
-        
+
         if not obj or obj.properties.get("user_email") != user_email:
             return jsonify({'error': 'Chat thread not found'}), 404
-            
+
         messages = json.loads(obj.properties.get("messages_json", "[]"))
         messages.append({
             'question': data['question'],
             'reply': data['reply'],
             'timestamp': datetime.now().isoformat()
         })
-        
+
         chat_threads.data.update(
             uuid=uuid_obj,
             properties={
@@ -902,23 +919,23 @@ def update_chat_thread(thread_id):
         user_email = data.get('user_email')
         if not user_email:
             return jsonify({'error': 'User email required'}), 400
-            
+
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
-        
+
         import uuid
         uuid_obj = uuid.UUID(thread_id)
         obj = chat_threads.query.fetch_object_by_id(uuid_obj)
-        
+
         if not obj or obj.properties.get("user_email") != user_email:
             return jsonify({'error': 'Chat thread not found'}), 404
-            
+
         update_data = {"last_updated": datetime.now()}
         if 'title' in data:
             update_data['title'] = data['title']
         if 'messages' in data:
             update_data['messages_json'] = json.dumps(data['messages'])
-            
+
         chat_threads.data.update(uuid=uuid_obj, properties=update_data)
         return jsonify({'message': 'Chat thread updated successfully'}), 200
     except Exception as e:
@@ -930,20 +947,20 @@ def delete_chat_thread(thread_id):
     try:
         data = request.json
         user_email = data.get('user_email')
-        
+
         if not user_email:
             return jsonify({'error': 'User email required'}), 400
-            
+
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
-        
+
         import uuid
         uuid_obj = uuid.UUID(thread_id)
         obj = chat_threads.query.fetch_object_by_id(uuid_obj)
-        
+
         if not obj or obj.properties.get("user_email") != user_email:
             return jsonify({'error': 'Chat thread not found'}), 404
-            
+
         chat_threads.data.delete_by_id(uuid=uuid_obj)
         return jsonify({'message': 'Chat thread deleted successfully'}), 200
     except Exception as e:
@@ -955,7 +972,7 @@ def clear_conversation():
         data = request.json
         session_id = data.get('session_id')
         user_id = data.get('user_id')
-        
+
         if not session_id:
             return jsonify({'error': 'session_id is required'}), 400
 
@@ -972,7 +989,7 @@ def get_conversation_history():
     try:
         session_id = request.args.get('session_id')
         user_id = request.args.get('user_id')
-        
+
         if not session_id:
             return jsonify({'error': 'session_id is required'}), 400
 
@@ -983,13 +1000,13 @@ def get_conversation_history():
             filters=Filter.by_property("session_id").equal(session_id),
             limit=1
         )
-        
+
         if response.objects:
             obj = response.objects[0]
             messages_json = obj.properties.get("messages_json", "[]")
             messages = json.loads(messages_json)
             last_updated = obj.properties.get("last_updated", datetime.now()).isoformat()
-            
+
             return jsonify({
                 'session_id': session_id,
                 'user_id': user_id,
@@ -1012,11 +1029,11 @@ def submit_feedback():
         data = request.json
         if not data:
             return jsonify({'error': 'Request body is required'}), 400
-            
+
         client = get_client()
         feedback_col = client.collections.get("Feedback")
-        
-        # Explicitly ignore citations per schema mismatch instruction, only log available parameters 
+
+        # Explicitly ignore citations per schema mismatch instruction, only log available parameters
         feedback_col.data.insert(properties={
             "question": data.get("question", ""),
             "answer": data.get("answer", ""),
@@ -1025,7 +1042,7 @@ def submit_feedback():
             "additional_comments": data.get("additionalComments", ""),
             "created_at": datetime.now()
         })
-        
+
         return jsonify({'message': 'Feedback submitted successfully'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
