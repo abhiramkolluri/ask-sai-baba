@@ -50,7 +50,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('
 mail = Mail(app)
 
 # Setup CORS and Redirection URLs
-frontend_urls_raw = os.getenv("FRONTEND_URL", "http://localhost:3000,http://127.0.0.1:3000,https://asksaividya.com,https://develop.d1zpscp56yzv1s.amplifyapp.com")
+frontend_urls_raw = os.getenv("FRONTEND_URL", "http://localhost:3000,http://127.0.0.1:3000,https://asksaividya.com,https://develop.d1zpscp56yzv1s.amplifyapp.com,https://staging.d3dlwf25gavin.amplifyapp.com")
 frontend_urls = [url.strip() for url in frontend_urls_raw.split(',')]
 # Use the first configured frontend URL as the default for redirections
 PRIMARY_FRONTEND_URL = frontend_urls[0].rstrip('/') if frontend_urls else "http://localhost:3000"
@@ -66,6 +66,22 @@ cors = CORS(app, resources={
 # Initialize Weaviate schema and client
 print("Initializing Weaviate schema...")
 init_schema()
+
+# Migrate: add highlights_json property to SavedDiscourse if missing
+try:
+    _client = get_client()
+    if _client and _client.collections.exists("SavedDiscourse"):
+        import weaviate.classes.config as wcd
+        saved_col = _client.collections.get("SavedDiscourse")
+        existing_props = {p.name for p in saved_col.config.get().properties}
+        if "highlights_json" not in existing_props:
+            saved_col.config.add_property(
+                wcd.Property(name="highlights_json", data_type=wcd.DataType.TEXT)
+            )
+            print("Added 'highlights_json' property to SavedDiscourse collection")
+except Exception as e:
+    print(f"Migration warning (non-fatal): {e}")
+
 weaviate_client = get_client()
 
 print("Checking vector store health...")
@@ -679,14 +695,31 @@ def get_saved_discourses(user_email):
 
         results = []
         for obj in response.objects:
+            title = obj.properties.get("title", "")
+            content_preview = obj.properties.get("content_preview", "")
+            link = obj.properties.get("link", "")
+            collection_name = obj.properties.get("collection_name", "")
+            highlights_raw = obj.properties.get("highlights_json", "[]")
+            try:
+                highlights = json.loads(highlights_raw) if highlights_raw else []
+            except (json.JSONDecodeError, TypeError):
+                highlights = []
             results.append({
                 "id": str(obj.uuid),
                 "article_uuid": obj.properties.get("article_uuid", ""),
-                "title": obj.properties.get("title", ""),
-                "content_preview": obj.properties.get("content_preview", ""),
-                "link": obj.properties.get("link", ""),
-                "collection_name": obj.properties.get("collection_name", ""),
-                "saved_at": obj.properties.get("saved_at", datetime.now()).isoformat()
+                "title": title,
+                "content_preview": content_preview,
+                "link": link,
+                "collection_name": collection_name,
+                "saved_at": obj.properties.get("saved_at", datetime.now()).isoformat(),
+                # Include nested discourse object for frontend compatibility
+                "discourse": {
+                    "title": title,
+                    "content": content_preview,
+                    "source_url": link,
+                    "source_citation": collection_name,
+                    "highlights": highlights
+                }
             })
 
         return jsonify(results), 200
@@ -702,8 +735,23 @@ def create_saved_discourse(user_email):
             return jsonify({'error': 'Unauthorized access'}), 403
 
         data = request.json
-        if not data or not data.get('article_uuid') or not data.get('title'):
-            return jsonify({'error': 'article_uuid and title are required'}), 400
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+
+        # Support both payload formats:
+        # New format: {article_uuid, title, content_preview, link, collection_name, ...}
+        # Old format: {discourse: {title, content, source_url, source_citation}, question_context, ...}
+        discourse = data.get('discourse', {})
+        title = data.get('title') or discourse.get('title', '')
+        source_url = data.get('link') or discourse.get('source_url', '')
+        article_uuid = data.get('article_uuid') or source_url.replace('/blog/', '') or f"saved-{datetime.now().timestamp()}"
+        content_preview = data.get('content_preview') or discourse.get('content', '')
+        collection_name = data.get('collection_name') or discourse.get('source_citation', '')
+        question_context = data.get('question_context', '')
+        highlights = data.get('highlights') or discourse.get('highlights', [])
+
+        if not title:
+            return jsonify({'error': 'title is required'}), 400
 
         client = get_client()
         saved_col = client.collections.get("SavedDiscourse")
@@ -711,24 +759,71 @@ def create_saved_discourse(user_email):
         now = datetime.now()
         uuid = saved_col.data.insert(properties={
             "user_email": user_email,
-            "article_uuid": data.get("article_uuid", ""),
-            "title": data.get("title", ""),
-            "content_preview": data.get("content_preview", ""),
-            "link": data.get("link", ""),
-            "collection_name": data.get("collection_name", ""),
-            "saved_at": now
+            "article_uuid": article_uuid,
+            "title": title,
+            "content_preview": content_preview,
+            "link": source_url,
+            "collection_name": collection_name,
+            "saved_at": now,
+            "highlights_json": json.dumps(highlights)
         })
 
         return jsonify({
             "id": str(uuid),
             "user_email": user_email,
-            "article_uuid": data.get("article_uuid", ""),
-            "title": data.get("title", ""),
-            "content_preview": data.get("content_preview", ""),
-            "link": data.get("link", ""),
-            "collection_name": data.get("collection_name", ""),
-            "saved_at": now.isoformat()
+            "article_uuid": article_uuid,
+            "title": title,
+            "content_preview": content_preview,
+            "link": source_url,
+            "collection_name": collection_name,
+            "saved_at": now.isoformat(),
+            # Include nested discourse object for frontend compatibility
+            "discourse": {
+                "title": title,
+                "content": content_preview,
+                "source_url": source_url,
+                "source_citation": collection_name,
+                "highlights": highlights
+            }
         }), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/saved-discourses/<discourse_id>', methods=['PUT'])
+@require_auth
+def update_saved_discourse(discourse_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'Request body is required'}), 400
+
+        # user_email comes from the request body (frontend sends it there)
+        user_email = data.get('user_email') or get_user_email_from_request()
+        if not user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+
+        client = get_client()
+        saved_col = client.collections.get("SavedDiscourse")
+
+        import uuid
+        try:
+            uuid_obj = uuid.UUID(discourse_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid discourse ID'}), 400
+
+        obj = saved_col.query.fetch_object_by_id(uuid_obj)
+        if not obj or obj.properties.get("user_email") != user_email:
+            return jsonify({'error': 'Saved discourse not found'}), 404
+
+        # Build update properties
+        update_props = {}
+        if 'highlights' in data:
+            update_props['highlights_json'] = json.dumps(data['highlights'])
+
+        if update_props:
+            saved_col.data.update(uuid=uuid_obj, properties=update_props)
+
+        return jsonify({'message': 'Discourse updated successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
