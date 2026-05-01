@@ -711,6 +711,7 @@ def get_saved_discourses(user_email):
                 "content_preview": content_preview,
                 "link": link,
                 "collection_name": collection_name,
+                "question_context": obj.properties.get("question_context", ""),
                 "saved_at": obj.properties.get("saved_at", datetime.now()).isoformat(),
                 # Include nested discourse object for frontend compatibility
                 "discourse": {
@@ -764,6 +765,7 @@ def create_saved_discourse(user_email):
             "content_preview": content_preview,
             "link": source_url,
             "collection_name": collection_name,
+            "question_context": question_context,
             "saved_at": now,
             "highlights_json": json.dumps(highlights)
         })
@@ -776,6 +778,7 @@ def create_saved_discourse(user_email):
             "content_preview": content_preview,
             "link": source_url,
             "collection_name": collection_name,
+            "question_context": question_context,
             "saved_at": now.isoformat(),
             # Include nested discourse object for frontend compatibility
             "discourse": {
