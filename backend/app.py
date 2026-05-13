@@ -792,18 +792,18 @@ def create_saved_discourse(user_email):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/saved-discourses/<discourse_id>', methods=['PUT'])
+@app.route('/saved-discourses/<user_email>/<discourse_id>', methods=['PUT'])
 @require_auth
-def update_saved_discourse(discourse_id):
+def update_saved_discourse(user_email, discourse_id):
     try:
+        # Verify the authenticated user matches the path's user_email (matches DELETE pattern)
+        request_user_email = get_user_email_from_request()
+        if not request_user_email or request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+
         data = request.json
         if not data:
             return jsonify({'error': 'Request body is required'}), 400
-
-        # user_email comes from the request body (frontend sends it there)
-        user_email = data.get('user_email') or get_user_email_from_request()
-        if not user_email:
-            return jsonify({'error': 'Unauthorized access'}), 403
 
         client = get_client()
         saved_col = client.collections.get("SavedDiscourse")
