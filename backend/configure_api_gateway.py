@@ -12,7 +12,7 @@ from botocore.exceptions import ClientError
 # Configuration
 API_GATEWAY_ID = 'dxhp0j33db'
 BACKEND_URL = 'asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com'
-STAGE_NAME = 'prod'
+STAGE_NAME = 'dev'
 
 # Define all endpoints from app.py
 ENDPOINTS = [
@@ -47,10 +47,9 @@ ENDPOINTS = [
     {'path': '/chats/{user_email}/{thread_id}/messages', 'methods': ['POST']},
     
     # Saved discourses
-    # Note: Similar conflict with {user_email} and {discourse_id} as siblings
     {'path': '/saved-discourses/{user_email}', 'methods': ['GET', 'POST']},
     {'path': '/saved-discourses/check', 'methods': ['POST']},
-    # For DELETE, we'll need to use a different approach or combine paths
+    {'path': '/saved-discourses/{user_email}/{discourse_id}', 'methods': ['DELETE']},
     
     # Conversation
     {'path': '/conversation/clear', 'methods': ['POST']},
@@ -246,61 +245,49 @@ def create_method(apigw, rest_api_id, resource_id, method, path):
             )
         
         # Set up integration
-        # Build integration URI - replace path parameters with API Gateway variables
+        # For HTTP_PROXY, keep {param} placeholders in the URI and map via requestParameters
         integration_path = path
         request_params = {}
-        
-        # Handle path parameters in integration URI and request parameters
-        # Note: {id+} means greedy path parameter in API Gateway
+
+        # Map path parameters for integration
         if '{id+}' in path:
-            integration_path = integration_path.replace('{id+}', '${request.path.id}')
             request_params['integration.request.path.id'] = 'method.request.path.id'
         elif '{id}' in path:
-            integration_path = integration_path.replace('{id}', '${request.path.id}')
             request_params['integration.request.path.id'] = 'method.request.path.id'
         if '{user_email}' in path:
-            integration_path = integration_path.replace('{user_email}', '${request.path.user_email}')
             request_params['integration.request.path.user_email'] = 'method.request.path.user_email'
         if '{thread_id}' in path:
-            integration_path = integration_path.replace('{thread_id}', '${request.path.thread_id}')
             request_params['integration.request.path.thread_id'] = 'method.request.path.thread_id'
         if '{discourse_id}' in path:
-            integration_path = integration_path.replace('{discourse_id}', '${request.path.discourse_id}')
             request_params['integration.request.path.discourse_id'] = 'method.request.path.discourse_id'
-        
+
         integration_uri = f'http://{BACKEND_URL}{integration_path}'
         
+        # HTTP_PROXY forwards the entire request (headers, body, query params) to the backend
+        # without transformation — this is required for POST/PUT requests with a JSON body
         apigw.put_integration(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method,
-            type='HTTP',
+            type='HTTP_PROXY',
             integrationHttpMethod=method,
             uri=integration_uri,
             requestParameters=request_params if request_params else {}
         )
-        
-        # Set up method response
-        apigw.put_method_response(
-            restApiId=rest_api_id,
-            resourceId=resource_id,
-            httpMethod=method,
-            statusCode='200',
-            responseParameters={
-                'method.response.header.Access-Control-Allow-Origin': True
-            }
-        )
-        
-        # Set up integration response
-        apigw.put_integration_response(
-            restApiId=rest_api_id,
-            resourceId=resource_id,
-            httpMethod=method,
-            statusCode='200',
-            responseParameters={
-                'method.response.header.Access-Control-Allow-Origin': "'*'"
-            }
-        )
+
+        # Method response (documentation only for HTTP_PROXY — status codes pass through automatically)
+        try:
+            apigw.put_method_response(
+                restApiId=rest_api_id,
+                resourceId=resource_id,
+                httpMethod=method,
+                statusCode='200',
+                responseParameters={
+                    'method.response.header.Access-Control-Allow-Origin': True
+                }
+            )
+        except ClientError:
+            pass  # May already exist
         
         
         print(f"    ✓ {method} method configured")

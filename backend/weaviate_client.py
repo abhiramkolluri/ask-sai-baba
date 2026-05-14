@@ -127,7 +127,8 @@ def init_schema():
                     wcd.Property(name="content_preview", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="link", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT),
-                    wcd.Property(name="saved_at", data_type=wcd.DataType.DATE)
+                    wcd.Property(name="saved_at", data_type=wcd.DataType.DATE),
+                    wcd.Property(name="highlights_json", data_type=wcd.DataType.TEXT)
                 ]
             )
             print("Created collection 'SavedDiscourse'")

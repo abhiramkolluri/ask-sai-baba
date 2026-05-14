@@ -191,25 +191,38 @@ def search(user_query: str, collection=None) -> List[Dict[str, Any]]:
     return search_browse(user_query)
 
 def get_full_article(id, collection=None):
-    """Retrieve full article by UUID from Weaviate."""
+    """Retrieve full article by UUID or slug from Weaviate."""
     try:
         client = get_client()
         articles = client.collections.get("Article")
-        
-        # UUID parsing
+
+        obj = None
+        # Try UUID lookup first
         try:
             import uuid
             uuid_obj = uuid.UUID(id)
+            obj = articles.query.fetch_object_by_id(uuid_obj)
         except ValueError:
-            logging.error(f"Invalid UUID provided to get_full_article: {id}")
-            return None
-            
-        obj = articles.query.fetch_object_by_id(uuid_obj)
+            # Not a UUID — try slug-based lookup by searching title similarity
+            logging.info(f"Non-UUID id '{id}', attempting slug-based search")
+            # Convert slug to search query: replace hyphens with spaces, strip trailing numbers
+            import re
+            search_query = re.sub(r'\d+$', '', id).replace('-', ' ').strip()
+            if search_query:
+                from weaviate.classes.query import MetadataQuery
+                response = articles.query.near_text(
+                    query=search_query,
+                    limit=1,
+                    return_metadata=MetadataQuery(distance=True)
+                )
+                if response.objects:
+                    obj = response.objects[0]
+
         if not obj:
             return None
 
         article = {
-            "_id": id,
+            "_id": str(obj.uuid),
             "title": obj.properties.get("title", ""),
             "content": obj.properties.get("content", ""),
             "location": obj.properties.get("location", ""),
@@ -226,7 +239,7 @@ def get_full_article(id, collection=None):
         markdown_article += f"**Link:** [{article['link']}]({article['link']})\n\n"
         markdown_article += f"## Content:\n\n{article['content']}\n"
         article['markdown_format'] = markdown_article
-        
+
         return article
     except Exception as e:
         logging.error(f"Error fetching article by id: {e}")
