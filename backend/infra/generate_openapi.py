@@ -269,6 +269,42 @@ for rule in flask_app.url_map.iter_rules():
         num_operations += 1
         all_routes.append(f"{method} {openapi_path}")
 
+# --- Post-process: merge paths that only differ by path variable name ---
+# API Gateway forbids sibling resources with different variable names at the
+# same level (e.g. /chats/{user_email} vs /chats/{thread_id}).  Since EB is
+# an http_proxy the parameter name is irrelevant — normalise to {id} and
+# merge all methods under one path entry.
+def _normalise_path(p):
+    """Replace every {param_name} with {id}, {id2}, … positionally."""
+    parts = p.split('/')
+    idx = 0
+    out = []
+    for part in parts:
+        if part.startswith('{') and part.endswith('}'):
+            suffix = '' if idx == 0 else str(idx + 1)
+            out.append('{id' + suffix + '}')
+            idx += 1
+        else:
+            out.append(part)
+    return '/'.join(out)
+
+normalised_paths: dict = {}
+for orig_path, methods in list(spec["paths"].items()):
+    norm = _normalise_path(orig_path)
+    if norm not in normalised_paths:
+        normalised_paths[norm] = {}
+    # Merge methods; later methods with the same verb overwrite earlier ones
+    for method_key, operation in methods.items():
+        # Rewrite parameter names to match the normalised path
+        norm_params = re.findall(r'\{([^}]+)\}', norm)
+        if "parameters" in operation:
+            for i, param in enumerate(operation["parameters"]):
+                if param["in"] == "path" and i < len(norm_params):
+                    param["name"] = norm_params[i]
+        normalised_paths[norm][method_key] = operation
+
+spec["paths"] = normalised_paths
+
 base_dir = os.path.dirname(os.path.abspath(__file__))
 os.makedirs(base_dir, exist_ok=True)
 

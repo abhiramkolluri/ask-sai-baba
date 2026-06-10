@@ -38,6 +38,156 @@ paths:
                     type: string
                   vector_store_healthy:
                     type: boolean
+  /auth/google/authorize:
+    get:
+      summary: Google Authorize
+      description: Endpoint structure for /auth/google/authorize
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+  /auth/google/callback:
+    get:
+      summary: Google Callback
+      description: Endpoint structure for /auth/google/callback
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+  /auth/google/login:
+    post:
+      summary: Google Login
+      description: Endpoint structure for /auth/google/login
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /register:
+    post:
+      summary: Register
+      description: Endpoint structure for /register
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /login:
+    post:
+      summary: Login
+      description: Endpoint structure for /login
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /password/reset/request:
+    post:
+      summary: Request Password Reset
+      description: Endpoint structure for /password/reset/request
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /password/reset/verify:
+    post:
+      summary: Verify Reset Token
+      description: Endpoint structure for /password/reset/verify
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /password/reset/confirm:
+    post:
+      summary: Confirm Password Reset
+      description: Endpoint structure for /password/reset/confirm
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
   /search:
     post:
       summary: Search Endpoint
@@ -178,7 +328,7 @@ paths:
         required: true
         schema:
           type: string
-  /saved-discourses/{user_email}:
+  /saved-discourses/{id}:
     get:
       summary: Get Saved Discourses
       description: Endpoint structure for /saved-discourses/{user_email}
@@ -200,7 +350,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: user_email
+      - name: id
         in: path
         required: true
         schema:
@@ -226,7 +376,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: user_email
+      - name: id
         in: path
         required: true
         schema:
@@ -236,38 +386,7 @@ paths:
           application/json:
             schema:
               type: object
-  /saved-discourses/{user_email}/{discourse_id}:
-    delete:
-      summary: Delete Saved Discourse
-      description: Endpoint structure for /saved-discourses/{user_email}/{discourse_id}
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '401':
-          description: Unauthorized
-        '404':
-          description: Resource Not Found
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      security:
-      - bearerAuth: []
-      parameters:
-      - name: user_email
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: discourse_id
-        in: path
-        required: true
-        schema:
-          type: string
+  /saved-discourses/{id}/{id2}:
     put:
       summary: Update Saved Discourse
       description: Endpoint structure for /saved-discourses/{user_email}/{discourse_id}
@@ -289,12 +408,12 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: user_email
+      - name: id
         in: path
         required: true
         schema:
           type: string
-      - name: discourse_id
+      - name: id2
         in: path
         required: true
         schema:
@@ -304,10 +423,9 @@ paths:
           application/json:
             schema:
               type: object
-  /chats/{user_email}:
-    get:
-      summary: Get User Chats
-      description: Endpoint structure for /chats/{user_email}
+    delete:
+      summary: Delete Saved Discourse
+      description: Endpoint structure for /saved-discourses/{user_email}/{discourse_id}
       responses:
         '400':
           description: Bad Request
@@ -322,24 +440,43 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    title:
-                      type: string
-                    timestamp:
-                      type: string
-                    messages:
-                      type: array
-                      items:
-                        type: object
+                type: object
       security:
       - bearerAuth: []
       parameters:
-      - name: user_email
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id2
+        in: path
+        required: true
+        schema:
+          type: string
+  /chats/{id}:
+    get:
+      summary: Get Chat Thread
+      description: Endpoint structure for /chats/{thread_id}
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource Not Found
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
         in: path
         required: true
         schema:
@@ -376,7 +513,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: user_email
+      - name: id
         in: path
         required: true
         schema:
@@ -391,33 +528,6 @@ paths:
                   type: string
                 user_email:
                   type: string
-  /chats/{thread_id}:
-    get:
-      summary: Get Chat Thread
-      description: Endpoint structure for /chats/{thread_id}
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '401':
-          description: Unauthorized
-        '404':
-          description: Resource Not Found
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      security:
-      - bearerAuth: []
-      parameters:
-      - name: thread_id
-        in: path
-        required: true
-        schema:
-          type: string
     put:
       summary: Update Chat Thread
       description: Endpoint structure for /chats/{thread_id}
@@ -439,7 +549,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: thread_id
+      - name: id
         in: path
         required: true
         schema:
@@ -470,7 +580,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: thread_id
+      - name: id
         in: path
         required: true
         schema:
@@ -480,7 +590,7 @@ paths:
           application/json:
             schema:
               type: object
-  /chats/{user_email}/{thread_id}/messages:
+  /chats/{id}/{id2}/messages:
     post:
       summary: Add Message To Thread
       description: Endpoint structure for /chats/{user_email}/{thread_id}/messages
@@ -502,12 +612,12 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: user_email
+      - name: id
         in: path
         required: true
         schema:
           type: string
-      - name: thread_id
+      - name: id2
         in: path
         required: true
         schema:

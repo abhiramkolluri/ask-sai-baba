@@ -62,13 +62,13 @@
   "/AskSaiVidyaApiGateway/AskSaiVidyaApi/Deployment/Resource": [
     {
       "type": "aws:cdk:logicalId",
-      "data": "AskSaiVidyaApiDeployment469C96CEede762da280c0c7f9df21feae52e490f"
+      "data": "AskSaiVidyaApiDeployment469C96CE58ba2b21dbc2996d9e85bbd88ddf182f"
     }
   ],
-  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/DeploymentStage.staging/Resource": [
+  "/AskSaiVidyaApiGateway/AskSaiVidyaApi/DeploymentStage.production/Resource": [
     {
       "type": "aws:cdk:logicalId",
-      "data": "AskSaiVidyaApiDeploymentStagestaging69E52452"
+      "data": "AskSaiVidyaApiDeploymentStageproductionD3F7E63C"
     }
   ]
 }
