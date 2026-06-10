@@ -6,7 +6,7 @@ BACKEND_DIR="$(dirname "$SCRIPT_DIR")"
 
 echo "=== Step 1: Generate OpenAPI spec from Flask routes ==="
 cd "$BACKEND_DIR"
-python infra/generate_openapi.py
+python3 infra/generate_openapi.py
 
 echo ""
 echo "=== Step 2: Diff current vs previous spec ==="
