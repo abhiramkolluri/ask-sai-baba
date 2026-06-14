@@ -29,7 +29,8 @@ def get_client():
     _client = weaviate.connect_to_weaviate_cloud(
         cluster_url=weaviate_url,
         auth_credentials=Auth.api_key(weaviate_api_key),
-        headers={"X-OpenAI-Api-Key": openai_api_key}
+        headers={"X-OpenAI-Api-Key": openai_api_key},
+        skip_init_checks=True
     )
     return _client
 
@@ -53,10 +54,20 @@ def init_schema():
                     wcd.Property(name="location", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="occasion", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="link", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True)
+                    wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True)
                 ]
             )
             print("Created collection 'Article'")
+        else:
+            # Add date property to existing Article collection if missing
+            article_col = client.collections.get("Article")
+            existing_props = {p.name for p in article_col.config.get().properties}
+            if "date" not in existing_props:
+                article_col.config.add_property(
+                    wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True)
+                )
+                print("Added 'date' property to existing Article collection")
 
         # Create ChatThread collection
         if not client.collections.exists("ChatThread"):
