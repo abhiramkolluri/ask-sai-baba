@@ -108,19 +108,19 @@ def verify_google_token(token):
             print(f"Error verifying Google token: {e}")
         return None
 
-def verify_manual_token(token):
+def verify_session_token(token):
     try:
         decoded = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-        if decoded.get('token_type') != 'manual':
+        if decoded.get('token_type') not in ('manual', 'google'):
             return None
         return decoded
     except Exception:
         return None
 
 def get_verified_identity(token):
-    manual_identity = verify_manual_token(token)
-    if manual_identity and manual_identity.get('email'):
-        return {'email': manual_identity.get('email'), 'provider': 'manual'}
+    session = verify_session_token(token)
+    if session and session.get('email'):
+        return {'email': session.get('email'), 'provider': session.get('token_type', 'manual')}
 
     google_identity = verify_google_token(token)
     if google_identity and google_identity.get('email'):
@@ -338,7 +338,13 @@ def google_callback():
     if not user.get("email"):
         return redirect(f"{frontend_signin}?error=no_email")
 
-    redirect_url = f"{frontend_signin}?success=true&token={quote(google_id_token)}&user={user_encoded}"
+    session_token = jwt.encode({
+        'email': user['email'],
+        'token_type': 'google',
+        'exp': datetime.utcnow() + timedelta(days=30)
+    }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+
+    redirect_url = f"{frontend_signin}?success=true&token={quote(session_token)}&user={user_encoded}"
     return redirect(redirect_url)
 
 @app.route('/auth/google/login', methods=['POST'])
@@ -363,8 +369,14 @@ def google_login():
         "auth_provider": "google",
     }
 
+    session_token = jwt.encode({
+        'email': user['email'],
+        'token_type': 'google',
+        'exp': datetime.utcnow() + timedelta(days=30)
+    }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+
     return jsonify({
-        "token": token,
+        "token": session_token,
         "user": user,
         "message": "Google login successful"
     }), 200
@@ -666,6 +678,114 @@ def summarize_question():
             return jsonify({'error': str(e)}), 500
     else:
         return jsonify({'error': 'Request must contain JSON data'}), 400
+
+@app.route('/discourses/years', methods=['GET'])
+def get_discourse_years():
+    """
+    Return all years that have at least one discourse, with discourse counts.
+    Response: { years: [ { year: "1958", count: 42 }, ... ] }  (sorted asc)
+    """
+    try:
+        client = get_client()
+        articles = client.collections.get("Article")
+
+        year_counts = {}
+        for obj in articles.iterator(return_properties=["date"]):
+            date_str = (obj.properties.get("date") or "").strip()
+            year = _extract_year(date_str)
+            if year:
+                year_counts[year] = year_counts.get(year, 0) + 1
+
+        sorted_years = [
+            {"year": y, "count": c}
+            for y, c in sorted(year_counts.items())
+        ]
+        return jsonify({"years": sorted_years})
+    except Exception as e:
+        print(f"Error fetching discourse years: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/discourses/year/<year>', methods=['GET'])
+def get_discourses_by_year(year):
+    """
+    Return paginated discourses for a given year.
+    Query params: page (1-based, default 1), limit (default 20)
+    Response: { discourses: [...], total: N, page: N, pages: N }
+    """
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+        limit = min(50, max(1, int(request.args.get("limit", 20))))
+
+        client = get_client()
+        articles = client.collections.get("Article")
+
+        matching = []
+        for obj in articles.iterator(
+            return_properties=["title", "date", "location", "occasion", "link", "collection_name"]
+        ):
+            date_str = (obj.properties.get("date") or "").strip()
+            if _extract_year(date_str) == year:
+                matching.append({
+                    "id": str(obj.uuid),
+                    "title": obj.properties.get("title", "Untitled"),
+                    "date": date_str,
+                    "location": obj.properties.get("location", ""),
+                    "occasion": obj.properties.get("occasion", ""),
+                    "link": obj.properties.get("link", ""),
+                    "collection": obj.properties.get("collection_name", ""),
+                })
+
+        # Sort by date string (day month year format — sort by parsed date)
+        matching.sort(key=lambda d: _sort_key(d.get("date", "")))
+
+        total = len(matching)
+        pages = max(1, (total + limit - 1) // limit)
+        start = (page - 1) * limit
+        page_items = matching[start: start + limit]
+
+        return jsonify({
+            "discourses": page_items,
+            "total": total,
+            "page": page,
+            "pages": pages,
+        })
+    except Exception as e:
+        print(f"Error fetching discourses for year {year}: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+def _extract_year(date_str: str) -> str:
+    """Extract 4-digit year from strings like '17 October 1953' or 'April 1957'."""
+    import re
+    m = re.search(r'\b(19\d{2}|20\d{2})\b', date_str or "")
+    return m.group(1) if m else ""
+
+
+def _sort_key(date_str: str):
+    """Return a sortable tuple (year, month, day) from a date string."""
+    import re
+    from datetime import datetime
+    MONTHS = {
+        "january": 1, "february": 2, "march": 3, "april": 4,
+        "may": 5, "june": 6, "july": 7, "august": 8,
+        "september": 9, "october": 10, "november": 11, "december": 12,
+    }
+    if not date_str:
+        return (9999, 99, 99)
+    parts = date_str.strip().split()
+    try:
+        if len(parts) == 3:   # "17 October 1953"
+            day, month_name, year = int(parts[0]), MONTHS.get(parts[1].lower(), 0), int(parts[2])
+        elif len(parts) == 2:  # "April 1957"
+            day, month_name, year = 0, MONTHS.get(parts[0].lower(), 0), int(parts[1])
+        else:
+            year = int(re.search(r'\d{4}', date_str).group())
+            return (year, 0, 0)
+        return (year, month_name, day)
+    except Exception:
+        return (9999, 99, 99)
+
 
 @app.route('/blog/<id>', methods=['GET'])
 def get_article(id):
