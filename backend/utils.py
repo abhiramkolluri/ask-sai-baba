@@ -123,6 +123,7 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None) -> List[
                 "occasion": obj.properties.get("occasion", ""),
                 "link": obj.properties.get("link", ""),
                 "collection": obj.properties.get("collection_name", ""),
+                "date": obj.properties.get("date", ""),
             })
         return results
     except Exception as e:
