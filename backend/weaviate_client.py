@@ -69,6 +69,27 @@ def init_schema():
                 )
                 print("Added 'date' property to existing Article collection")
 
+        # Create Passage collection (chunked discourse passages for fine-grained search)
+        if not client.collections.exists("Passage"):
+            client.collections.create(
+                name="Passage",
+                vectorizer_config=wcd.Configure.Vectorizer.text2vec_openai(
+                    model="text-embedding-3-large"
+                ),
+                properties=[
+                    wcd.Property(name="content", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="article_id", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="chunk_index", data_type=wcd.DataType.INT, skip_vectorization=True),
+                    wcd.Property(name="title", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="link", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="location", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="occasion", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="date_authored", data_type=wcd.DataType.TEXT, skip_vectorization=True)
+                ]
+            )
+            print("Created collection 'Passage'")
+
         # Create ChatThread collection
         if not client.collections.exists("ChatThread"):
             client.collections.create(
