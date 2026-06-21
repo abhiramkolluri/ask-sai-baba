@@ -613,7 +613,9 @@ def search_endpoint():
         query = request.json.get('query')
         if query:
             exact_phrase = extract_quoted_phrase(query)
-            results = search_browse(query, exact_phrase=exact_phrase)
+            # Browse shows more results than chat; allow_empty stays True so an
+            # honest empty result is returned rather than padded.
+            results = search_browse(query, limit=10, exact_phrase=exact_phrase)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -633,7 +635,9 @@ def query_endpoint():
 
         try:
             exact_phrase = extract_quoted_phrase(query)
-            search_results = search_browse(query, exact_phrase=exact_phrase)
+            # Chat needs grounding context: allow_empty=False so an empty grade
+            # result falls back to the top reranked passages.
+            search_results = search_browse(query, exact_phrase=exact_phrase, allow_empty=False)
             answer = handle_user_query(
                 query=query,
                 collection=None,

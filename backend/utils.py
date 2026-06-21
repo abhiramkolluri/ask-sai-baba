@@ -52,6 +52,12 @@ GRADE_MODEL = "gpt-4o-mini"
 GRADE_MIN_RELEVANCE = 0.5
 HYBRID_ALPHA = 0.5
 
+# When the grader rejects everything but the caller still needs grounding
+# context (chat, allow_empty=False), fall back to this many top reranked
+# (pre-grade) passages aggregated to discourses. Browse (allow_empty=True)
+# never falls back — an empty result is the honest answer there.
+CHAT_FALLBACK_DISCOURSES = 3
+
 def check_vector_store_health():
     """Check if Weaviate is properly initialized and has data."""
     try:
@@ -105,49 +111,48 @@ def get_embedding(text):
         logging.error(f"Error generating embedding: {e}")
         return None
 
-def search_browse(query: str, limit: int = 5, exact_phrase: str = None) -> List[Dict[str, Any]]:
-    """Search articles using Weaviate's native near_text capabilities."""
-    # If an exact phrase was extracted from a quoted user query, attempt exact
-    # matching first (title priority, then content). Only fall through to
-    # semantic search if no exact results are found, in which case we search
-    # on just the phrase rather than the full raw query sentence.
+def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_empty: bool = True) -> List[Dict[str, Any]]:
+    """Search discourses via the passage pipeline (hybrid -> rerank -> grade -> aggregate).
+
+    Keeps the quoted-phrase exact-match shortcut from the legacy implementation.
+    `allow_empty` controls the no-results behavior:
+      - True (browse): return [] when nothing directly answers the query.
+      - False (chat): fall back to the top reranked passages so the generator
+        still has grounding context.
+
+    The original near_text implementation is preserved verbatim as
+    search_browse_articles_legacy() for rollback.
+    """
+    # (a) Quoted-phrase shortcut: try exact match first, exactly as before.
     if exact_phrase:
         exact_results = search_exact(exact_phrase, limit=limit)
         if exact_results:
+            # Normalize to the pipeline output shape so downstream consumers
+            # (format_docs, frontend) see matched_passage/passage_index.
+            for r in exact_results:
+                r.setdefault("matched_passage", r.get("content", ""))
+                r.setdefault("passage_index", 0)
             return exact_results
-        # No exact matches found — run semantic search on the phrase alone,
-        # not the full raw query, so the vector search is focused.
+        # (b) No exact match — fall through using the phrase as the query, but
+        # route into the passage pipeline instead of near_text.
         query = exact_phrase
 
-    try:
-        client = get_client()
-        if not client:
-            logging.error("Weaviate client not available for search.")
+    # (c) Run the passage pipeline.
+    candidates = search_passages(query, PASSAGE_OVERFETCH)
+    reranked = rerank_passages(query, candidates, RERANK_KEEP)
+    graded = grade_passages(query, reranked)
+    results = aggregate_to_discourses(graded, limit)
+
+    # (d) Handle the empty case.
+    if not results:
+        if allow_empty:
             return []
-            
-        articles = client.collections.get("Article")
-        response = articles.query.near_text(
-            query=query,
-            limit=limit,
-            return_metadata=weaviate.classes.query.MetadataQuery(distance=True)
-        )
-        
-        results = []
-        for obj in response.objects:
-            results.append({
-                "_id": str(obj.uuid),
-                "title": obj.properties.get("title", "Untitled"),
-                "content": obj.properties.get("content", ""),
-                "score": 1 - (obj.metadata.distance or 0),
-                "location": obj.properties.get("location", ""),
-                "occasion": obj.properties.get("occasion", ""),
-                "link": obj.properties.get("link", ""),
-                "collection": obj.properties.get("collection_name", ""),
-            })
-        return results
-    except Exception as e:
-        logging.error(f"Weaviate search failed: {e}")
-        return []
+        # Chat path: ground the generator on the top reranked (pre-grade)
+        # passages even though the grader was not satisfied.
+        fallback = aggregate_to_discourses(reranked[:CHAT_FALLBACK_DISCOURSES], CHAT_FALLBACK_DISCOURSES)
+        return fallback
+
+    return results
 
 def search_browse_articles_legacy(query: str, limit: int = 5, exact_phrase: str = None) -> List[Dict[str, Any]]:
     """Search articles using Weaviate's native near_text capabilities.
@@ -528,10 +533,17 @@ def format_docs(docs):
     for doc in docs:
         if isinstance(doc, dict):
             title = doc.get('title', 'Untitled')
-            content = str(doc.get('content', 'N/A'))[:500]
-            description = f"This discourse '{title}' provides insights about the topic by discussing {content[:100]}..."
-            formatted_docs.append(f"From discourse '{title}': {description}")
-    
+            # Prefer the vetted matched passage in full — it is already short
+            # (post-chunking) and was confirmed relevant by the grader. Only
+            # fall back to truncating raw `content` when no passage is present
+            # (e.g. exact-match full-article results).
+            matched_passage = doc.get('matched_passage')
+            if matched_passage:
+                excerpt = str(matched_passage)
+            else:
+                excerpt = str(doc.get('content', 'N/A'))[:1500]
+            formatted_docs.append(f"From discourse '{title}': {excerpt}")
+
     if not formatted_docs:
         return "From discourse 'General Spiritual Guidance': This discourse provides general spiritual guidance and wisdom from Sai Baba's teachings."
     
@@ -696,8 +708,8 @@ def handle_user_query(query: str, collection=None, session_id: str = None, user_
                 search_results = search_exact(exact_phrase, limit=5)
         else:
             if search_results is None:
-                search_results = search_browse(query, limit=5)
-            
+                search_results = search_browse(query, limit=5, allow_empty=False)
+
         # Ensure we have at least 5 results (by grabbing random docs if search fails)
         # Assuming we aren't performing random augmentation here anymore due to semantic search efficiency,
         # but the fallback might just use what we have. 
