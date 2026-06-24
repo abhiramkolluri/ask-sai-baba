@@ -2,7 +2,7 @@ import os
 import re
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any
 from dotenv import load_dotenv
 import configparser
@@ -297,7 +297,7 @@ def save_conversation_turn(session_id: str, user_id: str, query: str, answer: st
             limit=1
         )
         
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         new_human = {"type": "human", "content": query, "timestamp": now.isoformat()}
         new_ai = {"type": "ai", "content": answer, "timestamp": now.isoformat()}
         
@@ -357,7 +357,7 @@ def store_new_user_query(query_text, response, get_knowledge, user_email=None):
                     "score": float(score),
                     "citation": citationString,
                     "user_email": user_email or "",
-                    "created_at": datetime.now()
+                    "created_at": datetime.now(timezone.utc)
                 })
     except Exception as exp:
         logging.error(f"Error storing user query: {exp}")
