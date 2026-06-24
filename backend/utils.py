@@ -132,7 +132,7 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
             for r in exact_results:
                 r.setdefault("matched_passage", r.get("content", ""))
                 r.setdefault("passage_index", 0)
-            return exact_results
+            return select_best_sentences(query, exact_results)
         # (b) No exact match — fall through using the phrase as the query, but
         # route into the passage pipeline instead of near_text.
         query = exact_phrase
@@ -150,9 +150,9 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # Chat path: ground the generator on the top reranked (pre-grade)
         # passages even though the grader was not satisfied.
         fallback = aggregate_to_discourses(reranked[:CHAT_FALLBACK_DISCOURSES], CHAT_FALLBACK_DISCOURSES)
-        return fallback
+        return select_best_sentences(query, fallback)
 
-    return results
+    return select_best_sentences(query, results)
 
 def search_browse_articles_legacy(query: str, limit: int = 5, exact_phrase: str = None) -> List[Dict[str, Any]]:
     """Search articles using Weaviate's native near_text capabilities.
@@ -322,6 +322,68 @@ def rerank_passages(query: str, candidates: List[Dict[str, Any]], keep: int = RE
         logging.error(f"Cohere rerank failed: {e}; falling back to hybrid-score order.")
         ranked = sorted(candidates, key=lambda c: c.get("score", 0.0), reverse=True)
         return ranked[:keep]
+
+def _split_sentences(text: str) -> List[str]:
+    """Split text into sentences with a lightweight regex (no nltk dependency).
+
+    Drops empty/trivial fragments. Abbreviations (e.g. "Mr.") can over-split, but
+    that is acceptable: the rerank below still picks the most relevant fragment.
+    """
+    if not text:
+        return []
+    parts = re.split(r"(?<=[.!?])\s+", text.strip())
+    return [p.strip() for p in parts if p and len(p.strip()) > 1]
+
+def select_best_sentences(query: str, discourses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Annotate each discourse with `best_sentence`: the single verbatim sentence
+    from its matched passage that best answers `query`.
+
+    Uses ONE Cohere rerank call over the sentences of all passages combined, then
+    assigns each discourse its highest-ranked sentence. Degrades to the passage's
+    first sentence when COHERE_API_KEY is unset or the call fails — never throws.
+    """
+    if not discourses:
+        return discourses
+
+    per_doc_sentences = []
+    flat = []  # (discourse_index, sentence)
+    for d_idx, d in enumerate(discourses):
+        sentences = _split_sentences(d.get("matched_passage", "") or d.get("content", ""))
+        per_doc_sentences.append(sentences)
+        for s in sentences:
+            flat.append((d_idx, s))
+
+    def _default(d_idx):
+        sents = per_doc_sentences[d_idx]
+        if sents:
+            return sents[0]
+        d = discourses[d_idx]
+        return d.get("matched_passage", "") or d.get("content", "")
+
+    chosen = {}  # discourse_index -> best sentence
+    if COHERE_API_KEY and flat:
+        try:
+            import cohere
+            co = cohere.Client(COHERE_API_KEY)
+            documents = [s for (_, s) in flat]
+            response = co.rerank(
+                model=RERANK_MODEL,
+                query=query,
+                documents=documents,
+                top_n=len(documents),
+            )
+            # Results are best-first; the first sentence seen per discourse wins.
+            for result in response.results:
+                d_idx, sentence = flat[result.index]
+                if d_idx not in chosen:
+                    chosen[d_idx] = sentence
+        except Exception as e:
+            logging.error(f"Cohere best-sentence selection failed: {e}; using first sentence.")
+            chosen = {}
+
+    for d_idx, d in enumerate(discourses):
+        d["best_sentence"] = chosen.get(d_idx) or _default(d_idx)
+    return discourses
 
 def grade_passages(query: str, candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """LLM relevance grade: keep only passages that directly answer the query.
