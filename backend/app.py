@@ -1255,13 +1255,17 @@ def submit_feedback():
         client = get_client()
         feedback_col = client.collections.get("Feedback")
 
-        # Explicitly ignore citations per schema mismatch instruction, only log available parameters
+        # Citations (array of objects) are intentionally not stored; the discourse
+        # is captured via its title/id/source and the quote (answer) instead.
         feedback_col.data.insert(properties={
-            "question": data.get("question", ""),
-            "answer": data.get("answer", ""),
-            "feedback_type": data.get("feedbackType", ""),
-            "reason": data.get("reason", ""),
-            "additional_comments": data.get("additionalComments", ""),
+            "question": data.get("question") or "",
+            "answer": data.get("answer") or "",
+            "feedback_type": data.get("feedbackType") or "",
+            "reason": data.get("reason") or "",
+            "additional_comments": data.get("additionalComments") or "",
+            "discourse_title": data.get("discourseTitle") or "",
+            "discourse_id": data.get("discourseId") or "",
+            "discourse_source": data.get("discourseSource") or "",
             "created_at": datetime.now()
         })
 

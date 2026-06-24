@@ -143,10 +143,23 @@ def init_schema():
                     wcd.Property(name="feedback_type", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="reason", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="additional_comments", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="discourse_title", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="discourse_id", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="discourse_source", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="created_at", data_type=wcd.DataType.DATE)
                 ]
             )
             print("Created collection 'Feedback'")
+        else:
+            # Ensure discourse-context properties exist on the already-created collection.
+            feedback_col = client.collections.get("Feedback")
+            existing = {p.name for p in feedback_col.config.get().properties}
+            for prop in ["discourse_title", "discourse_id", "discourse_source"]:
+                if prop not in existing:
+                    feedback_col.config.add_property(
+                        wcd.Property(name=prop, data_type=wcd.DataType.TEXT)
+                    )
+                    print(f"Added '{prop}' property to Feedback collection")
 
         # Create SavedDiscourse collection
         if not client.collections.exists("SavedDiscourse"):
