@@ -196,6 +196,7 @@ def search_browse_articles_legacy(query: str, limit: int = 5, exact_phrase: str 
                 "occasion": obj.properties.get("occasion", ""),
                 "link": obj.properties.get("link", ""),
                 "collection": obj.properties.get("collection_name", ""),
+                "date": obj.properties.get("date", ""),
             })
         return results
     except Exception as e:
