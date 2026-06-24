@@ -1,0 +1,2135 @@
+{
+ "Resources": {
+  "AskSaiVidyaApi60624B8C": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Body": {
+     "openapi": "3.0.0",
+     "info": {
+      "title": "Ask Sai Vidya API",
+      "version": "2.0.0"
+     },
+     "servers": [
+      {
+       "url": "{gateway_url}",
+       "variables": {
+        "gateway_url": {
+         "default": "https://dxhp0j33db.execute-api.us-east-1.amazonaws.com/dev"
+        }
+       }
+      }
+     ],
+     "components": {
+      "securitySchemes": {
+       "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+       }
+      }
+     },
+     "paths": {
+      "/": {
+       "get": {
+        "summary": "Index",
+        "description": "Endpoint structure for /",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object",
+             "properties": {
+              "status": {
+               "type": "string"
+              },
+              "service": {
+               "type": "string"
+              },
+              "version": {
+               "type": "string"
+              },
+              "vector_store_healthy": {
+               "type": "boolean"
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/search": {
+       "post": {
+        "summary": "Search Endpoint",
+        "description": "Endpoint structure for /search",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "array",
+             "items": {
+              "type": "object",
+              "properties": {
+               "_id": {
+                "type": "string"
+               },
+               "title": {
+                "type": "string"
+               },
+               "content": {
+                "type": "string"
+               },
+               "score": {
+                "type": "number"
+               },
+               "location": {
+                "type": "string"
+               },
+               "occasion": {
+                "type": "string"
+               },
+               "link": {
+                "type": "string"
+               },
+               "collection": {
+                "type": "string"
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object",
+            "properties": {
+             "query": {
+              "type": "string"
+             }
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/search",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/query": {
+       "post": {
+        "summary": "Query Endpoint",
+        "description": "Endpoint structure for /query",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object",
+             "properties": {
+              "response": {
+               "type": "string"
+              },
+              "session_id": {
+               "type": "string"
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object",
+            "properties": {
+             "query": {
+              "type": "string"
+             },
+             "session_id": {
+              "type": "string"
+             },
+             "user_id": {
+              "type": "string"
+             },
+             "user_email": {
+              "type": "string"
+             }
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/query",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/summarize-question": {
+       "post": {
+        "summary": "Summarize Question",
+        "description": "Endpoint structure for /summarize-question",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object",
+             "properties": {
+              "summary": {
+               "type": "string"
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object",
+            "properties": {
+             "question": {
+              "type": "string"
+             }
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/summarize-question",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/blog/{id}": {
+       "get": {
+        "summary": "Get Article",
+        "description": "Endpoint structure for /blog/{id}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object",
+             "properties": {
+              "title": {
+               "type": "string"
+              },
+              "content": {
+               "type": "string"
+              },
+              "location": {
+               "type": "string"
+              },
+              "occasion": {
+               "type": "string"
+              },
+              "link": {
+               "type": "string"
+              },
+              "collection": {
+               "type": "string"
+              },
+              "markdown_format": {
+               "type": "string"
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "parameters": [
+         {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/blog/{id}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.id": "method.request.path.id"
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/saved-discourses/{user_email}": {
+       "get": {
+        "summary": "Get Saved Discourses",
+        "description": "Endpoint structure for /saved-discourses/{user_email}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "user_email",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/saved-discourses/{user_email}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.user_email": "method.request.path.user_email"
+         }
+        }
+       },
+       "post": {
+        "summary": "Create Saved Discourse",
+        "description": "Endpoint structure for /saved-discourses/{user_email}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "user_email",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object"
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/saved-discourses/{user_email}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.user_email": "method.request.path.user_email"
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/saved-discourses/{user_email}/{discourse_id}": {
+       "delete": {
+        "summary": "Delete Saved Discourse",
+        "description": "Endpoint structure for /saved-discourses/{user_email}/{discourse_id}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "user_email",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         },
+         {
+          "name": "discourse_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "DELETE",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/saved-discourses/{user_email}/{discourse_id}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.user_email": "method.request.path.user_email",
+          "integration.request.path.discourse_id": "method.request.path.discourse_id"
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/chats/{user_email}": {
+       "get": {
+        "summary": "Get User Chats",
+        "description": "Endpoint structure for /chats/{user_email}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "array",
+             "items": {
+              "type": "object",
+              "properties": {
+               "id": {
+                "type": "string"
+               },
+               "title": {
+                "type": "string"
+               },
+               "timestamp": {
+                "type": "string"
+               },
+               "messages": {
+                "type": "array",
+                "items": {
+                 "type": "object"
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "user_email",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/chats/{user_email}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.user_email": "method.request.path.user_email"
+         }
+        }
+       },
+       "post": {
+        "summary": "Create Chat Thread",
+        "description": "Endpoint structure for /chats/{user_email}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object",
+             "properties": {
+              "id": {
+               "type": "string"
+              },
+              "title": {
+               "type": "string"
+              },
+              "timestamp": {
+               "type": "string"
+              },
+              "messages": {
+               "type": "array",
+               "items": {
+                "type": "object"
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "user_email",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object",
+            "properties": {
+             "title": {
+              "type": "string"
+             },
+             "user_email": {
+              "type": "string"
+             }
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/chats/{user_email}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.user_email": "method.request.path.user_email"
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/chats/{thread_id}": {
+       "get": {
+        "summary": "Get Chat Thread",
+        "description": "Endpoint structure for /chats/{thread_id}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "thread_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/chats/{thread_id}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.thread_id": "method.request.path.thread_id"
+         }
+        }
+       },
+       "put": {
+        "summary": "Update Chat Thread",
+        "description": "Endpoint structure for /chats/{thread_id}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "thread_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object"
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "PUT",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/chats/{thread_id}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.thread_id": "method.request.path.thread_id"
+         }
+        }
+       },
+       "delete": {
+        "summary": "Delete Chat Thread",
+        "description": "Endpoint structure for /chats/{thread_id}",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "thread_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object"
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "DELETE",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/chats/{thread_id}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.thread_id": "method.request.path.thread_id"
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/chats/{user_email}/{thread_id}/messages": {
+       "post": {
+        "summary": "Add Message To Thread",
+        "description": "Endpoint structure for /chats/{user_email}/{thread_id}/messages",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "401": {
+          "description": "Unauthorized"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "security": [
+         {
+          "bearerAuth": []
+         }
+        ],
+        "parameters": [
+         {
+          "name": "user_email",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         },
+         {
+          "name": "thread_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object"
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/chats/{user_email}/{thread_id}/messages",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.user_email": "method.request.path.user_email",
+          "integration.request.path.thread_id": "method.request.path.thread_id"
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/conversation/clear": {
+       "post": {
+        "summary": "Clear Conversation",
+        "description": "Endpoint structure for /conversation/clear",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object"
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/conversation/clear",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/conversation/history": {
+       "get": {
+        "summary": "Get Conversation History",
+        "description": "Endpoint structure for /conversation/history",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/conversation/history",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/api/feedback": {
+       "post": {
+        "summary": "Submit Feedback",
+        "description": "Endpoint structure for /api/feedback",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object",
+             "properties": {
+              "message": {
+               "type": "string"
+              }
+             }
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object",
+            "properties": {
+             "question": {
+              "type": "string"
+             },
+             "answer": {
+              "type": "string"
+             },
+             "feedbackType": {
+              "type": "string"
+             },
+             "reason": {
+              "type": "string"
+             },
+             "additionalComments": {
+              "type": "string"
+             },
+             "timestamp": {
+              "type": "string"
+             },
+             "citations": {
+              "type": "array",
+              "items": {
+               "type": "string"
+              }
+             }
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-dev.eba-hsdbwmfy.us-east-1.elasticbeanstalk.com/api/feedback",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "Name": "AskSaiVidyaApi"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AskSaiVidyaApiGateway/AskSaiVidyaApi/Resource"
+   }
+  },
+  "AskSaiVidyaApiCloudWatchRole9CB52BE1": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AskSaiVidyaApiGateway/AskSaiVidyaApi/CloudWatchRole/Resource"
+   }
+  },
+  "AskSaiVidyaApiAccountCC686FBA": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "AskSaiVidyaApiCloudWatchRole9CB52BE1",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "AskSaiVidyaApi60624B8C"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AskSaiVidyaApiGateway/AskSaiVidyaApi/Account"
+   }
+  },
+  "AskSaiVidyaApiDeployment469C96CEede762da280c0c7f9df21feae52e490f": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "AskSaiVidyaApi60624B8C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AskSaiVidyaApiGateway/AskSaiVidyaApi/Deployment/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "AskSaiVidyaApiDeploymentStagestaging69E52452": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "AskSaiVidyaApiDeployment469C96CEede762da280c0c7f9df21feae52e490f"
+    },
+    "RestApiId": {
+     "Ref": "AskSaiVidyaApi60624B8C"
+    },
+    "StageName": "staging"
+   },
+   "DependsOn": [
+    "AskSaiVidyaApiAccountCC686FBA"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AskSaiVidyaApiGateway/AskSaiVidyaApi/DeploymentStage.staging/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02MzQrCMBAGn6X3NEotgseq90p9AFnjWtf+JDQbSil5d7cVwdPMDsuX6SzP9TaB0afm0aQt3fV8ZTCNknSbwVENjCNMkh2aCj0XjtTp2f9UaMNg8Agel14YY0PP6oyutVOHolL/Lpmv189VoiLo9FzZdm0LY1ysDOwCR3WZ+GX7zU4f9D55e6J0kHnqUFdffgA/S8zdxAAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "AskSaiVidyaApiGateway/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "AskSaiVidyaApiEndpointC2CE932A": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "AskSaiVidyaApi60624B8C"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "AskSaiVidyaApiDeploymentStagestaging69E52452"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "ApiUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "AskSaiVidyaApi60624B8C"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "AskSaiVidyaApiDeploymentStagestaging69E52452"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "ApiId": {
+   "Value": {
+    "Ref": "AskSaiVidyaApi60624B8C"
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
