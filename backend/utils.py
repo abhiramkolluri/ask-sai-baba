@@ -49,6 +49,7 @@ PASSAGE_OVERFETCH = 40
 RERANK_KEEP = 15
 RERANK_MODEL = "rerank-v3.5"
 GRADE_MODEL = "gpt-4o-mini"
+JUDGE_MODEL = "gpt-4o"  # stronger judge for unified grade + verbatim quote extraction
 GRADE_MIN_RELEVANCE = 0.5
 HYBRID_ALPHA = 0.5
 
@@ -140,7 +141,9 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
     # (c) Run the passage pipeline.
     candidates = search_passages(query, PASSAGE_OVERFETCH)
     reranked = rerank_passages(query, candidates, RERANK_KEEP)
-    graded = grade_passages(query, reranked)
+    # Unified extractive grade: judges relevance AND extracts the verbatim answering
+    # quote in one pass, attaching `best_sentence` to each kept passage.
+    graded = grade_and_quote_passages(query, reranked)
     results = aggregate_to_discourses(graded, limit)
 
     # (d) Handle the empty case.
@@ -152,7 +155,8 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         fallback = aggregate_to_discourses(reranked[:CHAT_FALLBACK_DISCOURSES], CHAT_FALLBACK_DISCOURSES)
         return select_best_sentences(query, fallback)
 
-    return select_best_sentences(query, results)
+    # Quotes are already attached by the unified grade step.
+    return results
 
 def search_browse_articles_legacy(query: str, limit: int = 5, exact_phrase: str = None) -> List[Dict[str, Any]]:
     """Search articles using Weaviate's native near_text capabilities.
@@ -232,9 +236,9 @@ def expand_short_query(query: str) -> str:
                     "content": (
                         "Expand the user's short search query into a single richer search "
                         "phrase capturing its likely intent for searching a collection of "
-                        "spiritual discourses. For example 'dharma' -> 'the meaning and "
-                        "practice of dharma in spiritual life'. Return only the expanded "
-                        "phrase, with no quotes or extra commentary."
+                        "spiritual discourses by Sathya Sai Baba. For example 'dharma' -> "
+                        "'the meaning and practice of dharma in spiritual life'. Return only "
+                        "the expanded phrase, with no quotes or extra commentary."
                     ),
                 },
                 {"role": "user", "content": query},
@@ -334,56 +338,155 @@ def _split_sentences(text: str) -> List[str]:
     parts = re.split(r"(?<=[.!?])\s+", text.strip())
     return [p.strip() for p in parts if p and len(p.strip()) > 1]
 
-def select_best_sentences(query: str, discourses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Annotate each discourse with `best_sentence`: the single verbatim sentence
-    from its matched passage that best answers `query`.
+BEST_CHUNK_SENTENCES = 3  # target quote length: a contiguous 2–3 sentence chunk
 
-    Uses ONE Cohere rerank call over the sentences of all passages combined, then
-    assigns each discourse its highest-ranked sentence. Degrades to the passage's
-    first sentence when COHERE_API_KEY is unset or the call fails — never throws.
+def _sentence_windows(sentences: List[str], size: int = BEST_CHUNK_SENTENCES) -> List[str]:
+    """Contiguous windows of up to `size` sentences (sliding, step 1), each joined
+    into one string. Passages with `size` or fewer sentences yield a single
+    whole-passage window.
+    """
+    n = len(sentences)
+    if n == 0:
+        return []
+    if n <= size:
+        return [" ".join(sentences)]
+    return [" ".join(sentences[i:i + size]) for i in range(0, n - size + 1)]
+
+def select_best_sentences(query: str, discourses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Annotate each discourse with `best_sentence`: the contiguous 2–3 sentence
+    chunk from its matched passage that best answers `query`.
+
+    Uses ONE Cohere rerank call over the candidate chunks of all passages combined,
+    then assigns each discourse its highest-ranked chunk. Degrades to the passage's
+    leading chunk when COHERE_API_KEY is unset or the call fails — never throws.
     """
     if not discourses:
         return discourses
 
-    per_doc_sentences = []
-    flat = []  # (discourse_index, sentence)
+    per_doc_windows = []
+    flat = []  # (discourse_index, chunk)
     for d_idx, d in enumerate(discourses):
         sentences = _split_sentences(d.get("matched_passage", "") or d.get("content", ""))
-        per_doc_sentences.append(sentences)
-        for s in sentences:
-            flat.append((d_idx, s))
+        windows = _sentence_windows(sentences)
+        per_doc_windows.append(windows)
+        for w in windows:
+            flat.append((d_idx, w))
 
     def _default(d_idx):
-        sents = per_doc_sentences[d_idx]
-        if sents:
-            return sents[0]
+        windows = per_doc_windows[d_idx]
+        if windows:
+            return windows[0]
         d = discourses[d_idx]
         return d.get("matched_passage", "") or d.get("content", "")
 
-    chosen = {}  # discourse_index -> best sentence
+    chosen = {}  # discourse_index -> best chunk
     if COHERE_API_KEY and flat:
         try:
             import cohere
             co = cohere.Client(COHERE_API_KEY)
-            documents = [s for (_, s) in flat]
+            documents = [w for (_, w) in flat]
             response = co.rerank(
                 model=RERANK_MODEL,
                 query=query,
                 documents=documents,
                 top_n=len(documents),
             )
-            # Results are best-first; the first sentence seen per discourse wins.
+            # Results are best-first; the first chunk seen per discourse wins.
             for result in response.results:
-                d_idx, sentence = flat[result.index]
+                d_idx, chunk = flat[result.index]
                 if d_idx not in chosen:
-                    chosen[d_idx] = sentence
+                    chosen[d_idx] = chunk
         except Exception as e:
-            logging.error(f"Cohere best-sentence selection failed: {e}; using first sentence.")
+            logging.error(f"Cohere best-chunk selection failed: {e}; using leading chunk.")
             chosen = {}
 
     for d_idx, d in enumerate(discourses):
         d["best_sentence"] = chosen.get(d_idx) or _default(d_idx)
     return discourses
+
+def _locate_verbatim(quote: str, passage: str):
+    """Return the exact substring of `passage` matching `quote`, tolerant of
+    whitespace/newline differences, or None when the quote is not actually present.
+    """
+    if not quote or not passage:
+        return None
+    tokens = quote.split()
+    if not tokens:
+        return None
+    pattern = r"\s+".join(re.escape(t) for t in tokens)
+    m = re.search(pattern, passage)
+    return m.group(0) if m else None
+
+def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Unified extractive grade: ONE stronger-LLM call judges whether each passage
+    directly answers `query` AND extracts the verbatim span that answers it.
+
+    Keeps only passages where `answers` is true, `relevance >= GRADE_MIN_RELEVANCE`,
+    and a non-null quote can be located verbatim in the passage — attaching the exact
+    substring as `best_sentence` and `grade_relevance`. Because the quote is the
+    evidence for the verdict, relevance and the shown quote can no longer disagree.
+
+    On any LLM/parse failure, degrades to the Cohere chunk baseline
+    (`select_best_sentences`) and keeps everything (nothing dropped).
+    """
+    if not passages:
+        return []
+
+    system_prompt = (
+        "The passages below are excerpts from spiritual discourses (lectures) delivered by "
+        "Sathya Sai Baba, a revered Indian spiritual teacher. His teachings often illustrate "
+        "points with stories, scripture, and Sanskrit terms.\n\n"
+        "You judge whether each passage DIRECTLY answers the user's question, and if so "
+        "extract the exact quote that answers it. A passage that merely mentions the topic, "
+        "or is broadly on-theme but does not address what was asked, does NOT answer it. For "
+        "each passage return its id, `answers` (true/false), `relevance` (0.0-1.0), and "
+        "`quote`: the shortest contiguous span of 1 to 3 sentences copied EXACTLY (verbatim) "
+        "from the passage that answers the question, or null if the passage does not answer "
+        "it. Never quote generic, introductory, or closing remarks (e.g. 'I shall bring my "
+        "discourse to a close'). Respond ONLY with JSON: "
+        '{"results":[{"id":0,"answers":true,"relevance":0.0,"quote":"..."}]}. No prose.'
+    )
+    lines = [f"Question: {query}", "", "Passages:"]
+    for idx, p in enumerate(passages):
+        lines.append(f"[{idx}] {p.get('content', '')}")
+    user_content = "\n\n".join(lines)
+
+    try:
+        response = openai_client.chat.completions.create(
+            model=JUDGE_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+            response_format={"type": "json_object"},
+        )
+        raw = (response.choices[0].message.content or "").strip()
+        if raw.startswith("```"):
+            raw = re.sub(r"^```[a-zA-Z]*\n?", "", raw)
+            raw = re.sub(r"\n?```$", "", raw).strip()
+        data = json.loads(raw)
+
+        kept = []
+        for item in data.get("results", []):
+            idx = item.get("id")
+            if not isinstance(idx, int) or idx < 0 or idx >= len(passages):
+                continue
+            if item.get("answers") is not True:
+                continue
+            relevance = float(item.get("relevance", 0.0) or 0.0)
+            if relevance < GRADE_MIN_RELEVANCE:
+                continue
+            exact = _locate_verbatim(item.get("quote"), passages[idx].get("content", ""))
+            if not exact:
+                continue  # no verbatim answering span -> drop (avoid hallucinated quotes)
+            p = dict(passages[idx])
+            p["grade_relevance"] = relevance
+            p["best_sentence"] = exact
+            kept.append(p)
+        return kept
+    except Exception as e:
+        logging.error(f"grade_and_quote_passages failed: {e}; falling back to Cohere chunks (no drop).")
+        return select_best_sentences(query, passages)
 
 def grade_passages(query: str, candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """LLM relevance grade: keep only passages that directly answer the query.
@@ -459,6 +562,7 @@ def aggregate_to_discourses(graded: List[Dict[str, Any]], limit: int) -> List[Di
             "matched_passage": matched_passage,
             "passage_index": passage.get("chunk_index", 0),
             "content": matched_passage,  # keep `content` = passage for frontend/format_docs
+            "best_sentence": passage.get("best_sentence", ""),  # verified answering quote
             "score": relevance,
             "location": passage.get("location", ""),
             "occasion": passage.get("occasion", ""),
