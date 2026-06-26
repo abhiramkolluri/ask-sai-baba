@@ -611,11 +611,15 @@ def confirm_password_reset():
 def search_endpoint():
     if request.is_json:
         query = request.json.get('query')
+        # Recent prior user questions (optional) for multi-turn query planning.
+        history = request.json.get('history') or []
+        if not isinstance(history, list):
+            history = []
         if query:
             exact_phrase = extract_quoted_phrase(query)
             # Browse shows more results than chat; allow_empty stays True so an
             # honest empty result is returned rather than padded.
-            results = search_browse(query, limit=10, exact_phrase=exact_phrase)
+            results = search_browse(query, limit=10, exact_phrase=exact_phrase, history=history)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
