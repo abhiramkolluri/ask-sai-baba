@@ -173,10 +173,25 @@ def init_schema():
                     wcd.Property(name="link", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="saved_at", data_type=wcd.DataType.DATE),
-                    wcd.Property(name="highlights_json", data_type=wcd.DataType.TEXT)
+                    wcd.Property(name="highlights_json", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="bookmarked", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="question_context", data_type=wcd.DataType.TEXT),
                 ]
             )
             print("Created collection 'SavedDiscourse'")
+        else:
+            saved_col = client.collections.get("SavedDiscourse")
+            existing_props = {p.name for p in saved_col.config.get().properties}
+            if "bookmarked" not in existing_props:
+                saved_col.config.add_property(
+                    wcd.Property(name="bookmarked", data_type=wcd.DataType.TEXT)
+                )
+                print("Added 'bookmarked' property to SavedDiscourse collection")
+            if "question_context" not in existing_props:
+                saved_col.config.add_property(
+                    wcd.Property(name="question_context", data_type=wcd.DataType.TEXT)
+                )
+                print("Added 'question_context' property to SavedDiscourse collection")
 
         # Create UserAccount collection for manual auth
         if not client.collections.exists("UserAccount"):

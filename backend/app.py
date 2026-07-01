@@ -80,6 +80,16 @@ try:
                 wcd.Property(name="highlights_json", data_type=wcd.DataType.TEXT)
             )
             print("Added 'highlights_json' property to SavedDiscourse collection")
+        if "bookmarked" not in existing_props:
+            saved_col.config.add_property(
+                wcd.Property(name="bookmarked", data_type=wcd.DataType.TEXT)
+            )
+            print("Added 'bookmarked' property to SavedDiscourse collection")
+        if "question_context" not in existing_props:
+            saved_col.config.add_property(
+                wcd.Property(name="question_context", data_type=wcd.DataType.TEXT)
+            )
+            print("Added 'question_context' property to SavedDiscourse collection")
 except Exception as e:
     print(f"Migration warning (non-fatal): {e}")
 
@@ -121,6 +131,15 @@ def get_verified_identity(token):
     session = verify_session_token(token)
     if session and session.get('email'):
         return {'email': session.get('email'), 'provider': session.get('token_type', 'manual')}
+
+    # App-issued JWTs use HS256; skip Google verification to avoid noisy errors.
+    try:
+        import jwt
+        header = jwt.get_unverified_header(token)
+        if header.get('alg') not in ('RS256', 'ES256'):
+            return None
+    except Exception:
+        return None
 
     google_identity = verify_google_token(token)
     if google_identity and google_identity.get('email'):
@@ -234,7 +253,8 @@ def _is_token_expired(expires_at):
         now = datetime.now(timezone.utc)
         return now > expires_at.astimezone(timezone.utc)
 
-    return datetime.now() > expires_at
+    expires_at_utc = expires_at.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) > expires_at_utc
 
 def get_frontend_signin_url():
     """Return the frontend signin URL used for OAuth callback redirection."""
@@ -341,7 +361,7 @@ def google_callback():
     session_token = jwt.encode({
         'email': user['email'],
         'token_type': 'google',
-        'exp': datetime.utcnow() + timedelta(days=30)
+        'exp': datetime.now(timezone.utc) + timedelta(days=30)
     }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
     redirect_url = f"{frontend_signin}?success=true&token={quote(session_token)}&user={user_encoded}"
@@ -372,7 +392,7 @@ def google_login():
     session_token = jwt.encode({
         'email': user['email'],
         'token_type': 'google',
-        'exp': datetime.utcnow() + timedelta(days=30)
+        'exp': datetime.now(timezone.utc) + timedelta(days=30)
     }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
     return jsonify({
@@ -417,7 +437,7 @@ def register():
             "email": email,
             "password_hash": password_hash,
             "auth_provider": "manual",
-            "created_at": datetime.now()
+            "created_at": datetime.now(timezone.utc)
         })
 
         return jsonify({'message': 'User registered successfully'}), 201
@@ -453,7 +473,7 @@ def login():
         token = jwt.encode({
             'email': email,
             'token_type': 'manual',
-            'exp': datetime.utcnow() + timedelta(days=7)
+            'exp': datetime.now(timezone.utc) + timedelta(days=7)
         }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
         return jsonify({
@@ -802,6 +822,46 @@ def get_article(id):
     else:
         return jsonify({'error': 'ID parameter is missing'}), 400
 
+def _parse_bookmarked(value):
+    return str(value).strip().lower() in {"true", "1", "yes"}
+
+def _format_saved_discourse(obj):
+    title = obj.properties.get("title", "")
+    content_preview = obj.properties.get("content_preview", "")
+    link = obj.properties.get("link", "")
+    collection_name = obj.properties.get("collection_name", "")
+    highlights_raw = obj.properties.get("highlights_json", "[]")
+    try:
+        highlights = json.loads(highlights_raw) if highlights_raw else []
+    except (json.JSONDecodeError, TypeError):
+        highlights = []
+
+    saved_at = obj.properties.get("saved_at", datetime.now(timezone.utc))
+    if hasattr(saved_at, "isoformat"):
+        saved_at = saved_at.isoformat()
+
+    bookmarked = _parse_bookmarked(obj.properties.get("bookmarked", "false"))
+
+    return {
+        "id": str(obj.uuid),
+        "article_uuid": obj.properties.get("article_uuid", ""),
+        "title": title,
+        "content_preview": content_preview,
+        "link": link,
+        "collection_name": collection_name,
+        "question_context": obj.properties.get("question_context", ""),
+        "bookmarked": bookmarked,
+        "saved_at": saved_at,
+        "highlights": highlights,
+        "discourse": {
+            "title": title,
+            "content": content_preview,
+            "source_url": link,
+            "source_citation": collection_name,
+            "highlights": highlights,
+        },
+    }
+
 # Saved Discourses Endpoints
 @app.route('/saved-discourses/<user_email>', methods=['GET'])
 @require_auth
@@ -822,33 +882,7 @@ def get_saved_discourses(user_email):
 
         results = []
         for obj in response.objects:
-            title = obj.properties.get("title", "")
-            content_preview = obj.properties.get("content_preview", "")
-            link = obj.properties.get("link", "")
-            collection_name = obj.properties.get("collection_name", "")
-            highlights_raw = obj.properties.get("highlights_json", "[]")
-            try:
-                highlights = json.loads(highlights_raw) if highlights_raw else []
-            except (json.JSONDecodeError, TypeError):
-                highlights = []
-            results.append({
-                "id": str(obj.uuid),
-                "article_uuid": obj.properties.get("article_uuid", ""),
-                "title": title,
-                "content_preview": content_preview,
-                "link": link,
-                "collection_name": collection_name,
-                "question_context": obj.properties.get("question_context", ""),
-                "saved_at": obj.properties.get("saved_at", datetime.now()).isoformat(),
-                # Include nested discourse object for frontend compatibility
-                "discourse": {
-                    "title": title,
-                    "content": content_preview,
-                    "source_url": link,
-                    "source_citation": collection_name,
-                    "highlights": highlights
-                }
-            })
+            results.append(_format_saved_discourse(obj))
 
         return jsonify(results), 200
     except Exception as e:
@@ -872,11 +906,12 @@ def create_saved_discourse(user_email):
         discourse = data.get('discourse', {})
         title = data.get('title') or discourse.get('title', '')
         source_url = data.get('link') or discourse.get('source_url', '')
-        article_uuid = data.get('article_uuid') or source_url.replace('/blog/', '') or f"saved-{datetime.now().timestamp()}"
+        article_uuid = data.get('article_uuid') or source_url.replace('/blog/', '') or f"saved-{datetime.now(timezone.utc).timestamp()}"
         content_preview = data.get('content_preview') or discourse.get('content', '')
         collection_name = data.get('collection_name') or discourse.get('source_citation', '')
         question_context = data.get('question_context', '')
         highlights = data.get('highlights') or discourse.get('highlights', [])
+        bookmarked = data.get('bookmarked', True)
 
         if not title:
             return jsonify({'error': 'title is required'}), 400
@@ -884,7 +919,7 @@ def create_saved_discourse(user_email):
         client = get_client()
         saved_col = client.collections.get("SavedDiscourse")
 
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         uuid = saved_col.data.insert(properties={
             "user_email": user_email,
             "article_uuid": article_uuid,
@@ -893,29 +928,13 @@ def create_saved_discourse(user_email):
             "link": source_url,
             "collection_name": collection_name,
             "question_context": question_context,
+            "bookmarked": "true" if bookmarked else "false",
             "saved_at": now,
             "highlights_json": json.dumps(highlights)
         })
 
-        return jsonify({
-            "id": str(uuid),
-            "user_email": user_email,
-            "article_uuid": article_uuid,
-            "title": title,
-            "content_preview": content_preview,
-            "link": source_url,
-            "collection_name": collection_name,
-            "question_context": question_context,
-            "saved_at": now.isoformat(),
-            # Include nested discourse object for frontend compatibility
-            "discourse": {
-                "title": title,
-                "content": content_preview,
-                "source_url": source_url,
-                "source_citation": collection_name,
-                "highlights": highlights
-            }
-        }), 201
+        created = saved_col.query.fetch_object_by_id(uuid)
+        return jsonify(_format_saved_discourse(created)), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -949,11 +968,16 @@ def update_saved_discourse(user_email, discourse_id):
         update_props = {}
         if 'highlights' in data:
             update_props['highlights_json'] = json.dumps(data['highlights'])
+        if 'bookmarked' in data:
+            update_props['bookmarked'] = "true" if data['bookmarked'] else "false"
+        if 'question_context' in data:
+            update_props['question_context'] = data['question_context']
 
         if update_props:
             saved_col.data.update(uuid=uuid_obj, properties=update_props)
 
-        return jsonify({'message': 'Discourse updated successfully'}), 200
+        updated = saved_col.query.fetch_object_by_id(uuid_obj)
+        return jsonify(_format_saved_discourse(updated)), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -988,7 +1012,10 @@ def delete_saved_discourse(user_email, discourse_id):
 @require_auth
 def get_user_chats(user_email):
     try:
-        request_user_email = user_email
+        request_user_email = get_user_email_from_request()
+        if not request_user_email or request_user_email != user_email:
+            return jsonify({'error': 'Unauthorized access'}), 403
+
         if not request_user_email or '@' not in request_user_email:
             return jsonify({'error': 'Invalid user email'}), 400
 
@@ -1007,7 +1034,7 @@ def get_user_chats(user_email):
                 "id": str(obj.uuid),
                 "_id": str(obj.uuid),
                 "title": obj.properties.get("title", ""),
-                "timestamp": obj.properties.get("created_at", datetime.now()).isoformat()
+                "timestamp": obj.properties.get("created_at", datetime.now(timezone.utc)).isoformat()
             }
             messages_json = obj.properties.get("messages_json", "[]")
             thread["messages"] = json.loads(messages_json)
@@ -1042,7 +1069,7 @@ def get_chat_thread(thread_id):
             "id": str(obj.uuid),
             "_id": str(obj.uuid),
             "title": obj.properties.get("title", ""),
-            "timestamp": obj.properties.get("created_at", datetime.now()).isoformat()
+            "timestamp": obj.properties.get("created_at", datetime.now(timezone.utc)).isoformat()
         }
         thread["messages"] = json.loads(obj.properties.get("messages_json", "[]"))
 
@@ -1069,7 +1096,7 @@ def create_chat_thread(user_email):
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
 
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         uuid = chat_threads.data.insert(properties={
             "user_email": user_email,
             "title": data['title'],
@@ -1119,14 +1146,14 @@ def add_message_to_thread(user_email, thread_id):
         messages.append({
             'question': data['question'],
             'reply': data['reply'],
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         })
 
         chat_threads.data.update(
             uuid=uuid_obj,
             properties={
                 "messages_json": json.dumps(messages),
-                "last_updated": datetime.now()
+                "last_updated": datetime.now(timezone.utc)
             }
         )
         return jsonify({'message': 'Message added successfully'}), 200
@@ -1152,7 +1179,7 @@ def update_chat_thread(thread_id):
         if not obj or obj.properties.get("user_email") != user_email:
             return jsonify({'error': 'Chat thread not found'}), 404
 
-        update_data = {"last_updated": datetime.now()}
+        update_data = {"last_updated": datetime.now(timezone.utc)}
         if 'title' in data:
             update_data['title'] = data['title']
         if 'messages' in data:
@@ -1227,7 +1254,7 @@ def get_conversation_history():
             obj = response.objects[0]
             messages_json = obj.properties.get("messages_json", "[]")
             messages = json.loads(messages_json)
-            last_updated = obj.properties.get("last_updated", datetime.now()).isoformat()
+            last_updated = obj.properties.get("last_updated", datetime.now(timezone.utc)).isoformat()
 
             return jsonify({
                 'session_id': session_id,
