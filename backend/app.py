@@ -17,15 +17,19 @@ import requests
 
 from openai import OpenAI
 from weaviate_client import get_client, init_schema
-from utils import (
-    handle_user_query,
-    get_full_article,
-    clear_conversation_memory,
+from search import (
+    openai_client,
     check_vector_store_health,
+    get_full_article,
     search_browse,
-    load_conversation_history,
-    extract_quoted_phrase
+    generate_followups,
+    extract_quoted_phrase,
 )
+from persistence import (
+    load_conversation_history,
+    clear_conversation_memory,
+)
+from chat import handle_user_query
 
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
@@ -181,7 +185,7 @@ def get_base_url():
 
 def send_reset_email(email, token):
     if not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
-        print("Password reset email config missing: MAIL_USERNAME/MAIL_PASSWORD")
+        app.logger.error("Password reset email config missing: MAIL_USERNAME/MAIL_PASSWORD")
         return False
 
     try:
@@ -210,7 +214,7 @@ def send_reset_email(email, token):
         mail.send(msg)
         return True
     except Exception as e:
-        print(f"Error sending password reset email: {e}")
+        app.logger.error(f"Error sending password reset email: {e}")
         return False
 
 def _parse_datetime(value):
@@ -506,7 +510,7 @@ def request_password_reset():
 
         return jsonify({'message': 'If an account exists with this email, a password reset link has been sent.'}), 200
     except Exception as e:
-        print(f"Error in password reset request: {e}")
+        app.logger.error(f"Error in password reset request: {e}")
         return jsonify({'error': 'An error occurred. Please try again later.'}), 500
 
 @app.route('/password/reset/verify', methods=['POST'])
@@ -611,14 +615,42 @@ def confirm_password_reset():
 def search_endpoint():
     if request.is_json:
         query = request.json.get('query')
+        # Recent prior user questions (optional) for multi-turn query planning.
+        history = request.json.get('history') or []
+        if not isinstance(history, list):
+            history = []
         if query:
             exact_phrase = extract_quoted_phrase(query)
             # Browse shows more results than chat; allow_empty stays True so an
             # honest empty result is returned rather than padded.
-            results = search_browse(query, limit=10, exact_phrase=exact_phrase)
+            results = search_browse(query, limit=10, exact_phrase=exact_phrase, history=history)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
+    else:
+        return jsonify({'error': 'Request must contain JSON data'}), 400
+
+@app.route('/followups', methods=['POST'])
+def followups_endpoint():
+    """Generate verified follow-up questions for an answer the user just received.
+
+    The client passes the original query, recent history, and the discourses it got
+    back from /search (used to ground candidate generation). Each candidate is then
+    verified against the search pipeline so only follow-ups that surface
+    directly-answering quotes are returned. Always 200 with a (possibly empty) list.
+    """
+    if request.is_json:
+        query = request.json.get('query')
+        history = request.json.get('history') or []
+        if not isinstance(history, list):
+            history = []
+        results = request.json.get('results') or []
+        if not isinstance(results, list):
+            results = []
+        if not query:
+            return jsonify({'error': 'Query parameter is missing'}), 400
+        followups = generate_followups(query, results, history=history)
+        return jsonify({'followups': followups})
     else:
         return jsonify({'error': 'Request must contain JSON data'}), 400
 
@@ -666,7 +698,7 @@ def summarize_question():
         if not query:
             return jsonify({'error': 'Query parameter is required'}), 400
         try:
-            from utils import openai_client, load_fine_tuned_model_id_from_file
+            from fine_tuning import load_fine_tuned_model_id_from_file
             model_id = load_fine_tuned_model_id_from_file()
             response = openai_client.chat.completions.create(
                 model=model_id,

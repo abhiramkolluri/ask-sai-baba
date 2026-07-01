@@ -50,8 +50,18 @@ Frontend ──► API Gateway ──► Elastic Beanstalk (Flask: app.py)
 ```
 
 - **`app.py`** — single-file Flask app: every route and all auth logic.
-- **`utils.py`** — `handle_user_query` (main RAG entrypoint), hybrid/exact search helpers (vector-weighted, alpha≈0.75), query classification, and conversation persistence.
-- **`weaviate_client.py`** — singleton client (`get_client`) and `init_schema`, which defines all collections: `Article` (the discourse corpus), `ChatThread`, `Conversation`, `UserQuery`, `Feedback`, `SavedDiscourse`, `UserAccount`, `PasswordResetToken`.
+- **`utils.py`** — the search + answer logic (see **Search pipeline** below): the `plan_queries → per-facet hybrid+rerank → RRF → grade+quote → aggregate` discourse search used by `/search`, plus the legacy `handle_user_query` RAG entrypoint (`/query`) and conversation persistence.
+- **`weaviate_client.py`** — singleton client (`get_client`) and `init_schema`, which defines all collections: `Article` and `Passage` (the discourse corpus, chunked for search), `ChatThread`, `Conversation`, `UserQuery`, `Feedback`, `SavedDiscourse`, `UserAccount`, `PasswordResetToken`.
+
+### Search pipeline (`/search` → `search_browse`)
+
+1. **`plan_queries(message, history)`** (gpt-4o-mini) — turns the user message into **1–N standalone search queries**: resolves multi-turn references against recent `history`, distills long "chatbot-style" scenarios to their core spiritual concept(s), glosses romanized Sanskrit/Telugu terms (corpus spelling + variants + English meaning), and **adaptively** decomposes only genuinely multi-concept messages (defaults to one query). Supersedes the old `expand_short_query`.
+2. **Per-facet retrieval** — each sub-query runs through `search_passages` (Weaviate **hybrid** BM25+vector, `HYBRID_ALPHA = 0.5`) → **Cohere rerank** (`rerank-v3.5`), reranked against *its own* facet. Each passage is tagged with the `source_query` that surfaced it.
+3. **`_rrf_merge`** — fuses the per-facet lists with Reciprocal Rank Fusion (dedupe by passage, keep best-rank provenance).
+4. **`grade_and_quote_passages`** (gpt-4o) — one batched call judges each passage **against its own facet** and extracts a verbatim 1–3 sentence `best_sentence`; passages that don't answer their facet (or have no locatable quote) are dropped.
+5. **`aggregate_to_discourses`** — collapses to one result per discourse (best passage wins). Output is **citations-only** (discourse + verbatim quote); no AI-synthesized answer.
+
+`eval_transliteration.py` is the romanized-robustness + `HYBRID_ALPHA` tuning harness (α=0.5 confirmed optimal).
 
 ### Auth
 
@@ -67,7 +77,7 @@ Protect a route with the `@require_auth` decorator; read the caller's email via 
 | Method | Path | Notes |
 |--------|------|-------|
 | GET | `/` | Health check (includes `vector_store_healthy`) |
-| POST | `/search` | Hybrid search results |
+| POST | `/search` | Discourse search (planner → hybrid+rerank → RRF → grade+quote); body `{query, history?}`, returns discourses with a verbatim `best_sentence` quote |
 | POST | `/query` | RAG answer with citations |
 | POST | `/summarize-question` | Summarize/clean a user question |
 | GET | `/blog/<id>` | Full article by id |
