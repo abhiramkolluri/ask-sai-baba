@@ -23,8 +23,7 @@ from utils import (
     clear_conversation_memory,
     check_vector_store_health,
     search_browse,
-    load_conversation_history,
-    extract_quoted_phrase
+    load_conversation_history
 )
 
 from google.oauth2 import id_token
@@ -67,32 +66,6 @@ cors = CORS(app, resources={
 # Initialize Weaviate schema and client
 print("Initializing Weaviate schema...")
 init_schema()
-
-# Migrate: add highlights_json property to SavedDiscourse if missing
-try:
-    _client = get_client()
-    if _client and _client.collections.exists("SavedDiscourse"):
-        import weaviate.classes.config as wcd
-        saved_col = _client.collections.get("SavedDiscourse")
-        existing_props = {p.name for p in saved_col.config.get().properties}
-        if "highlights_json" not in existing_props:
-            saved_col.config.add_property(
-                wcd.Property(name="highlights_json", data_type=wcd.DataType.TEXT)
-            )
-            print("Added 'highlights_json' property to SavedDiscourse collection")
-        if "bookmarked" not in existing_props:
-            saved_col.config.add_property(
-                wcd.Property(name="bookmarked", data_type=wcd.DataType.TEXT)
-            )
-            print("Added 'bookmarked' property to SavedDiscourse collection")
-        if "question_context" not in existing_props:
-            saved_col.config.add_property(
-                wcd.Property(name="question_context", data_type=wcd.DataType.TEXT)
-            )
-            print("Added 'question_context' property to SavedDiscourse collection")
-except Exception as e:
-    print(f"Migration warning (non-fatal): {e}")
-
 weaviate_client = get_client()
 
 print("Checking vector store health...")
@@ -118,28 +91,19 @@ def verify_google_token(token):
             print(f"Error verifying Google token: {e}")
         return None
 
-def verify_session_token(token):
+def verify_manual_token(token):
     try:
         decoded = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
-        if decoded.get('token_type') not in ('manual', 'google'):
+        if decoded.get('token_type') != 'manual':
             return None
         return decoded
     except Exception:
         return None
 
 def get_verified_identity(token):
-    session = verify_session_token(token)
-    if session and session.get('email'):
-        return {'email': session.get('email'), 'provider': session.get('token_type', 'manual')}
-
-    # App-issued JWTs use HS256; skip Google verification to avoid noisy errors.
-    try:
-        import jwt
-        header = jwt.get_unverified_header(token)
-        if header.get('alg') not in ('RS256', 'ES256'):
-            return None
-    except Exception:
-        return None
+    manual_identity = verify_manual_token(token)
+    if manual_identity and manual_identity.get('email'):
+        return {'email': manual_identity.get('email'), 'provider': 'manual'}
 
     google_identity = verify_google_token(token)
     if google_identity and google_identity.get('email'):
@@ -253,8 +217,7 @@ def _is_token_expired(expires_at):
         now = datetime.now(timezone.utc)
         return now > expires_at.astimezone(timezone.utc)
 
-    expires_at_utc = expires_at.replace(tzinfo=timezone.utc)
-    return datetime.now(timezone.utc) > expires_at_utc
+    return datetime.now() > expires_at
 
 def get_frontend_signin_url():
     """Return the frontend signin URL used for OAuth callback redirection."""
@@ -358,13 +321,7 @@ def google_callback():
     if not user.get("email"):
         return redirect(f"{frontend_signin}?error=no_email")
 
-    session_token = jwt.encode({
-        'email': user['email'],
-        'token_type': 'google',
-        'exp': datetime.now(timezone.utc) + timedelta(days=30)
-    }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
-
-    redirect_url = f"{frontend_signin}?success=true&token={quote(session_token)}&user={user_encoded}"
+    redirect_url = f"{frontend_signin}?success=true&token={quote(google_id_token)}&user={user_encoded}"
     return redirect(redirect_url)
 
 @app.route('/auth/google/login', methods=['POST'])
@@ -389,14 +346,8 @@ def google_login():
         "auth_provider": "google",
     }
 
-    session_token = jwt.encode({
-        'email': user['email'],
-        'token_type': 'google',
-        'exp': datetime.now(timezone.utc) + timedelta(days=30)
-    }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
-
     return jsonify({
-        "token": session_token,
+        "token": token,
         "user": user,
         "message": "Google login successful"
     }), 200
@@ -437,7 +388,7 @@ def register():
             "email": email,
             "password_hash": password_hash,
             "auth_provider": "manual",
-            "created_at": datetime.now(timezone.utc)
+            "created_at": datetime.now()
         })
 
         return jsonify({'message': 'User registered successfully'}), 201
@@ -473,7 +424,7 @@ def login():
         token = jwt.encode({
             'email': email,
             'token_type': 'manual',
-            'exp': datetime.now(timezone.utc) + timedelta(days=7)
+            'exp': datetime.utcnow() + timedelta(days=7)
         }, app.config['JWT_SECRET_KEY'], algorithm='HS256')
 
         return jsonify({
@@ -632,10 +583,7 @@ def search_endpoint():
     if request.is_json:
         query = request.json.get('query')
         if query:
-            exact_phrase = extract_quoted_phrase(query)
-            # Browse shows more results than chat; allow_empty stays True so an
-            # honest empty result is returned rather than padded.
-            results = search_browse(query, limit=10, exact_phrase=exact_phrase)
+            results = search_browse(query)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
@@ -654,10 +602,7 @@ def query_endpoint():
             return jsonify({'error': 'Query parameter is required'}), 400
 
         try:
-            exact_phrase = extract_quoted_phrase(query)
-            # Chat needs grounding context: allow_empty=False so an empty grade
-            # result falls back to the top reranked passages.
-            search_results = search_browse(query, exact_phrase=exact_phrase, allow_empty=False)
+            search_results = search_browse(query)
             answer = handle_user_query(
                 query=query,
                 collection=None,
@@ -703,114 +648,6 @@ def summarize_question():
     else:
         return jsonify({'error': 'Request must contain JSON data'}), 400
 
-@app.route('/discourses/years', methods=['GET'])
-def get_discourse_years():
-    """
-    Return all years that have at least one discourse, with discourse counts.
-    Response: { years: [ { year: "1958", count: 42 }, ... ] }  (sorted asc)
-    """
-    try:
-        client = get_client()
-        articles = client.collections.get("Article")
-
-        year_counts = {}
-        for obj in articles.iterator(return_properties=["date"]):
-            date_str = (obj.properties.get("date") or "").strip()
-            year = _extract_year(date_str)
-            if year:
-                year_counts[year] = year_counts.get(year, 0) + 1
-
-        sorted_years = [
-            {"year": y, "count": c}
-            for y, c in sorted(year_counts.items())
-        ]
-        return jsonify({"years": sorted_years})
-    except Exception as e:
-        print(f"Error fetching discourse years: {e}")
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route('/discourses/year/<year>', methods=['GET'])
-def get_discourses_by_year(year):
-    """
-    Return paginated discourses for a given year.
-    Query params: page (1-based, default 1), limit (default 20)
-    Response: { discourses: [...], total: N, page: N, pages: N }
-    """
-    try:
-        page = max(1, int(request.args.get("page", 1)))
-        limit = min(50, max(1, int(request.args.get("limit", 20))))
-
-        client = get_client()
-        articles = client.collections.get("Article")
-
-        matching = []
-        for obj in articles.iterator(
-            return_properties=["title", "date", "location", "occasion", "link", "collection_name"]
-        ):
-            date_str = (obj.properties.get("date") or "").strip()
-            if _extract_year(date_str) == year:
-                matching.append({
-                    "id": str(obj.uuid),
-                    "title": obj.properties.get("title", "Untitled"),
-                    "date": date_str,
-                    "location": obj.properties.get("location", ""),
-                    "occasion": obj.properties.get("occasion", ""),
-                    "link": obj.properties.get("link", ""),
-                    "collection": obj.properties.get("collection_name", ""),
-                })
-
-        # Sort by date string (day month year format — sort by parsed date)
-        matching.sort(key=lambda d: _sort_key(d.get("date", "")))
-
-        total = len(matching)
-        pages = max(1, (total + limit - 1) // limit)
-        start = (page - 1) * limit
-        page_items = matching[start: start + limit]
-
-        return jsonify({
-            "discourses": page_items,
-            "total": total,
-            "page": page,
-            "pages": pages,
-        })
-    except Exception as e:
-        print(f"Error fetching discourses for year {year}: {e}")
-        return jsonify({"error": str(e)}), 500
-
-
-def _extract_year(date_str: str) -> str:
-    """Extract 4-digit year from strings like '17 October 1953' or 'April 1957'."""
-    import re
-    m = re.search(r'\b(19\d{2}|20\d{2})\b', date_str or "")
-    return m.group(1) if m else ""
-
-
-def _sort_key(date_str: str):
-    """Return a sortable tuple (year, month, day) from a date string."""
-    import re
-    from datetime import datetime
-    MONTHS = {
-        "january": 1, "february": 2, "march": 3, "april": 4,
-        "may": 5, "june": 6, "july": 7, "august": 8,
-        "september": 9, "october": 10, "november": 11, "december": 12,
-    }
-    if not date_str:
-        return (9999, 99, 99)
-    parts = date_str.strip().split()
-    try:
-        if len(parts) == 3:   # "17 October 1953"
-            day, month_name, year = int(parts[0]), MONTHS.get(parts[1].lower(), 0), int(parts[2])
-        elif len(parts) == 2:  # "April 1957"
-            day, month_name, year = 0, MONTHS.get(parts[0].lower(), 0), int(parts[1])
-        else:
-            year = int(re.search(r'\d{4}', date_str).group())
-            return (year, 0, 0)
-        return (year, month_name, day)
-    except Exception:
-        return (9999, 99, 99)
-
-
 @app.route('/blog/<id>', methods=['GET'])
 def get_article(id):
     if id:
@@ -821,46 +658,6 @@ def get_article(id):
             return jsonify({'error': 'Article not found'}), 404
     else:
         return jsonify({'error': 'ID parameter is missing'}), 400
-
-def _parse_bookmarked(value):
-    return str(value).strip().lower() in {"true", "1", "yes"}
-
-def _format_saved_discourse(obj):
-    title = obj.properties.get("title", "")
-    content_preview = obj.properties.get("content_preview", "")
-    link = obj.properties.get("link", "")
-    collection_name = obj.properties.get("collection_name", "")
-    highlights_raw = obj.properties.get("highlights_json", "[]")
-    try:
-        highlights = json.loads(highlights_raw) if highlights_raw else []
-    except (json.JSONDecodeError, TypeError):
-        highlights = []
-
-    saved_at = obj.properties.get("saved_at", datetime.now(timezone.utc))
-    if hasattr(saved_at, "isoformat"):
-        saved_at = saved_at.isoformat()
-
-    bookmarked = _parse_bookmarked(obj.properties.get("bookmarked", "false"))
-
-    return {
-        "id": str(obj.uuid),
-        "article_uuid": obj.properties.get("article_uuid", ""),
-        "title": title,
-        "content_preview": content_preview,
-        "link": link,
-        "collection_name": collection_name,
-        "question_context": obj.properties.get("question_context", ""),
-        "bookmarked": bookmarked,
-        "saved_at": saved_at,
-        "highlights": highlights,
-        "discourse": {
-            "title": title,
-            "content": content_preview,
-            "source_url": link,
-            "source_citation": collection_name,
-            "highlights": highlights,
-        },
-    }
 
 # Saved Discourses Endpoints
 @app.route('/saved-discourses/<user_email>', methods=['GET'])
@@ -882,7 +679,27 @@ def get_saved_discourses(user_email):
 
         results = []
         for obj in response.objects:
-            results.append(_format_saved_discourse(obj))
+            title = obj.properties.get("title", "")
+            content_preview = obj.properties.get("content_preview", "")
+            link = obj.properties.get("link", "")
+            collection_name = obj.properties.get("collection_name", "")
+            results.append({
+                "id": str(obj.uuid),
+                "article_uuid": obj.properties.get("article_uuid", ""),
+                "title": title,
+                "content_preview": content_preview,
+                "link": link,
+                "collection_name": collection_name,
+                "saved_at": obj.properties.get("saved_at", datetime.now()).isoformat(),
+                # Include nested discourse object for frontend compatibility
+                "discourse": {
+                    "title": title,
+                    "content": content_preview,
+                    "source_url": link,
+                    "source_citation": collection_name,
+                    "highlights": []
+                }
+            })
 
         return jsonify(results), 200
     except Exception as e:
@@ -906,12 +723,10 @@ def create_saved_discourse(user_email):
         discourse = data.get('discourse', {})
         title = data.get('title') or discourse.get('title', '')
         source_url = data.get('link') or discourse.get('source_url', '')
-        article_uuid = data.get('article_uuid') or source_url.replace('/blog/', '') or f"saved-{datetime.now(timezone.utc).timestamp()}"
+        article_uuid = data.get('article_uuid') or source_url.replace('/blog/', '') or f"saved-{datetime.now().timestamp()}"
         content_preview = data.get('content_preview') or discourse.get('content', '')
         collection_name = data.get('collection_name') or discourse.get('source_citation', '')
         question_context = data.get('question_context', '')
-        highlights = data.get('highlights') or discourse.get('highlights', [])
-        bookmarked = data.get('bookmarked', True)
 
         if not title:
             return jsonify({'error': 'title is required'}), 400
@@ -919,7 +734,7 @@ def create_saved_discourse(user_email):
         client = get_client()
         saved_col = client.collections.get("SavedDiscourse")
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now()
         uuid = saved_col.data.insert(properties={
             "user_email": user_email,
             "article_uuid": article_uuid,
@@ -927,57 +742,27 @@ def create_saved_discourse(user_email):
             "content_preview": content_preview,
             "link": source_url,
             "collection_name": collection_name,
-            "question_context": question_context,
-            "bookmarked": "true" if bookmarked else "false",
-            "saved_at": now,
-            "highlights_json": json.dumps(highlights)
+            "saved_at": now
         })
 
-        created = saved_col.query.fetch_object_by_id(uuid)
-        return jsonify(_format_saved_discourse(created)), 201
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/saved-discourses/<user_email>/<discourse_id>', methods=['PUT'])
-@require_auth
-def update_saved_discourse(user_email, discourse_id):
-    try:
-        # Verify the authenticated user matches the path's user_email (matches DELETE pattern)
-        request_user_email = get_user_email_from_request()
-        if not request_user_email or request_user_email != user_email:
-            return jsonify({'error': 'Unauthorized access'}), 403
-
-        data = request.json
-        if not data:
-            return jsonify({'error': 'Request body is required'}), 400
-
-        client = get_client()
-        saved_col = client.collections.get("SavedDiscourse")
-
-        import uuid
-        try:
-            uuid_obj = uuid.UUID(discourse_id)
-        except ValueError:
-            return jsonify({'error': 'Invalid discourse ID'}), 400
-
-        obj = saved_col.query.fetch_object_by_id(uuid_obj)
-        if not obj or obj.properties.get("user_email") != user_email:
-            return jsonify({'error': 'Saved discourse not found'}), 404
-
-        # Build update properties
-        update_props = {}
-        if 'highlights' in data:
-            update_props['highlights_json'] = json.dumps(data['highlights'])
-        if 'bookmarked' in data:
-            update_props['bookmarked'] = "true" if data['bookmarked'] else "false"
-        if 'question_context' in data:
-            update_props['question_context'] = data['question_context']
-
-        if update_props:
-            saved_col.data.update(uuid=uuid_obj, properties=update_props)
-
-        updated = saved_col.query.fetch_object_by_id(uuid_obj)
-        return jsonify(_format_saved_discourse(updated)), 200
+        return jsonify({
+            "id": str(uuid),
+            "user_email": user_email,
+            "article_uuid": article_uuid,
+            "title": title,
+            "content_preview": content_preview,
+            "link": source_url,
+            "collection_name": collection_name,
+            "saved_at": now.isoformat(),
+            # Include nested discourse object for frontend compatibility
+            "discourse": {
+                "title": title,
+                "content": content_preview,
+                "source_url": source_url,
+                "source_citation": collection_name,
+                "highlights": []
+            }
+        }), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -1012,10 +797,7 @@ def delete_saved_discourse(user_email, discourse_id):
 @require_auth
 def get_user_chats(user_email):
     try:
-        request_user_email = get_user_email_from_request()
-        if not request_user_email or request_user_email != user_email:
-            return jsonify({'error': 'Unauthorized access'}), 403
-
+        request_user_email = user_email
         if not request_user_email or '@' not in request_user_email:
             return jsonify({'error': 'Invalid user email'}), 400
 
@@ -1034,7 +816,7 @@ def get_user_chats(user_email):
                 "id": str(obj.uuid),
                 "_id": str(obj.uuid),
                 "title": obj.properties.get("title", ""),
-                "timestamp": obj.properties.get("created_at", datetime.now(timezone.utc)).isoformat()
+                "timestamp": obj.properties.get("created_at", datetime.now()).isoformat()
             }
             messages_json = obj.properties.get("messages_json", "[]")
             thread["messages"] = json.loads(messages_json)
@@ -1069,7 +851,7 @@ def get_chat_thread(thread_id):
             "id": str(obj.uuid),
             "_id": str(obj.uuid),
             "title": obj.properties.get("title", ""),
-            "timestamp": obj.properties.get("created_at", datetime.now(timezone.utc)).isoformat()
+            "timestamp": obj.properties.get("created_at", datetime.now()).isoformat()
         }
         thread["messages"] = json.loads(obj.properties.get("messages_json", "[]"))
 
@@ -1096,7 +878,7 @@ def create_chat_thread(user_email):
         client = get_client()
         chat_threads = client.collections.get("ChatThread")
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now()
         uuid = chat_threads.data.insert(properties={
             "user_email": user_email,
             "title": data['title'],
@@ -1146,14 +928,14 @@ def add_message_to_thread(user_email, thread_id):
         messages.append({
             'question': data['question'],
             'reply': data['reply'],
-            'timestamp': datetime.now(timezone.utc).isoformat()
+            'timestamp': datetime.now().isoformat()
         })
 
         chat_threads.data.update(
             uuid=uuid_obj,
             properties={
                 "messages_json": json.dumps(messages),
-                "last_updated": datetime.now(timezone.utc)
+                "last_updated": datetime.now()
             }
         )
         return jsonify({'message': 'Message added successfully'}), 200
@@ -1179,7 +961,7 @@ def update_chat_thread(thread_id):
         if not obj or obj.properties.get("user_email") != user_email:
             return jsonify({'error': 'Chat thread not found'}), 404
 
-        update_data = {"last_updated": datetime.now(timezone.utc)}
+        update_data = {"last_updated": datetime.now()}
         if 'title' in data:
             update_data['title'] = data['title']
         if 'messages' in data:
@@ -1254,7 +1036,7 @@ def get_conversation_history():
             obj = response.objects[0]
             messages_json = obj.properties.get("messages_json", "[]")
             messages = json.loads(messages_json)
-            last_updated = obj.properties.get("last_updated", datetime.now(timezone.utc)).isoformat()
+            last_updated = obj.properties.get("last_updated", datetime.now()).isoformat()
 
             return jsonify({
                 'session_id': session_id,
@@ -1282,17 +1064,13 @@ def submit_feedback():
         client = get_client()
         feedback_col = client.collections.get("Feedback")
 
-        # Citations (array of objects) are intentionally not stored; the discourse
-        # is captured via its title/id/source and the quote (answer) instead.
+        # Explicitly ignore citations per schema mismatch instruction, only log available parameters
         feedback_col.data.insert(properties={
-            "question": data.get("question") or "",
-            "answer": data.get("answer") or "",
-            "feedback_type": data.get("feedbackType") or "",
-            "reason": data.get("reason") or "",
-            "additional_comments": data.get("additionalComments") or "",
-            "discourse_title": data.get("discourseTitle") or "",
-            "discourse_id": data.get("discourseId") or "",
-            "discourse_source": data.get("discourseSource") or "",
+            "question": data.get("question", ""),
+            "answer": data.get("answer", ""),
+            "feedback_type": data.get("feedbackType", ""),
+            "reason": data.get("reason", ""),
+            "additional_comments": data.get("additionalComments", ""),
             "created_at": datetime.now()
         })
 
