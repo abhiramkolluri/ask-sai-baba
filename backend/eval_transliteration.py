@@ -14,8 +14,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
-import utils
-from utils import search_passages, rerank_passages, RERANK_KEEP, plan_queries, PASSAGE_OVERFETCH
+from search import retrieval  # imported as a submodule so HYBRID_ALPHA can be monkeypatched
+from search import search_passages, rerank_passages, RERANK_KEEP, plan_queries, PASSAGE_OVERFETCH
 
 K = 10
 ALPHAS = [0.3, 0.4, 0.5, 0.6, 0.7]
@@ -46,7 +46,7 @@ prepared = {q: (plan_queries(q) or [q])[0] for q in unique}
 
 
 def discourse_topk(query, alpha, k=K):
-    utils.HYBRID_ALPHA = alpha
+    retrieval.HYBRID_ALPHA = alpha
     pq = prepared.get(query, query)
     cands = search_passages(pq, PASSAGE_OVERFETCH)
     reranked = rerank_passages(pq, cands, RERANK_KEEP)

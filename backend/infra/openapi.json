@@ -375,6 +375,39 @@
         }
       }
     },
+    "/followups": {
+      "post": {
+        "summary": "Followups Endpoint",
+        "description": "Generate verified follow-up questions for an answer the user just received.\n\n    The client passes the original query, recent history, and the discourses it got\n    back from /search (used to ground candidate generation). Each candidate is then\n    verified against the search pipeline so only follow-ups that surface\n    directly-answering quotes are returned. Always 200 with a (possibly empty) list.",
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
     "/query": {
       "post": {
         "summary": "Query Endpoint",
@@ -471,6 +504,67 @@
             }
           }
         }
+      }
+    },
+    "/discourses/years": {
+      "get": {
+        "summary": "Get Discourse Years",
+        "description": "Return all years that have at least one discourse, with discourse counts.\n    Response: { years: [ { year: \"1958\", count: 42 }, ... ] }  (sorted asc)",
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/discourses/year/{id}": {
+      "get": {
+        "summary": "Get Discourses By Year",
+        "description": "Return paginated discourses for a given year.\n    Query params: page (1-based, default 1), limit (default 20)\n    Response: { discourses: [...], total: N, page: N, pages: N }",
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "404": {
+            "description": "Resource Not Found"
+          },
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     },
     "/blog/{id}": {
