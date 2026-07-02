@@ -38,156 +38,6 @@ paths:
                     type: string
                   vector_store_healthy:
                     type: boolean
-  /auth/google/authorize:
-    get:
-      summary: Google Authorize
-      description: Endpoint structure for /auth/google/authorize
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-  /auth/google/callback:
-    get:
-      summary: Google Callback
-      description: Endpoint structure for /auth/google/callback
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-  /auth/google/login:
-    post:
-      summary: Google Login
-      description: Endpoint structure for /auth/google/login
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-  /register:
-    post:
-      summary: Register
-      description: Endpoint structure for /register
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-  /login:
-    post:
-      summary: Login
-      description: Endpoint structure for /login
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-  /password/reset/request:
-    post:
-      summary: Request Password Reset
-      description: Endpoint structure for /password/reset/request
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-  /password/reset/verify:
-    post:
-      summary: Verify Reset Token
-      description: Endpoint structure for /password/reset/verify
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-  /password/reset/confirm:
-    post:
-      summary: Confirm Password Reset
-      description: Endpoint structure for /password/reset/confirm
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
   /search:
     post:
       summary: Search Endpoint
@@ -230,31 +80,6 @@ paths:
               properties:
                 query:
                   type: string
-  /followups:
-    post:
-      summary: Followups Endpoint
-      description: "Generate verified follow-up questions for an answer the user just\
-        \ received.\n\n    The client passes the original query, recent history, and\
-        \ the discourses it got\n    back from /search (used to ground candidate generation).\
-        \ Each candidate is then\n    verified against the search pipeline so only\
-        \ follow-ups that surface\n    directly-answering quotes are returned. Always\
-        \ 200 with a (possibly empty) list."
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
   /query:
     post:
       summary: Query Endpoint
@@ -315,48 +140,6 @@ paths:
               properties:
                 question:
                   type: string
-  /discourses/years:
-    get:
-      summary: Get Discourse Years
-      description: "Return all years that have at least one discourse, with discourse\
-        \ counts.\n    Response: { years: [ { year: \"1958\", count: 42 }, ... ] }\
-        \  (sorted asc)"
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-  /discourses/year/{id}:
-    get:
-      summary: Get Discourses By Year
-      description: "Return paginated discourses for a given year.\n    Query params:\
-        \ page (1-based, default 1), limit (default 20)\n    Response: { discourses:\
-        \ [...], total: N, page: N, pages: N }"
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '404':
-          description: Resource Not Found
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
   /blog/{id}:
     get:
       summary: Get Article
@@ -395,7 +178,7 @@ paths:
         required: true
         schema:
           type: string
-  /saved-discourses/{id}:
+  /saved-discourses/{user_email}:
     get:
       summary: Get Saved Discourses
       description: Endpoint structure for /saved-discourses/{user_email}
@@ -417,7 +200,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: user_email
         in: path
         required: true
         schema:
@@ -443,7 +226,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: user_email
         in: path
         required: true
         schema:
@@ -453,43 +236,7 @@ paths:
           application/json:
             schema:
               type: object
-  /saved-discourses/{id}/{id2}:
-    put:
-      summary: Update Saved Discourse
-      description: Endpoint structure for /saved-discourses/{user_email}/{discourse_id}
-      responses:
-        '400':
-          description: Bad Request
-        '500':
-          description: Server Error
-        '401':
-          description: Unauthorized
-        '404':
-          description: Resource Not Found
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: object
-      security:
-      - bearerAuth: []
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: id2
-        in: path
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
+  /saved-discourses/{user_email}/{discourse_id}:
     delete:
       summary: Delete Saved Discourse
       description: Endpoint structure for /saved-discourses/{user_email}/{discourse_id}
@@ -511,20 +258,20 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: user_email
         in: path
         required: true
         schema:
           type: string
-      - name: id2
+      - name: discourse_id
         in: path
         required: true
         schema:
           type: string
-  /chats/{id}:
+  /chats/{user_email}:
     get:
-      summary: Get Chat Thread
-      description: Endpoint structure for /chats/{thread_id}
+      summary: Get User Chats
+      description: Endpoint structure for /chats/{user_email}
       responses:
         '400':
           description: Bad Request
@@ -539,11 +286,24 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    title:
+                      type: string
+                    timestamp:
+                      type: string
+                    messages:
+                      type: array
+                      items:
+                        type: object
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: user_email
         in: path
         required: true
         schema:
@@ -580,7 +340,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: user_email
         in: path
         required: true
         schema:
@@ -595,6 +355,33 @@ paths:
                   type: string
                 user_email:
                   type: string
+  /chats/{thread_id}:
+    get:
+      summary: Get Chat Thread
+      description: Endpoint structure for /chats/{thread_id}
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '401':
+          description: Unauthorized
+        '404':
+          description: Resource Not Found
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: thread_id
+        in: path
+        required: true
+        schema:
+          type: string
     put:
       summary: Update Chat Thread
       description: Endpoint structure for /chats/{thread_id}
@@ -616,7 +403,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: thread_id
         in: path
         required: true
         schema:
@@ -647,7 +434,7 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: thread_id
         in: path
         required: true
         schema:
@@ -657,7 +444,7 @@ paths:
           application/json:
             schema:
               type: object
-  /chats/{id}/{id2}/messages:
+  /chats/{user_email}/{thread_id}/messages:
     post:
       summary: Add Message To Thread
       description: Endpoint structure for /chats/{user_email}/{thread_id}/messages
@@ -679,12 +466,12 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: id
+      - name: user_email
         in: path
         required: true
         schema:
           type: string
-      - name: id2
+      - name: thread_id
         in: path
         required: true
         schema:

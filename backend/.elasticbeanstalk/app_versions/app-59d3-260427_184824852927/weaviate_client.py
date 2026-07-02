@@ -29,8 +29,7 @@ def get_client():
     _client = weaviate.connect_to_weaviate_cloud(
         cluster_url=weaviate_url,
         auth_credentials=Auth.api_key(weaviate_api_key),
-        headers={"X-OpenAI-Api-Key": openai_api_key},
-        skip_init_checks=True
+        headers={"X-OpenAI-Api-Key": openai_api_key}
     )
     return _client
 
@@ -54,41 +53,10 @@ def init_schema():
                     wcd.Property(name="location", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="occasion", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="link", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True)
+                    wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True)
                 ]
             )
             print("Created collection 'Article'")
-        else:
-            # Add date property to existing Article collection if missing
-            article_col = client.collections.get("Article")
-            existing_props = {p.name for p in article_col.config.get().properties}
-            if "date" not in existing_props:
-                article_col.config.add_property(
-                    wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True)
-                )
-                print("Added 'date' property to existing Article collection")
-
-        # Create Passage collection (chunked discourse passages for fine-grained search)
-        if not client.collections.exists("Passage"):
-            client.collections.create(
-                name="Passage",
-                vectorizer_config=wcd.Configure.Vectorizer.text2vec_openai(
-                    model="text-embedding-3-large"
-                ),
-                properties=[
-                    wcd.Property(name="content", data_type=wcd.DataType.TEXT),
-                    wcd.Property(name="article_id", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="chunk_index", data_type=wcd.DataType.INT, skip_vectorization=True),
-                    wcd.Property(name="title", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="link", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="location", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="occasion", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="date_authored", data_type=wcd.DataType.TEXT, skip_vectorization=True)
-                ]
-            )
-            print("Created collection 'Passage'")
 
         # Create ChatThread collection
         if not client.collections.exists("ChatThread"):
@@ -143,23 +111,10 @@ def init_schema():
                     wcd.Property(name="feedback_type", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="reason", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="additional_comments", data_type=wcd.DataType.TEXT),
-                    wcd.Property(name="discourse_title", data_type=wcd.DataType.TEXT),
-                    wcd.Property(name="discourse_id", data_type=wcd.DataType.TEXT),
-                    wcd.Property(name="discourse_source", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="created_at", data_type=wcd.DataType.DATE)
                 ]
             )
             print("Created collection 'Feedback'")
-        else:
-            # Ensure discourse-context properties exist on the already-created collection.
-            feedback_col = client.collections.get("Feedback")
-            existing = {p.name for p in feedback_col.config.get().properties}
-            for prop in ["discourse_title", "discourse_id", "discourse_source"]:
-                if prop not in existing:
-                    feedback_col.config.add_property(
-                        wcd.Property(name=prop, data_type=wcd.DataType.TEXT)
-                    )
-                    print(f"Added '{prop}' property to Feedback collection")
 
         # Create SavedDiscourse collection
         if not client.collections.exists("SavedDiscourse"):
@@ -172,8 +127,7 @@ def init_schema():
                     wcd.Property(name="content_preview", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="link", data_type=wcd.DataType.TEXT),
                     wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT),
-                    wcd.Property(name="saved_at", data_type=wcd.DataType.DATE),
-                    wcd.Property(name="highlights_json", data_type=wcd.DataType.TEXT)
+                    wcd.Property(name="saved_at", data_type=wcd.DataType.DATE)
                 ]
             )
             print("Created collection 'SavedDiscourse'")

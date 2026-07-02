@@ -1,0 +1,53 @@
+
+Exactly Where To Change What
+
+Backend code (already done)
+
+OAuth routes are in app.py.
+
+No further code edits needed there.
+
+Backend hosting environment variables (set in your backend host dashboard, not in code)
+
+Go to your backend host env settings (Elastic Beanstalk / Railway / server env panel).
+
+Add/update these keys:
+
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+BACKEND_BASE_URL = https://dxhp0j33db.execute-api.us-east-1.amazonaws.com/dev (or prod, choose one)
+GOOGLE_REDIRECT_URI = https://dxhp0j33db.execute-api.us-east-1.amazonaws.com/dev/auth/google/callback
+FRONTEND_SIGNIN_URL = https://your-frontend-domain/signin
+FRONTEND_URL = https://your-frontend-domain
+Frontend hosting environment variables (set in frontend host dashboard)
+
+Add/update:
+
+REACT_APP_API_URL = same backend base URL
+REACT_APP_BASE_API_SERVER = same backend base URL
+These are used by frontend code in:
+
+Login.jsx
+Signup.jsx
+apiRoute.js
+Google Cloud Console
+
+Open OAuth Client ID settings.
+
+Set:
+
+Authorized redirect URI = GOOGLE_REDIRECT_URI exactly
+Authorized JavaScript origin = frontend origin only (example: https://your-frontend-domain)
+Important rule
+
+Use one stage only (dev or prod) across all 3 places:
+
+Backend host env
+Frontend host env
+Google redirect URI
+Quick verification after deploy
+
+Open https://dxhp0j33db.execute-api.us-east-1.amazonaws.com/dev/auth/google/authorize
+
+If it redirects to Google account chooser, config is correct.
+
