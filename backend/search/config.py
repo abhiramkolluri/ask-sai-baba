@@ -55,6 +55,13 @@ openai_client = OpenAI(api_key=openai_api_key)
 # ===========================================================================
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 
+# Decoding settings for every pipeline LLM call (planning, grading, follow-ups).
+# temperature=0 plus a fixed seed makes repeat runs of the same query return the
+# same plans/grades/quotes. NOTE: OpenAI's seed is best-effort reproducibility,
+# not a guarantee — outputs can still change across their backend updates.
+LLM_TEMPERATURE = 0.0
+LLM_SEED = 42
+
 PASSAGE_OVERFETCH = 40
 RERANK_KEEP = 15
 RERANK_MODEL = "rerank-v3.5"
@@ -76,6 +83,15 @@ MAX_PLANNED_QUERIES = 4
 # Best-quote selection (select_best_sentences): target quote length, a contiguous
 # 2–3 sentence chunk.
 BEST_CHUNK_SENTENCES = 3
+
+# Structured search (plan_search router + metadata listing path).
+# LISTING_MAX_RESULTS caps pure metadata listings ("all discourses from 1976")
+# regardless of what the router or caller asks for; LISTING_SNIPPET_SENTENCES is
+# how many leading sentences a listing card shows as its snippet (there is no
+# answering quote to extract — nothing was asked about the content).
+LISTING_MAX_RESULTS = 25
+LISTING_SNIPPET_SENTENCES = 3
+CATALOG_TTL_SECONDS = 6 * 3600  # corpus vocabulary cache for the router prompt
 
 # Follow-up question generation (generate_followups). One cheap LLM call proposes
 # candidate follow-ups grounded in the discourses already retrieved for the answer,

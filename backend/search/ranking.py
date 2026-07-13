@@ -32,6 +32,8 @@ from .config import (
     JUDGE_MODEL,
     GRADE_MIN_RELEVANCE,
     BEST_CHUNK_SENTENCES,
+    LLM_TEMPERATURE,
+    LLM_SEED,
 )
 
 
@@ -53,7 +55,7 @@ def rerank_passages(query: str, candidates: List[Dict[str, Any]], keep: int = RE
             "COHERE_API_KEY not set; skipping Cohere rerank and sorting by hybrid "
             "score. Set COHERE_API_KEY in the EB environment to enable reranking."
         )
-        ranked = sorted(candidates, key=lambda c: c.get("score", 0.0), reverse=True)
+        ranked = sorted(candidates, key=lambda c: (-c.get("score", 0.0), c.get("_id", "")))
         return ranked[:keep]
 
     try:
@@ -74,7 +76,7 @@ def rerank_passages(query: str, candidates: List[Dict[str, Any]], keep: int = RE
         return reranked
     except Exception as e:
         logging.error(f"Cohere rerank failed: {e}; falling back to hybrid-score order.")
-        ranked = sorted(candidates, key=lambda c: c.get("score", 0.0), reverse=True)
+        ranked = sorted(candidates, key=lambda c: (-c.get("score", 0.0), c.get("_id", "")))
         return ranked[:keep]
 
 
@@ -197,7 +199,10 @@ def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]]) -> List
         "Each passage is paired with ITS OWN question. Judge whether each passage DIRECTLY "
         "answers ITS question, and if so extract the exact quote that answers it. A passage "
         "that merely mentions the topic, or is broadly on-theme but does not address its "
-        "question, does NOT answer it. For each passage return its id, `answers` (true/false), "
+        "question, does NOT answer it. EXCEPTION: when the question asks about a specific "
+        "story, parable, person, or incident, a passage that NARRATES that story or incident "
+        "DOES directly answer it — quote the span most relevant to what was asked. "
+        "For each passage return its id, `answers` (true/false), "
         "`relevance` (0.0-1.0), and `quote`: the shortest contiguous span of 1 to 3 sentences "
         "copied EXACTLY (verbatim) from the passage that answers its question, or null if it "
         "does not answer it. Never quote generic, introductory, or closing remarks (e.g. 'I "
@@ -220,6 +225,8 @@ def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]]) -> List
                 {"role": "user", "content": user_content},
             ],
             response_format={"type": "json_object"},
+            temperature=LLM_TEMPERATURE,
+            seed=LLM_SEED,
         )
         raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
@@ -279,6 +286,8 @@ def grade_passages(query: str, candidates: List[Dict[str, Any]]) -> List[Dict[st
                 {"role": "user", "content": user_content},
             ],
             response_format={"type": "json_object"},
+            temperature=LLM_TEMPERATURE,
+            seed=LLM_SEED,
         )
         raw = (response.choices[0].message.content or "").strip()
         # Strip code fences defensively before parsing.
@@ -335,7 +344,8 @@ def aggregate_to_discourses(graded: List[Dict[str, Any]], limit: int) -> List[Di
             "link": passage.get("link", ""),
             "collection": passage.get("collection_name", ""),  # output key is `collection`
             "date_authored": passage.get("date_authored", ""),
+            "date": passage.get("date_authored", ""),  # frontend reads `date`
         })
 
-    discourses.sort(key=lambda d: d["score"], reverse=True)
+    discourses.sort(key=lambda d: (-d["score"], d["_id"]))
     return discourses[:limit]

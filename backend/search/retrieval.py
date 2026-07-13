@@ -62,11 +62,49 @@ def get_embedding(text):
 # Hybrid passage search & rank fusion
 # ===========================================================================
 
-def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH) -> List[Dict[str, Any]]:
+def build_passage_filter(filters: Dict[str, Any]):
+    """Compose a Weaviate Filter from a validated SearchPlan.filters dict, or
+    None when there is nothing to filter on.
+
+    Reads the normalized metadata backfilled by backfill_metadata.py:
+    `book` is FIELD-tokenized so equality is whole-name exact; `chapter_index`
+    is stored 0-based while the plan speaks 1-based chapters (converted here);
+    location/occasion match word tokens case-insensitively, which tolerates
+    the corpus's messy values ('Brindavan, KA', 'Dasara, Vijayadasami').
+    """
+    if not filters:
+        return None
+    clauses = []
+    if filters.get("book"):
+        clauses.append(Filter.by_property("book").equal(filters["book"]))
+    if filters.get("volume") is not None:
+        clauses.append(Filter.by_property("volume").equal(filters["volume"]))
+    if filters.get("chapter_start") is not None:
+        clauses.append(Filter.by_property("chapter_index").greater_or_equal(filters["chapter_start"] - 1))
+    if filters.get("chapter_end") is not None:
+        clauses.append(Filter.by_property("chapter_index").less_or_equal(filters["chapter_end"] - 1))
+    if filters.get("year_start") is not None:
+        clauses.append(Filter.by_property("year").greater_or_equal(filters["year_start"]))
+    if filters.get("year_end") is not None:
+        clauses.append(Filter.by_property("year").less_or_equal(filters["year_end"]))
+    for prop in ("location", "occasion"):
+        if filters.get(prop):
+            tokens = filters[prop].split()
+            clauses.append(Filter.by_property(prop).contains_all(tokens))
+    if not clauses:
+        return None
+    combined = clauses[0]
+    for clause in clauses[1:]:
+        combined = combined & clause
+    return combined
+
+def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH, filters=None) -> List[Dict[str, Any]]:
     """Hybrid (BM25 + vector) search over the Passage collection.
 
     The query is expected to be already prepared (glossed/distilled) by
-    `plan_queries`; this function does not re-expand it.
+    `plan_queries`; this function does not re-expand it. `filters` is an
+    optional Weaviate Filter (see build_passage_filter) constraining the
+    candidate set by metadata; None preserves the unfiltered behavior.
     """
     try:
         client = get_client()
@@ -79,6 +117,7 @@ def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH) -> List[Dict
             query=query,
             alpha=HYBRID_ALPHA,
             limit=overfetch,
+            filters=filters,
             query_properties=["content", "title"],
             return_metadata=MetadataQuery(score=True)
         )
@@ -118,7 +157,7 @@ def _rrf_merge(ranked_lists, k: int = 60) -> List[Dict[str, Any]]:
             scores[pid] = scores.get(pid, 0.0) + 1.0 / (k + rank)
             if pid not in best or rank < best[pid][0]:
                 best[pid] = (rank, p)
-    return [best[pid][1] for pid in sorted(scores, key=lambda x: scores[x], reverse=True)]
+    return [best[pid][1] for pid in sorted(scores, key=lambda pid: (-scores[pid], pid))]
 
 
 # ===========================================================================
@@ -260,14 +299,25 @@ def get_full_article(id, collection=None):
         if not obj:
             return None
 
+        props = obj.properties or {}
+        volume = props.get("volume")
+        chapter_index = props.get("chapter_index")
+        year = props.get("year")
         article = {
             "_id": str(obj.uuid),
-            "title": obj.properties.get("title", ""),
-            "content": obj.properties.get("content", ""),
-            "location": obj.properties.get("location", ""),
-            "occasion": obj.properties.get("occasion", ""),
-            "link": obj.properties.get("link", ""),
-            "collection": obj.properties.get("collection_name", "")
+            "title": props.get("title", ""),
+            "content": props.get("content", ""),
+            "location": props.get("location", ""),
+            "occasion": props.get("occasion", ""),
+            "link": props.get("link", ""),
+            "collection": props.get("collection_name", ""),
+            "date": props.get("date", "") or "",
+            # Normalized position metadata for the reader's chapter line
+            # ("Vol 14 · Discourse 10", "Chapter 3").
+            "book": props.get("book", "") or "",
+            "volume": int(volume) if volume is not None else None,
+            "chapter_index": int(chapter_index) if chapter_index is not None else None,
+            "year": int(year) if year is not None else None,
         }
 
         # Convert to markdown format

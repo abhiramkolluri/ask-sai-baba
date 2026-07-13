@@ -34,6 +34,41 @@ def get_client():
     )
     return _client
 
+# Normalized metadata props added to Article and Passage for structured search
+# (book/chapter/year filtering). `book` uses FIELD tokenization so equality
+# filters match the whole name exactly — with the default word tokenization,
+# Equal("Geeta Vahini") would be token-bag matching and cross-match other books.
+def _metadata_props():
+    return [
+        wcd.Property(name="book", data_type=wcd.DataType.TEXT,
+                     skip_vectorization=True, tokenization=wcd.Tokenization.FIELD),
+        wcd.Property(name="volume", data_type=wcd.DataType.INT),
+        wcd.Property(name="chapter_index", data_type=wcd.DataType.INT),
+        wcd.Property(name="year", data_type=wcd.DataType.INT),
+    ]
+
+def _ensure_props(collection, props):
+    # config.get() can fail on client/server version skew (e.g. the client not
+    # knowing a newer server's ReplicationDeletionStrategy enum value). Fall
+    # back to blindly adding each property and treating "already exists" as
+    # success — autoschema must never be what creates these (it would infer
+    # the wrong tokenization for FIELD-tokenized props like `book`).
+    try:
+        existing = {p.name for p in collection.config.get().properties}
+    except Exception as e:
+        print(f"Could not read {collection.name} config ({e}); adding properties blindly")
+        existing = set()
+    for prop in props:
+        if prop.name in existing:
+            continue
+        try:
+            collection.config.add_property(prop)
+            print(f"Added '{prop.name}' property to {collection.name} collection")
+        except Exception as e:
+            if "already" in str(e).lower() or "exists" in str(e).lower():
+                continue
+            raise
+
 def init_schema():
     client = get_client()
     if not client:
@@ -55,19 +90,17 @@ def init_schema():
                     wcd.Property(name="occasion", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="link", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True)
+                    wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    *_metadata_props()
                 ]
             )
             print("Created collection 'Article'")
         else:
-            # Add date property to existing Article collection if missing
             article_col = client.collections.get("Article")
-            existing_props = {p.name for p in article_col.config.get().properties}
-            if "date" not in existing_props:
-                article_col.config.add_property(
-                    wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True)
-                )
-                print("Added 'date' property to existing Article collection")
+            _ensure_props(article_col, [
+                wcd.Property(name="date", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                *_metadata_props(),
+            ])
 
         # Create Passage collection (chunked discourse passages for fine-grained search)
         if not client.collections.exists("Passage"):
@@ -85,10 +118,13 @@ def init_schema():
                     wcd.Property(name="location", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="occasion", data_type=wcd.DataType.TEXT, skip_vectorization=True),
                     wcd.Property(name="collection_name", data_type=wcd.DataType.TEXT, skip_vectorization=True),
-                    wcd.Property(name="date_authored", data_type=wcd.DataType.TEXT, skip_vectorization=True)
+                    wcd.Property(name="date_authored", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    *_metadata_props()
                 ]
             )
             print("Created collection 'Passage'")
+        else:
+            _ensure_props(client.collections.get("Passage"), _metadata_props())
 
         # Create ChatThread collection
         if not client.collections.exists("ChatThread"):

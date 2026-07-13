@@ -32,9 +32,12 @@ from .config import (
     FOLLOWUP_RERANK_KEEP,
     FOLLOWUP_MIN_HITS,
     FOLLOWUP_MAX_WORKERS,
+    LLM_TEMPERATURE,
+    LLM_SEED,
 )
-from .query_planning import plan_queries
-from .retrieval import search_passages, search_exact, _rrf_merge
+from .query_planning import plan_queries, plan_search, SearchPlan
+from .retrieval import search_passages, search_exact, _rrf_merge, build_passage_filter
+from .listing import list_discourses
 from .ranking import (
     rerank_passages,
     grade_and_quote_passages,
@@ -130,17 +133,52 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # route into the passage pipeline instead of near_text.
         query = exact_phrase
 
-    # (c) Plan the query into 1-N standalone sub-queries (multi-turn + distillation
-    #     + adaptive decomposition), retrieve and rerank EACH against its own facet,
-    #     then fuse with provenance so quotes can be judged per-facet downstream.
-    planned = plan_queries(query, history)
-    ranked_lists = []
-    for q in planned:
-        cands = search_passages(q, PASSAGE_OVERFETCH)
-        rl = rerank_passages(q, cands, RERANK_KEEP)
-        for p in rl:
-            p["source_query"] = q
-        ranked_lists.append(rl)
+    # (c) Route the message: intent (semantic / listing / hybrid) + metadata
+    #     filters + 1-N standalone semantic sub-queries (multi-turn resolution,
+    #     distillation, and glossing exactly as plan_queries did).
+    plan = plan_search(query, history)
+
+    # (c1) Pure metadata listing ("first five discourses of Geeta Vahini",
+    #      "all discourses from 1976") — no topic to grade against, so bypass
+    #      the passage pipeline entirely.
+    if plan.intent == "listing":
+        # Listings ignore the caller's semantic-results `limit`: "all discourses
+        # from 1976" legitimately returns more than a topic search page. The
+        # user-implied count ("first five" -> 5) arrives via plan.limit, and
+        # LISTING_MAX_RESULTS caps the rest inside list_discourses.
+        listed = list_discourses(plan)
+        if listed:
+            return listed
+        # Nothing matched. Book/chapter/year filters are trustworthy metadata,
+        # so an empty browse result is the honest answer; but location/occasion
+        # values are sparse and messy, and chat (allow_empty=False) always
+        # needs grounding — those degrade to a semantic search on the message.
+        sparse = "location" in plan.filters or "occasion" in plan.filters
+        if allow_empty and not sparse:
+            return []
+        plan = SearchPlan(intent="semantic", queries=[query])
+
+    # (c2) Retrieve and rerank EACH sub-query against its own facet — constrained
+    #      by the plan's metadata filter for hybrid intent — then fuse with
+    #      provenance so quotes can be judged per-facet downstream.
+    flt = build_passage_filter(plan.filters) if plan.intent == "hybrid" else None
+
+    def _retrieve(passage_filter):
+        lists = []
+        for q in plan.queries:
+            cands = search_passages(q, PASSAGE_OVERFETCH, filters=passage_filter)
+            rl = rerank_passages(q, cands, RERANK_KEEP)
+            for p in rl:
+                p["source_query"] = q
+            lists.append(rl)
+        return lists
+
+    ranked_lists = _retrieve(flt)
+    if flt is not None and not any(ranked_lists):
+        # The metadata filter starved retrieval (sparse/mistagged metadata) —
+        # a filtered zero is worse than unfiltered results, so retry open.
+        logging.info(f"search_browse: hybrid filter {plan.filters} matched nothing; retrying unfiltered")
+        ranked_lists = _retrieve(None)
     reranked = _rrf_merge(ranked_lists)[:RERANK_KEEP]
     # Unified extractive grade: judges relevance AND extracts the verbatim answering
     # quote per passage against its own facet, attaching `best_sentence` to each kept one.
@@ -268,6 +306,8 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None) 
                 {"role": "user", "content": user_content},
             ],
             response_format={"type": "json_object"},
+            temperature=LLM_TEMPERATURE,
+            seed=LLM_SEED,
         )
         raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
