@@ -1,0 +1,33 @@
+---
+description: Core conventions for the Ask Sai Vidya backend (Flask + Weaviate)
+globs:
+alwaysApply: true
+---
+
+# Ask Sai Vidya backend — core rules
+
+## Environment
+- Always use `backend/venv` for Python commands (`source backend/venv/bin/activate` or `./venv/bin/python` from `backend/`). Other venvs in the tree lack weaviate.
+- The venv is Python 3.9 — no `match` statements, no `X | Y` type unions, no 3.10+ stdlib.
+- Load env with `load_dotenv('.env')` (explicit path) in scripts; required vars are checked by `validate-env.py`.
+
+## Storage layer
+- Weaviate Cloud is the only live storage layer — users, chats, saved discourses, and the discourse corpus all live in Weaviate collections (see `weaviate_client.py::init_schema`). Ignore README mentions of MongoDB/Docker/Railway; they are legacy.
+- The cluster is SHARED WITH PRODUCTION (serves asksaividya.com). Any bulk write, update, or delete against it requires explicit user approval first. Reads are fine.
+
+## Routes and deployment
+- Adding, removing, or renaming any `@app.route` REQUIRES regenerating the OpenAPI spec (`infra/generate_openapi.py`) and redeploying the gateway (`infra/sync_gateway.sh`), or the route 404s through API Gateway even though EB serves it.
+- Put identifiers in query strings, never in path segments — sibling path variables collide in API Gateway (`/chats/<user_email>` vs `/chats/<thread_id>`).
+- Deploy only via the scripts: `./package_eb.sh [prod]` then `eb deploy <env>`. Never deploy manually; manual deploys have caused outages.
+- For scripted AWS calls prefer boto3 over the `aws` CLI — session tokens here contain `//` and `+` that break shell parsing.
+
+## Testing
+- `python test_router_unit.py` — pure unit checks, no network.
+- `python eval_router.py` — 27 labeled LLM routing cases; expects 27/27. LLM output varies: rerun once before treating a failure as real, and check for transient network errors masquerading as regressions.
+- `test_*.py` files are integration scripts that hit a RUNNING server (`BASE_URL=http://localhost:8000`), not pytest suites.
+
+## Corpus facts (do not "fix" these)
+- The book is spelled "Geeta Vahini", not "Gita Vahini". "The Gita"/"Bhagavad Gita" in a user query refers to the scripture, not the book.
+- Occasion values use corpus transliteration: 'shivarathri' (not 'shivaratri'), 'dasara'.
+- Old Sathya Sai Speaks collection_names look like `'SSS, Vol 14Disc. 10'` — parse with `metadata_norm.normalize_collection`, don't hand-roll regexes.
+- UI/user-facing copy says "Swami", not "Bhagawan".
