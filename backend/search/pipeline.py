@@ -15,6 +15,7 @@ Public entrypoints:
 
 import re
 import json
+import time
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any
@@ -24,6 +25,9 @@ from .config import (
     GRADE_MODEL,
     PASSAGE_OVERFETCH,
     RERANK_KEEP,
+    MERGE_MIN_PER_FACET,
+    MERGE_PER_FACET_CAP,
+    FACET_MAX_WORKERS,
     CHAT_FALLBACK_DISCOURSES,
     GRADE_MIN_RELEVANCE,
     FOLLOWUP_CANDIDATES,
@@ -34,13 +38,15 @@ from .config import (
     FOLLOWUP_MAX_WORKERS,
 )
 from .query_planning import plan_queries
-from .retrieval import search_passages, search_exact, _rrf_merge
+from .retrieval import search_passages, search_exact, _rrf_merge, phrase_in_text
 from .ranking import (
     rerank_passages,
     grade_and_quote_passages,
     aggregate_to_discourses,
     select_best_sentences,
 )
+from .transparency import new_trace, StageTimer, assess_quality
+from .resilience import PipelineServiceError
 
 
 # ===========================================================================
@@ -104,7 +110,7 @@ def format_docs(docs):
 # Main discourse search — plan → retrieve → rerank → fuse → grade → aggregate
 # ===========================================================================
 
-def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_empty: bool = True, history=None) -> List[Dict[str, Any]]:
+def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_empty: bool = True, history=None, return_trace: bool = False):
     """Search discourses via the passage pipeline (hybrid -> rerank -> grade -> aggregate).
 
     Keeps the quoted-phrase exact-match shortcut from the legacy implementation.
@@ -113,51 +119,192 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
       - False (chat): fall back to the top reranked passages so the generator
         still has grounding context.
 
+    `return_trace` (opt-in): when True, returns a ``(results, trace)`` tuple where
+    ``trace`` is the transparency dict (see search/transparency.py) describing how
+    the search ran. When False (default, all existing callers), returns just the
+    results list as before.
+
     The original near_text implementation is preserved verbatim as
     search_browse_articles_legacy() for rollback.
     """
-    # (a) Quoted-phrase shortcut: try exact match first, exactly as before.
-    if exact_phrase:
-        exact_results = search_exact(exact_phrase, limit=limit)
-        if exact_results:
-            # Normalize to the pipeline output shape so downstream consumers
-            # (format_docs, frontend) see matched_passage/passage_index.
-            for r in exact_results:
-                r.setdefault("matched_passage", r.get("content", ""))
-                r.setdefault("passage_index", 0)
-            return select_best_sentences(query, exact_results)
-        # (b) No exact match — fall through using the phrase as the query, but
-        # route into the passage pipeline instead of near_text.
-        query = exact_phrase
+    # When return_trace is False, `trace` stays None and every trace write below is
+    # skipped; StageTimer is a no-op on a None trace, so the traced and untraced
+    # paths are the same code with no branching noise. `trace["planning"]` etc. are
+    # pre-created sub-dicts (see new_trace), so we can hand them straight to the
+    # stage functions as `trace_out` without None checks. plan_meta is always a
+    # real dict (throwaway when untraced) because the planner reports the occasion
+    # filter through it and occasion routing must work for chat too.
+    trace = new_trace(query, history) if return_trace else None
+    plan_meta = trace["planning"] if trace else {}
+    grade_meta = trace["grading"] if trace else None
 
-    # (c) Plan the query into 1-N standalone sub-queries (multi-turn + distillation
-    #     + adaptive decomposition), retrieve and rerank EACH against its own facet,
-    #     then fuse with provenance so quotes can be judged per-facet downstream.
-    planned = plan_queries(query, history)
-    ranked_lists = []
-    for q in planned:
-        cands = search_passages(q, PASSAGE_OVERFETCH)
-        rl = rerank_passages(q, cands, RERANK_KEEP)
-        for p in rl:
-            p["source_query"] = q
-        ranked_lists.append(rl)
-    reranked = _rrf_merge(ranked_lists)[:RERANK_KEEP]
-    # Unified extractive grade: judges relevance AND extracts the verbatim answering
-    # quote per passage against its own facet, attaching `best_sentence` to each kept one.
-    graded = grade_and_quote_passages(query, reranked)
-    results = aggregate_to_discourses(graded, limit)
+    def _finish(results):
+        """Record result-level fields + quality on the trace (if any) and return in
+        the caller's requested shape: (results, trace) when tracing, else results."""
+        if trace is None:
+            return results
+        trace["results"]["discourses"] = len(results)
+        trace["results"]["top_relevance"] = results[0].get("score", 0.0) if results else 0.0
+        assess_quality(trace, results)
+        return results, trace
 
-    # (d) Handle the empty case.
-    if not results:
-        if allow_empty:
-            return []
-        # Chat path: ground the generator on the top reranked (pre-grade)
-        # passages even though the grader was not satisfied.
-        fallback = aggregate_to_discourses(reranked[:CHAT_FALLBACK_DISCOURSES], CHAT_FALLBACK_DISCOURSES)
-        return select_best_sentences(query, fallback)
+    with StageTimer(trace, "total"):
+        # (a) Quoted-phrase shortcut: try exact match first. search_exact's
+        # Weaviate filters are token-based and can return bag-of-words matches
+        # that never contain the phrase, so each hit is verified with
+        # phrase_in_text before we honor the "exact match" claim.
+        if exact_phrase:
+            if trace:
+                trace["exact_phrase"]["phrase"] = exact_phrase
+            exact_results = search_exact(exact_phrase, limit=limit)
+            exact_results = [
+                r for r in exact_results
+                if phrase_in_text(exact_phrase, r.get("title", ""))
+                or phrase_in_text(exact_phrase, r.get("content", ""))
+            ]
+            if exact_results:
+                if trace:
+                    trace["exact_phrase"]["matched"] = True
+                # Normalize to the pipeline output shape so downstream consumers
+                # (format_docs, frontend) see matched_passage/passage_index.
+                for r in exact_results:
+                    r.setdefault("matched_passage", r.get("content", ""))
+                    r.setdefault("passage_index", 0)
+                return _finish(select_best_sentences(query, exact_results))
+            # (b) No exact match — fall through using the phrase as the query, but
+            # route into the passage pipeline instead of near_text.
+            query = exact_phrase
 
-    # Quotes are already attached by the unified grade step.
-    return results
+        # (c) Plan the query into 1-N standalone sub-queries (multi-turn + distillation
+        #     + adaptive decomposition), retrieve and rerank EACH against its own facet,
+        #     then fuse with provenance so quotes can be judged per-facet downstream.
+        with StageTimer(trace, "planning"):
+            planned = plan_queries(query, history, trace_out=plan_meta)
+        if trace:
+            trace["planning"]["facets"] = planned
+
+        # The planner flags occasion questions ("discourses given during Dasara");
+        # retrieval then filters on the passage `occasion` metadata instead of
+        # hoping semantic search lands on the right occasions.
+        occasion = plan_meta.get("occasion")
+        # It also flags factual/biographical questions so the UI can note that
+        # discourse search matches themes, not facts. Lift it to the top-level
+        # trace where assess_quality reads it.
+        if trace:
+            trace["intent"] = plan_meta.get("intent")
+
+        def _retrieve_one(q, occ):
+            """Retrieve + rerank a single facet. Runs concurrently across facets,
+            so it times itself into its own stats row rather than a shared trace
+            stage (concurrent per-stage sums would overstate real latency).
+
+            A PipelineServiceError (retrieval couldn't reach Weaviate) is caught
+            here and marked `errored` so one flaky facet doesn't kill a
+            multi-facet query; search_browse decides the whole search failed only
+            if EVERY facet errored (distinguishing infra failure from empty)."""
+            started = time.perf_counter()
+            try:
+                cands = search_passages(q, PASSAGE_OVERFETCH, occasion=occ)
+            except PipelineServiceError as e:
+                logging.error(f"facet retrieval errored for {q!r}: {e}")
+                return [], {"facet": q, "retrieved": 0, "kept_after_rerank": 0,
+                            "reranker": "n/a", "ms": int((time.perf_counter() - started) * 1000),
+                            "errored": True}
+            rl = rerank_passages(q, cands, RERANK_KEEP)
+            for p in rl:
+                p["source_query"] = q
+            # Which reranker actually ran, inferred without touching rerank_passages:
+            # the Cohere path is the only one that sets `rerank_score`; both the
+            # no-key and exception fallbacks omit it -> hybrid-score order.
+            reranker = "n/a" if not rl else ("cohere" if "rerank_score" in rl[0] else "hybrid_score")
+            stat = {
+                "facet": q,
+                "retrieved": len(cands),
+                "kept_after_rerank": len(rl),
+                "reranker": reranker,
+                "ms": int((time.perf_counter() - started) * 1000),
+                "errored": False,
+            }
+            return rl, stat
+
+        def _retrieve_and_rerank(occ):
+            """One retrieval+rerank pass over every facet, fanned out one worker
+            per facet (facets are independent; sequential passes pushed 3-4 facet
+            queries past API Gateway's 29s production timeout). Returns per-facet
+            ranked lists plus stats, in facet order. Stats are recorded into the
+            trace only for the pass whose results we keep — the occasion-filtered
+            pass may be discarded and re-run unfiltered. The single trace timing
+            "retrieval" is the wall clock of the whole fan-out, rerank included.
+            """
+            with StageTimer(trace, "retrieval"):
+                if len(planned) == 1:
+                    pairs = [_retrieve_one(planned[0], occ)]
+                else:
+                    with ThreadPoolExecutor(max_workers=min(len(planned), FACET_MAX_WORKERS)) as pool:
+                        pairs = list(pool.map(lambda q: _retrieve_one(q, occ), planned))
+            return [rl for rl, _ in pairs], [stat for _, stat in pairs]
+
+        ranked_lists, facet_stats = _retrieve_and_rerank(occasion)
+        fell_back = False
+        if occasion and sum(s["retrieved"] for s in facet_stats) < 5:
+            # The occasion filter found (almost) nothing — the occasion name may
+            # not match corpus metadata. Retry unfiltered rather than returning a
+            # hollow result for a real topic; the trace records the fallback so
+            # the UI can say so honestly.
+            fell_back = True
+            ranked_lists, facet_stats = _retrieve_and_rerank(None)
+
+        # Record per-facet stats first so the trace is complete even when we
+        # short-circuit on a service error below.
+        if trace:
+            trace["retrieval"]["facet_results"] = facet_stats
+            if occasion:
+                trace["metadata_filter"] = {
+                    "occasion": occasion,
+                    "applied": not fell_back,
+                    "fell_back": fell_back,
+                }
+
+        # If EVERY facet failed to reach the search service, this is an
+        # infrastructure failure, not an empty corpus. On the traced path (the
+        # frontend) surface it honestly — service_error drives a "please try
+        # again" state instead of a misleading "no discourses found". The
+        # non-traced path (legacy /query chat) falls through to today's empty
+        # handling unchanged. One facet erroring is tolerated (handled above).
+        if trace and facet_stats and all(s.get("errored") for s in facet_stats):
+            trace["service_error"] = True
+            return _finish([])
+
+        # Fuse the per-facet lists. The cap scales with facet count and every
+        # facet keeps its top passages: with a flat cap, one facet of a
+        # multi-topic question could be crowded out of the merge entirely and
+        # never reach the grader (observed in adversarial probing).
+        merged = _rrf_merge(ranked_lists)
+        cap = max(RERANK_KEEP, MERGE_PER_FACET_CAP * len(ranked_lists))
+        keep_ids = {p["_id"] for p in merged[:cap]}
+        for rl in ranked_lists:
+            keep_ids.update(p["_id"] for p in rl[:MERGE_MIN_PER_FACET])
+        reranked = [p for p in merged if p["_id"] in keep_ids]
+        if trace:
+            trace["retrieval"]["merged_candidates"] = len(reranked)
+
+        # Unified extractive grade: judges relevance AND extracts the verbatim answering
+        # quote per passage against its own facet, attaching `best_sentence` to each kept one.
+        with StageTimer(trace, "grading"):
+            graded = grade_and_quote_passages(query, reranked, trace_out=grade_meta)
+        results = aggregate_to_discourses(graded, limit)
+
+        # (d) Handle the empty case.
+        if not results:
+            if allow_empty:
+                return _finish([])
+            # Chat path: ground the generator on the top reranked (pre-grade)
+            # passages even though the grader was not satisfied.
+            fallback = aggregate_to_discourses(reranked[:CHAT_FALLBACK_DISCOURSES], CHAT_FALLBACK_DISCOURSES)
+            return _finish(select_best_sentences(query, fallback))
+
+        # Quotes are already attached by the unified grade step.
+        return _finish(results)
 
 def search(user_query: str, collection=None) -> List[Dict[str, Any]]:
     """Search for documents."""

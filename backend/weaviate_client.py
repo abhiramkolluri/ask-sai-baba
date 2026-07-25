@@ -18,9 +18,16 @@ def validate_env():
 
 def get_client():
     global _client
-    if _client is not None and _client.is_live():
-        return _client
-        
+    # Reuse the cached client only if it's still live. is_live() can itself throw
+    # when the underlying connection has dropped — treat that as "not live" and
+    # fall through to rebuild, rather than letting it propagate as a hard failure.
+    if _client is not None:
+        try:
+            if _client.is_live():
+                return _client
+        except Exception:
+            pass  # stale/broken connection -> reconnect below
+
     validate_env()
     weaviate_url = os.getenv("WEAVIATE_URL")
     weaviate_api_key = os.getenv("WEAVIATE_API_KEY")

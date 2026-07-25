@@ -14,3 +14,12 @@ Database Vectorizer\.env
 .qodo
 
 /claude_instructions
+
+# Search-pipeline analysis artifacts: contain real user questions harvested from
+# production Weaviate (privacy) and are multi-MB. The scripts that produce them
+# are committed; their output is not.
+/backend/real_questions.json
+/backend/real_replay_results.json
+/backend/real_replay_results_noisy.json
+/backend/probe_results.json
+/backend/coverage_gaps.json

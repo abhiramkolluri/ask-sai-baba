@@ -619,10 +619,22 @@ def search_endpoint():
         history = request.json.get('history') or []
         if not isinstance(history, list):
             history = []
+        # Opt-in pipeline transparency: when the client sends include_trace, we
+        # return {results, trace} where trace describes how the search ran (planned
+        # facets, per-facet counts, grader verdicts, timings — see
+        # search/transparency.py). Omitting it preserves the original bare-array
+        # response, so older clients are unaffected. Same route/body-only change —
+        # no API Gateway/OpenAPI update needed.
+        include_trace = bool(request.json.get('include_trace'))
         if query:
             exact_phrase = extract_quoted_phrase(query)
             # Browse shows more results than chat; allow_empty stays True so an
             # honest empty result is returned rather than padded.
+            if include_trace:
+                results, trace = search_browse(
+                    query, limit=10, exact_phrase=exact_phrase,
+                    history=history, return_trace=True)
+                return jsonify({'results': results, 'trace': trace})
             results = search_browse(query, limit=10, exact_phrase=exact_phrase, history=history)
             return jsonify(results)
         else:

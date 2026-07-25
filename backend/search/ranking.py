@@ -26,13 +26,28 @@ from typing import List, Dict, Any
 from .config import (
     openai_client,
     COHERE_API_KEY,
+    COHERE_TIMEOUT,
     RERANK_MODEL,
     RERANK_KEEP,
     GRADE_MODEL,
     JUDGE_MODEL,
+    JUDGE_TEMPERATURE,
     GRADE_MIN_RELEVANCE,
     BEST_CHUNK_SENTENCES,
 )
+
+# One shared Cohere client with a bounded timeout, built once at import (guarded
+# by the key so the no-key path is unchanged). Per-call clients previously had no
+# timeout, which produced a 97s rerank hang under real traffic. None when the key
+# is absent -> callers fall back to hybrid-score order, exactly as before.
+_cohere_client = None
+if COHERE_API_KEY:
+    try:
+        import cohere
+        _cohere_client = cohere.Client(COHERE_API_KEY, timeout=COHERE_TIMEOUT)
+    except Exception as e:  # pragma: no cover - import/init guard
+        logging.error(f"Cohere client init failed: {e}; reranking disabled.")
+        _cohere_client = None
 
 
 # ===========================================================================
@@ -48,19 +63,17 @@ def rerank_passages(query: str, candidates: List[Dict[str, Any]], keep: int = RE
     if not candidates:
         return []
 
-    if not COHERE_API_KEY:
+    if _cohere_client is None:
         logging.warning(
-            "COHERE_API_KEY not set; skipping Cohere rerank and sorting by hybrid "
+            "Cohere reranking unavailable (no COHERE_API_KEY); sorting by hybrid "
             "score. Set COHERE_API_KEY in the EB environment to enable reranking."
         )
         ranked = sorted(candidates, key=lambda c: c.get("score", 0.0), reverse=True)
         return ranked[:keep]
 
     try:
-        import cohere
-        co = cohere.Client(COHERE_API_KEY)
         documents = [c.get("content", "") for c in candidates]
-        response = co.rerank(
+        response = _cohere_client.rerank(
             model=RERANK_MODEL,
             query=query,
             documents=documents,
@@ -133,12 +146,10 @@ def select_best_sentences(query: str, discourses: List[Dict[str, Any]]) -> List[
         return d.get("matched_passage", "") or d.get("content", "")
 
     chosen = {}  # discourse_index -> best chunk
-    if COHERE_API_KEY and flat:
+    if _cohere_client is not None and flat:
         try:
-            import cohere
-            co = cohere.Client(COHERE_API_KEY)
             documents = [w for (_, w) in flat]
-            response = co.rerank(
+            response = _cohere_client.rerank(
                 model=RERANK_MODEL,
                 query=query,
                 documents=documents,
@@ -175,7 +186,7 @@ def _locate_verbatim(quote: str, passage: str):
     m = re.search(pattern, passage)
     return m.group(0) if m else None
 
-def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]], trace_out=None) -> List[Dict[str, Any]]:
     """Unified extractive grade: ONE stronger-LLM call judges whether each passage
     directly answers `query` AND extracts the verbatim span that answers it.
 
@@ -186,9 +197,17 @@ def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]]) -> List
 
     On any LLM/parse failure, degrades to the Cohere chunk baseline
     (`select_best_sentences`) and keeps everything (nothing dropped).
+
+    ``trace_out`` (optional dict): when provided, records the grader verdicts for
+    the transparency trace — model, kept/rejected counts, per-kept-passage
+    (title/facet/relevance), per-rejected-passage (title/facet/reason), and a
+    `fallback` flag set when the Cohere baseline was used (no verdicts available).
+    Passage bodies are never recorded.
     """
     if not passages:
         return []
+    if trace_out is not None:
+        trace_out["model"] = JUDGE_MODEL
 
     system_prompt = (
         "The passages below are excerpts from spiritual discourses (lectures) delivered by "
@@ -220,6 +239,7 @@ def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]]) -> List
                 {"role": "user", "content": user_content},
             ],
             response_format={"type": "json_object"},
+            temperature=JUDGE_TEMPERATURE,
         )
         raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
@@ -227,26 +247,49 @@ def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]]) -> List
             raw = re.sub(r"\n?```$", "", raw).strip()
         data = json.loads(raw)
 
+        def _reject(idx, reason):
+            if trace_out is not None:
+                p = passages[idx]
+                trace_out.setdefault("rejected_passages", []).append({
+                    "title": p.get("title", ""),
+                    "facet": p.get("source_query") or query,
+                    "reason": reason,
+                })
+
         kept = []
         for item in data.get("results", []):
             idx = item.get("id")
             if not isinstance(idx, int) or idx < 0 or idx >= len(passages):
                 continue
             if item.get("answers") is not True:
+                _reject(idx, "not_answering")
                 continue
             relevance = float(item.get("relevance", 0.0) or 0.0)
             if relevance < GRADE_MIN_RELEVANCE:
+                _reject(idx, "low_relevance")
                 continue
             exact = _locate_verbatim(item.get("quote"), passages[idx].get("content", ""))
             if not exact:
-                continue  # no verbatim answering span -> drop (avoid hallucinated quotes)
+                _reject(idx, "quote_not_verbatim")  # avoid hallucinated quotes
+                continue
             p = dict(passages[idx])
             p["grade_relevance"] = relevance
             p["best_sentence"] = exact
             kept.append(p)
+            if trace_out is not None:
+                trace_out.setdefault("kept_passages", []).append({
+                    "title": p.get("title", ""),
+                    "facet": p.get("source_query") or query,
+                    "relevance": relevance,
+                })
+        if trace_out is not None:
+            trace_out["kept"] = len(kept)
+            trace_out["rejected"] = len(trace_out.get("rejected_passages", []))
         return kept
     except Exception as e:
         logging.error(f"grade_and_quote_passages failed: {e}; falling back to Cohere chunks (no drop).")
+        if trace_out is not None:
+            trace_out["fallback"] = True
         return select_best_sentences(query, passages)
 
 def grade_passages(query: str, candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

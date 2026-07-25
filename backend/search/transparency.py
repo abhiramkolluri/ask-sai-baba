@@ -1,0 +1,209 @@
+"""Pipeline transparency — collect a user-facing trace of how a search ran.
+
+The search pipeline (plan -> retrieve -> rerank -> fuse -> grade -> aggregate)
+computes many intermediate signals (planned facets, per-facet candidate counts,
+which reranker ran, how many passages the grader kept vs. rejected, timings) that
+were previously discarded. This module provides the small, dependency-free
+plumbing to gather those signals into a plain dict that ``search_browse`` returns
+alongside its results and the frontend renders as a "How I searched" panel.
+
+Design rules baked in here:
+  - The trace is a plain dict (jsonify-friendly, matches the package's style).
+  - It NEVER contains passage bodies — only titles, facets, scores, reasons — so a
+    worst-case trace stays a few KB and is cheap to persist with a chat message.
+  - Every section is optional: the exact-phrase shortcut emits a minimal trace,
+    and the grader-fallback path emits a partial one. Consumers must treat every
+    field as possibly-absent.
+  - ``assess_quality`` derives a coarse ``quality`` label plus machine-readable
+    ``reasons`` codes; the human-facing copy for those codes lives in the frontend
+    so wording can iterate without a backend redeploy.
+"""
+
+import time
+
+from .config import (
+    QUALITY_STRONG_MIN_RESULTS,
+    QUALITY_STRONG_MIN_RELEVANCE,
+)
+
+TRACE_VERSION = 1
+
+# Romanized-term spellings the corpus uses, keyed by common user spellings. Used
+# to emit a SPELLING_HINT when a weak/empty result contains a term the user likely
+# misspelled relative to the corpus. Keys are lowercase user spellings; values are
+# the corpus form to suggest. The discourse corpus consistently uses "Geetha",
+# "Sathya", etc. (English-transliteration of the Telugu/Sanskrit).
+CORPUS_SPELLINGS = {
+    "gita": "Geetha",
+    "geeta": "Geetha",
+    "geetha": "Geetha",
+    "bhagavadgita": "Bhagavad Geetha",
+    "satya": "Sathya",
+    "moksa": "moksha",
+    "ahinsa": "ahimsa",
+    "krisna": "Krishna",
+    "krsna": "Krishna",
+    "atma": "Atma",
+    "dharma": "dharma",
+    "karma": "karma",
+}
+
+
+def new_trace(query, history=None):
+    """Return an empty trace skeleton for one search. Sections are filled in by
+    ``search_browse`` as each stage runs; anything a given path skips stays at its
+    default so the frontend can guard on presence/emptiness.
+    """
+    history = history or []
+    return {
+        "version": TRACE_VERSION,
+        "query": query,
+        "history_used": len([h for h in history if isinstance(h, str) and h.strip()]),
+        "exact_phrase": {"phrase": None, "matched": False},
+        "planning": {"facets": [], "fallback": False},
+        # Set by search_browse when the planner routed an occasion question to a
+        # metadata filter: {"occasion", "applied", "fell_back"}. None otherwise.
+        "metadata_filter": None,
+        # True when every retrieval failed to reach the search service — an
+        # infrastructure error, distinct from a genuinely empty result.
+        "service_error": False,
+        # Planner-detected question intent, e.g. "factual" for biographical/who/
+        # when questions the discourse search can't directly answer. None otherwise.
+        "intent": None,
+        "retrieval": {"facet_results": [], "merged_candidates": 0},
+        "grading": {
+            "model": None,
+            "fallback": False,
+            "kept": 0,
+            "rejected": 0,
+            "kept_passages": [],
+            "rejected_passages": [],
+        },
+        "results": {"discourses": 0, "top_relevance": 0.0},
+        "quality": "strong",
+        "reasons": [],
+        "timings_ms": {},
+    }
+
+
+class StageTimer:
+    """Context manager that accumulates wall-clock time (ms) for a pipeline stage
+    into ``trace["timings_ms"][stage]``. Accumulating because retrieval/rerank run
+    once per facet in a loop — entering the same stage repeatedly sums the deltas.
+
+    When ``trace`` is None (tracing not requested) this is a no-op, so pipeline
+    code can wrap every stage in ``with StageTimer(trace, ...)`` unconditionally
+    and stay readable whether or not a trace is being collected.
+    """
+
+    def __init__(self, trace, stage):
+        self.trace = trace
+        self.stage = stage
+        self._start = None
+
+    def __enter__(self):
+        self._start = time.perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        if self.trace is None:
+            return False
+        elapsed_ms = int((time.perf_counter() - self._start) * 1000)
+        timings = self.trace.setdefault("timings_ms", {})
+        timings[self.stage] = timings.get(self.stage, 0) + elapsed_ms
+        return False
+
+
+def _query_tokens(query):
+    """Lowercase alphabetic tokens of a query, for spelling-hint matching."""
+    if not query or not isinstance(query, str):
+        return []
+    return [t for t in "".join(c if c.isalpha() else " " for c in query).lower().split() if t]
+
+
+def assess_quality(trace, results):
+    """Set ``trace['quality']`` and ``trace['reasons']`` from the collected trace.
+
+    quality:
+      - "none"    : no results at all
+      - "strong"  : enough results AND a confidently-relevant top result
+      - "partial" : everything in between
+    reasons are emitted only when quality != "strong", in priority order, as
+    ``{"code": ..., "data": {...}?}`` objects the frontend maps to copy.
+    """
+    # Infrastructure failure short-circuits everything: it is neither empty nor
+    # weak, it is "we couldn't complete the search" and the user should retry.
+    if trace.get("service_error"):
+        trace["quality"] = "error"
+        trace["reasons"] = [{"code": "SERVICE_UNAVAILABLE"}]
+        return trace
+
+    num = len(results)
+    top_rel = trace["results"].get("top_relevance", 0.0) or 0.0
+
+    if num == 0:
+        trace["quality"] = "none"
+    elif trace.get("exact_phrase", {}).get("matched"):
+        # A verified exact-phrase match is a perfect outcome regardless of count —
+        # 2 discourses containing the user's exact phrase is not a "partial" result.
+        trace["quality"] = "strong"
+    elif num >= QUALITY_STRONG_MIN_RESULTS and top_rel >= QUALITY_STRONG_MIN_RELEVANCE:
+        trace["quality"] = "strong"
+    else:
+        trace["quality"] = "partial"
+
+    # A factual/biographical question (who/when/where) gets an honest note even
+    # when results are strong — the discourse search matches themes, not facts,
+    # so "Who was Swami's mother?" surfaces mother-themed discourses, not an
+    # answer. Emitted regardless of quality (unlike the weak-result reasons below).
+    base_reasons = []
+    if trace.get("intent") == "factual":
+        base_reasons.append({"code": "FACTUAL_QUESTION"})
+
+    if trace["quality"] == "strong":
+        trace["reasons"] = base_reasons
+        return trace
+
+    reasons = list(base_reasons)
+    exact = trace.get("exact_phrase", {})
+    grading = trace.get("grading", {})
+    retrieval = trace.get("retrieval", {})
+    facets = trace.get("planning", {}).get("facets", [])
+    merged = retrieval.get("merged_candidates", 0)
+
+    # (1) Exact-phrase requested but not found -> we searched its meaning instead.
+    if exact.get("phrase") and not exact.get("matched"):
+        reasons.append({"code": "EXACT_PHRASE_MISS", "data": {"phrase": exact.get("phrase")}})
+
+    # (2) Retrieval surfaced nothing at all. Requires no results too, so the
+    #     exact-phrase shortcut (which produces results without running retrieval,
+    #     leaving merged at 0) doesn't trip this.
+    if merged == 0 and num == 0:
+        reasons.append({"code": "NO_MATCHES"})
+
+    # (3) Candidates existed but the grader rejected all of them (real judgment,
+    #     not the fallback path where nothing is judged).
+    if merged > 0 and grading.get("kept", 0) == 0 and not grading.get("fallback"):
+        reasons.append({"code": "ALL_REJECTED_BY_GRADER"})
+
+    # (4) The message spanned several distinct concepts, diluting each search.
+    if len(facets) >= 3 or (len(facets) >= 2 and trace["quality"] in ("none", "partial")):
+        reasons.append({"code": "MULTI_TOPIC_DILUTION", "data": {"count": len(facets), "facets": facets}})
+
+    # (5) We have results, but none is confidently relevant.
+    if num > 0 and top_rel < QUALITY_STRONG_MIN_RELEVANCE:
+        reasons.append({"code": "LOW_RELEVANCE"})
+
+    # (6) A query term is likely misspelled relative to the corpus.
+    for tok in _query_tokens(trace.get("query", "")):
+        corpus_form = CORPUS_SPELLINGS.get(tok)
+        if corpus_form and corpus_form.lower() != tok:
+            reasons.append({"code": "SPELLING_HINT", "data": {"user_term": tok, "corpus_term": corpus_form}})
+            break
+
+    # (7) The planner crashed and we searched the raw message verbatim.
+    if trace.get("planning", {}).get("fallback"):
+        reasons.append({"code": "PLANNER_FALLBACK"})
+
+    trace["reasons"] = reasons
+    return trace

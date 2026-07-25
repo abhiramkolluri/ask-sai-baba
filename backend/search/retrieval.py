@@ -23,7 +23,8 @@ import weaviate
 from weaviate_client import get_client
 from weaviate.classes.query import Filter, MetadataQuery
 
-from .config import openai_client, HYBRID_ALPHA, PASSAGE_OVERFETCH
+from .config import openai_client, HYBRID_ALPHA, PASSAGE_OVERFETCH, EXCLUDED_COLLECTIONS, WEAVIATE_RETRY_ATTEMPTS
+from .resilience import with_retries
 
 
 # ===========================================================================
@@ -62,27 +63,52 @@ def get_embedding(text):
 # Hybrid passage search & rank fusion
 # ===========================================================================
 
-def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH) -> List[Dict[str, Any]]:
+def _passage_filters(occasion: str = None):
+    """Build the Weaviate filter for passage search.
+
+    Always excludes EXCLUDED_COLLECTIONS (administrative documents, not
+    discourses). When `occasion` is given (from the planner's occasion routing,
+    e.g. "Dasara"), additionally restrict to passages whose occasion metadata
+    contains it — wildcards make "Summer Course" match the corpus's longer
+    "Summer Course in Indian Culture and Spirituality".
+    """
+    combined = None
+    for name in EXCLUDED_COLLECTIONS:
+        f = Filter.by_property("collection_name").not_equal(name)
+        combined = f if combined is None else combined & f
+    if occasion:
+        f = Filter.by_property("occasion").like(f"*{occasion.lower()}*")
+        combined = f if combined is None else combined & f
+    return combined
+
+
+def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH, occasion: str = None) -> List[Dict[str, Any]]:
     """Hybrid (BM25 + vector) search over the Passage collection.
 
     The query is expected to be already prepared (glossed/distilled) by
-    `plan_queries`; this function does not re-expand it.
+    `plan_queries`; this function does not re-expand it. `occasion` optionally
+    restricts results to a given occasion/festival via metadata filter.
+
+    Transient Weaviate connection failures are retried; if they persist this
+    raises ``PipelineServiceError`` rather than returning ``[]`` — an empty list
+    means "the corpus had no matches", a raised error means "we couldn't reach
+    the search service", and the two must not be conflated (a blip previously
+    surfaced to users as a false "no discourses found").
     """
-    try:
+    def _query():
         client = get_client()
         if not client:
-            logging.error("Weaviate client not available for passage search.")
-            return []
-
+            # Treated as transient: get_client rebuilds the connection on retry.
+            raise RuntimeError("Weaviate client not available for passage search.")
         passages = client.collections.get("Passage")
         response = passages.query.hybrid(
             query=query,
             alpha=HYBRID_ALPHA,
             limit=overfetch,
             query_properties=["content", "title"],
+            filters=_passage_filters(occasion),
             return_metadata=MetadataQuery(score=True)
         )
-
         results = []
         for obj in response.objects:
             props = obj.properties
@@ -100,9 +126,10 @@ def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH) -> List[Dict
                 "score": obj.metadata.score or 0.0,
             })
         return results
-    except Exception as e:
-        logging.error(f"Passage hybrid search failed: {e}")
-        return []
+
+    # Raises PipelineServiceError when retries are exhausted; the caller
+    # (search_browse) distinguishes this from a genuinely empty result.
+    return with_retries(_query, attempts=WEAVIATE_RETRY_ATTEMPTS, what="Passage hybrid search")
 
 def _rrf_merge(ranked_lists, k: int = 60) -> List[Dict[str, Any]]:
     """Reciprocal Rank Fusion over several best-first passage lists. Dedupes by
@@ -124,6 +151,28 @@ def _rrf_merge(ranked_lists, k: int = 60) -> List[Dict[str, Any]]:
 # ===========================================================================
 # Legacy Article reads — exact match, near_text, single-article fetch
 # ===========================================================================
+
+def phrase_in_text(phrase: str, text: str) -> bool:
+    """True when `phrase` appears in `text` as a contiguous phrase, ignoring
+    case and punctuation/whitespace between words (so 'love all serve all'
+    matches the title 'Love all: Serve all').
+
+    Exists because search_exact's Weaviate filters are TOKEN-based — they can
+    return bag-of-words matches that never contain the phrase. This verifies
+    the promise the exact-phrase feature makes to the user. It is deliberately
+    looser than ranking._locate_verbatim (which tolerates only whitespace):
+    quote extraction must be verbatim, but a user-typed phrase shouldn't fail
+    on a colon or comma the corpus happens to use.
+    """
+    if not phrase or not text:
+        return False
+    tokens = [t.strip(",.:;!?\"'") for t in phrase.split()]
+    tokens = [t for t in tokens if t]  # drop tokens that were pure punctuation
+    if not tokens:
+        return False
+    pattern = r"[^\w]+".join(re.escape(t) for t in tokens)
+    return re.search(pattern, text, re.IGNORECASE) is not None
+
 
 def search_exact(
     query: str,

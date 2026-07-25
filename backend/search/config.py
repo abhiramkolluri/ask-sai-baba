@@ -39,7 +39,11 @@ if not openai_api_key:
     config.read('openai.ini')
     openai_api_key = config.get('OpenAI', 'api_key', fallback=None)
 
-openai_client = OpenAI(api_key=openai_api_key)
+# max_retries/timeout added after real-traffic replay showed transient OpenAI
+# connection drops (the SDK's default 2 retries were exhausting) turning into
+# silent empty results. The SDK retries connection errors itself; we raise the
+# ceiling and bound each call so a hang can't blow the API Gateway budget.
+openai_client = OpenAI(api_key=openai_api_key, max_retries=3, timeout=20.0)
 
 
 # ===========================================================================
@@ -55,6 +59,13 @@ openai_client = OpenAI(api_key=openai_api_key)
 # ===========================================================================
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 
+# Bound external calls so a hang or blip can't run past the API Gateway timeout.
+# COHERE_TIMEOUT closes the observed 97s rerank hang (client had no timeout);
+# WEAVIATE_RETRY_ATTEMPTS retries transient Weaviate connection drops before the
+# pipeline reports an honest service error rather than a false empty result.
+COHERE_TIMEOUT = 5
+WEAVIATE_RETRY_ATTEMPTS = 2
+
 PASSAGE_OVERFETCH = 40
 RERANK_KEEP = 15
 RERANK_MODEL = "rerank-v3.5"
@@ -62,6 +73,41 @@ GRADE_MODEL = "gpt-4o-mini"
 JUDGE_MODEL = "gpt-4o"  # stronger judge for unified grade + verbatim quote extraction
 GRADE_MIN_RELEVANCE = 0.5
 HYBRID_ALPHA = 0.5
+
+# LLM temperatures. Adversarial probing showed the unpinned default (1.0) made
+# plan_queries interpret the SAME question differently run-to-run (e.g. "value of
+# Truth" sometimes kept the aspect, sometimes collapsed to bare "truth") — users
+# experienced this as flaky search. The planner keeps a little freedom for
+# glossing/decomposition; the grader is a pure judgment call and gets none.
+PLAN_TEMPERATURE = 0.2
+JUDGE_TEMPERATURE = 0.0
+
+# RRF-merge sizing. The merged candidate list is capped, but with multiple facets
+# a flat cap starved facets entirely (probing: a 4-facet question left one facet
+# with ZERO graded passages). The cap now scales with facet count, and every
+# facet is guaranteed its top MERGE_MIN_PER_FACET passages in the merged list.
+MERGE_MIN_PER_FACET = 3
+MERGE_PER_FACET_CAP = 5  # cap = max(RERANK_KEEP, MERGE_PER_FACET_CAP * facets)
+
+# Per-facet retrieval+rerank runs concurrently (one worker per facet). Probing
+# showed the sequential loop pushed 3-4 facet queries to 26-31s total — past API
+# Gateway's 29s integration timeout in production. Facets are independent, so
+# they fan out like followup verification does. Max facets = MAX_PLANNED_QUERIES.
+FACET_MAX_WORKERS = 4
+
+# Collections excluded from passage search. "SSIO Guidelines" are organizational/
+# administrative documents, not Swami's discourses — they rank well on "Sathya
+# Sai" wording but are the wrong content for a discourse search (probing surfaced
+# them for "birthday discourse" and children queries).
+EXCLUDED_COLLECTIONS = ["SSIO Guidelines"]
+
+# Result-quality thresholds for the transparency trace (search/transparency.py).
+# A result set is "strong" only when it has at least this many discourses AND the
+# top discourse clears this relevance bar; otherwise it is "partial" (or "none"
+# when empty), which is what gates the frontend's refinement guidance. These are
+# heuristic — tune here without touching the pipeline.
+QUALITY_STRONG_MIN_RESULTS = 3
+QUALITY_STRONG_MIN_RELEVANCE = 0.7
 
 # When the grader rejects everything but the caller still needs grounding
 # context (chat, allow_empty=False), fall back to this many top reranked

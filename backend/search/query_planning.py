@@ -14,7 +14,7 @@ import re
 import json
 import logging
 
-from .config import openai_client, GRADE_MODEL, MAX_PLANNED_QUERIES
+from .config import openai_client, GRADE_MODEL, MAX_PLANNED_QUERIES, PLAN_TEMPERATURE
 
 
 # ===========================================================================
@@ -71,7 +71,7 @@ def expand_short_query(query: str) -> str:
 # Adaptive multi-query planning (the live pipeline's entry stage)
 # ===========================================================================
 
-def plan_queries(message: str, history=None) -> list:
+def plan_queries(message: str, history=None, trace_out=None) -> list:
     """Turn a (possibly long, multi-turn) user message into 1-N standalone search
     queries for the English discourse corpus. One gpt-4o-mini JSON call that:
       - resolves references to earlier turns so each query stands alone,
@@ -81,6 +81,17 @@ def plan_queries(message: str, history=None) -> list:
         clearly spans multiple distinct concepts.
     Falls back to [message] on any failure (today's behavior). Subsumes
     expand_short_query for the search path.
+
+    ``trace_out`` (optional dict): when provided,
+      - ``trace_out['fallback']`` is set True if planning fell back to the raw
+        message, so the transparency trace can distinguish a deliberate
+        single-query plan from a planner crash;
+      - ``trace_out['occasion']`` is set to the occasion/festival name when the
+        message asks for discourses from a specific occasion (e.g. "Dasara"),
+        which the pipeline turns into a Weaviate metadata filter;
+      - ``trace_out['intent']`` is set to "factual" when the message is a
+        biographical/factual question the discourse search can't directly answer,
+        so the UI can show an honest note.
     """
     if not message or not isinstance(message, str):
         return [message] if message else []
@@ -94,7 +105,7 @@ def plan_queries(message: str, history=None) -> list:
         system = (
             "You convert a user's message into search queries for a corpus of "
             "English-translated spiritual discourses by Sathya Sai Baba. Output 1 to 4 "
-            'STANDALONE search queries as JSON: {"queries":["..."]}. Rules: '
+            'STANDALONE search queries as JSON: {"queries":["..."],"occasion":null,"intent":null}. Rules: '
             "(1) Resolve any references to earlier turns so each query stands alone. "
             "(2) Distill long or emotional scenarios down to the underlying spiritual "
             "concept(s) being asked about; drop names and incidental narrative detail. "
@@ -109,6 +120,33 @@ def plan_queries(message: str, history=None) -> list:
             "SAME concept are NOT multiple concepts. Return 2-4 queries ONLY when the message "
             "explicitly involves clearly different, separable concepts (e.g. a scenario about "
             "anger AND forgiveness AND attachment to money). When in doubt, return one. "
+            # Rules 5-8 close nuance-drop holes found by adversarial probing: the
+            # distillation rule (2) alone erased aspects, stories, and enumerations,
+            # and invented topics for gibberish.
+            "(5) PRESERVE THE ASKED-ABOUT ASPECT. When the message asks about an aspect of a "
+            "topic — the value of X, stages of X, obstacles to X, signs of X, why X, how to X, "
+            "difference between X and Y — at least one query MUST keep that aspect wording "
+            "(e.g. 'value of truth', 'stages of meditation'); never reduce the message to the "
+            "bare topic alone. "
+            "(6) STORY LOOKUPS ARE LITERAL. When the message asks for a story, parable, or "
+            "example Swami tells, keep the concrete imagery in the query (e.g. 'story "
+            "sandalwood tree') — the narrative detail IS the search target; do not abstract "
+            "it to its moral or symbolism. "
+            "(7) NEVER GUESS ENUMERATIONS. When the message references a named list (the "
+            "'three P's', the 'five human values'), keep the reference verbatim in the query; "
+            "do not substitute your own guess of the list's contents. "
+            "(8) NO INVENTED INTENT. If the message has no discernible meaning or topic "
+            "(gibberish, random characters), return it unchanged as the single query — do NOT "
+            "invent a spiritual topic for it. "
+            "OCCASION: if the message asks for discourses from a specific occasion or festival, "
+            'set "occasion" to that occasion\'s name using the corpus spelling — e.g. "Dasara", '
+            '"Shivarathri", "Guru Purnima", "Christmas", "Ugadi", "Onam", "Krishna Jayanthi", '
+            '"Summer Course" — otherwise null. '
+            'INTENT: set "intent" to "factual" if the message is a biographical or factual '
+            "question about a specific person, place, date, or event (who/when/where/what-is — "
+            "e.g. \"Who was Swami's mother?\", \"When was Baba born?\", \"Where is Puttaparthi?\"). "
+            "These ask for a fact the thematic discourse search cannot directly answer. For "
+            "ordinary topical/spiritual questions leave intent null. "
             "JSON only, no prose."
         )
         response = openai_client.chat.completions.create(
@@ -118,6 +156,7 @@ def plan_queries(message: str, history=None) -> list:
                 {"role": "user", "content": hist_block + "Message: " + message},
             ],
             response_format={"type": "json_object"},
+            temperature=PLAN_TEMPERATURE,
         )
         raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
@@ -125,7 +164,16 @@ def plan_queries(message: str, history=None) -> list:
             raw = re.sub(r"\n?```$", "", raw).strip()
         data = json.loads(raw)
         qs = [q.strip() for q in data.get("queries", []) if isinstance(q, str) and q.strip()]
+        # Occasion and intent are optional and best-effort: anything non-string (or
+        # an unrecognized intent) degrades to None so malformed output is harmless.
+        if trace_out is not None:
+            occasion = data.get("occasion")
+            trace_out["occasion"] = occasion.strip() if isinstance(occasion, str) and occasion.strip() else None
+            intent = data.get("intent")
+            trace_out["intent"] = "factual" if isinstance(intent, str) and intent.strip().lower() == "factual" else None
         return qs[:MAX_PLANNED_QUERIES] or [message]
     except Exception as e:
         logging.error(f"plan_queries failed: {e}; using raw message.")
+        if trace_out is not None:
+            trace_out["fallback"] = True
         return [message]
