@@ -16,6 +16,14 @@ import logging
 
 from .config import openai_client, GRADE_MODEL, MAX_PLANNED_QUERIES, PLAN_TEMPERATURE
 
+# The intent taxonomy the router classifies into; search_browse dispatches on it.
+# Anything outside this set normalizes to "conceptual" (the plain semantic route),
+# which is always a safe fallback.
+KNOWN_INTENTS = {
+    "conceptual", "scenario", "aspect", "factual", "named_text",
+    "occasion", "comparative", "org_doctrine", "meta", "out_of_domain",
+}
+
 
 # ===========================================================================
 # Single-query expansion (legacy helper, superseded by plan_queries for search)
@@ -105,7 +113,8 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
         system = (
             "You convert a user's message into search queries for a corpus of "
             "English-translated spiritual discourses by Sathya Sai Baba. Output 1 to 4 "
-            'STANDALONE search queries as JSON: {"queries":["..."],"occasion":null,"intent":null}. Rules: '
+            'STANDALONE search queries as JSON: '
+            '{"queries":["..."],"occasion":null,"intent":"conceptual","is_comparison":false,"entities":[]}. Rules: '
             "(1) Resolve any references to earlier turns so each query stands alone. "
             "(2) Distill long or emotional scenarios down to the underlying spiritual "
             "concept(s) being asked about; drop names and incidental narrative detail. "
@@ -138,15 +147,42 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             "(8) NO INVENTED INTENT. If the message has no discernible meaning or topic "
             "(gibberish, random characters), return it unchanged as the single query — do NOT "
             "invent a spiritual topic for it. "
+            # Rule 9 added after auditing real questions: terse 1-4 word inputs ("commitment
+            # to god", "what is faith") retrieved too little because a bare facet misses the
+            # corpus's own vocabulary. Broaden them with synonyms/closely-related terms.
+            "(9) EXPAND SHORT/BARE-TOPIC QUERIES. When the message is a short query or bare "
+            "topic (roughly 1-4 meaningful words, e.g. 'commitment to god', 'letting go', "
+            "'what is faith'), enrich the query with the synonymous and closely-related "
+            "vocabulary the discourses actually use, so retrieval isn't starved. Examples: "
+            "'commitment to god' -> 'commitment surrender dedication self-offering devotion "
+            "to God'; 'faith' -> 'faith trust conviction and confidence in God'; 'letting go' "
+            "-> 'letting go detachment renunciation non-attachment'. This still describes ONE "
+            "concept (keep it a single query unless the message truly spans separate concepts). "
             "OCCASION: if the message asks for discourses from a specific occasion or festival, "
             'set "occasion" to that occasion\'s name using the corpus spelling — e.g. "Dasara", '
             '"Shivarathri", "Guru Purnima", "Christmas", "Ugadi", "Onam", "Krishna Jayanthi", '
             '"Summer Course" — otherwise null. '
-            'INTENT: set "intent" to "factual" if the message is a biographical or factual '
-            "question about a specific person, place, date, or event (who/when/where/what-is — "
-            "e.g. \"Who was Swami's mother?\", \"When was Baba born?\", \"Where is Puttaparthi?\"). "
-            "These ask for a fact the thematic discourse search cannot directly answer. For "
-            "ordinary topical/spiritual questions leave intent null. "
+            # INTENT drives routing (search/pipeline.py): the pipeline sends each
+            # intent to the retrieval strategy that fits it, so classify carefully.
+            'INTENT: classify the message into exactly one of: '
+            '"conceptual" (a spiritual concept or bare topic — "faith", "what is karma"); '
+            '"scenario" (a personal situation asking for guidance — "I struggle with X, how do I…"); '
+            '"aspect" (asks about a specific aspect of a topic — the value/stages/obstacles/why/how of X); '
+            '"factual" (a biographical or factual question about a specific person, place, date, or event — '
+            '"Who was Swami\'s mother?", "When was Baba born?", "Where is Puttaparthi?"); '
+            '"named_text" (asks about a specific named text/scripture, or "where is this quote from" — '
+            '"Tripura Rahasyam", a Gita verse, a quoted line to locate); '
+            '"occasion" (asks for discourses from a specific occasion/festival — pair with the occasion field); '
+            '"comparative" (compares two things or asks which is better — "difference between bhakti and jnana"); '
+            '"org_doctrine" (asks about Sathya Sai organization doctrine/terms — "Nine Point Code of Conduct", '
+            '"SSE", "Balvikas", guidelines); '
+            '"meta" (a request to the product itself, not the corpus — "give me some follow ups"); '
+            '"out_of_domain" (unrelated to spiritual discourses, or gibberish — "best pizza"). '
+            "When unsure between conceptual/scenario/aspect, prefer the most specific that fits. "
+            'IS_COMPARISON: set "is_comparison" true when the message compares two or more things or asks '
+            "which of them is better/more important. "
+            'ENTITIES: list any specific named people, places, texts, org terms, or festivals mentioned '
+            '(e.g. ["Easwaramma"], ["Bhagavad Geetha"], ["Nine Point Code of Conduct"]); [] if none. '
             "JSON only, no prose."
         )
         response = openai_client.chat.completions.create(
@@ -164,13 +200,19 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             raw = re.sub(r"\n?```$", "", raw).strip()
         data = json.loads(raw)
         qs = [q.strip() for q in data.get("queries", []) if isinstance(q, str) and q.strip()]
-        # Occasion and intent are optional and best-effort: anything non-string (or
-        # an unrecognized intent) degrades to None so malformed output is harmless.
+        # The routing fields are optional and best-effort: anything malformed
+        # degrades to a safe default so a bad LLM response never breaks retrieval.
         if trace_out is not None:
             occasion = data.get("occasion")
             trace_out["occasion"] = occasion.strip() if isinstance(occasion, str) and occasion.strip() else None
+            # Normalize intent to the known taxonomy; unknown/missing -> "conceptual"
+            # (the plain semantic route), which is always a safe fallback.
             intent = data.get("intent")
-            trace_out["intent"] = "factual" if isinstance(intent, str) and intent.strip().lower() == "factual" else None
+            intent = intent.strip().lower() if isinstance(intent, str) else ""
+            trace_out["intent"] = intent if intent in KNOWN_INTENTS else "conceptual"
+            trace_out["is_comparison"] = bool(data.get("is_comparison"))
+            ents = data.get("entities")
+            trace_out["entities"] = [e.strip() for e in ents if isinstance(e, str) and e.strip()] if isinstance(ents, list) else []
         return qs[:MAX_PLANNED_QUERIES] or [message]
     except Exception as e:
         logging.error(f"plan_queries failed: {e}; using raw message.")

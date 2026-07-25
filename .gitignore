@@ -23,3 +23,6 @@ Database Vectorizer\.env
 /backend/real_replay_results_noisy.json
 /backend/probe_results.json
 /backend/coverage_gaps.json
+/backend/real_questions_new.json
+/backend/quote_audit.json
+/backend/eval_results.json

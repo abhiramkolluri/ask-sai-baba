@@ -28,6 +28,7 @@ from .config import (
     MERGE_MIN_PER_FACET,
     MERGE_PER_FACET_CAP,
     FACET_MAX_WORKERS,
+    ROUTER_V2_ENABLED,
     CHAT_FALLBACK_DISCOURSES,
     GRADE_MIN_RELEVANCE,
     FOLLOWUP_CANDIDATES,
@@ -47,6 +48,8 @@ from .ranking import (
 )
 from .transparency import new_trace, StageTimer, assess_quality
 from .resilience import PipelineServiceError
+from .knowledge import lookup_entity
+from . import cache
 
 
 # ===========================================================================
@@ -134,19 +137,31 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
     # stage functions as `trace_out` without None checks. plan_meta is always a
     # real dict (throwaway when untraced) because the planner reports the occasion
     # filter through it and occasion routing must work for chat too.
+    # Repeated-question cache (Phase 4, off by default). Keyed on the original
+    # args before `query` is reassigned by the exact-phrase branch. A hit returns
+    # the exact prior value; a miss/disabled cache returns None.
+    cache_args = (query, history, exact_phrase, allow_empty, return_trace)
+    cached = cache.get(*cache_args)
+    if cached is not None:
+        return cached
+
     trace = new_trace(query, history) if return_trace else None
     plan_meta = trace["planning"] if trace else {}
     grade_meta = trace["grading"] if trace else None
 
     def _finish(results):
-        """Record result-level fields + quality on the trace (if any) and return in
-        the caller's requested shape: (results, trace) when tracing, else results."""
+        """Record result-level fields + quality on the trace (if any), cache the
+        value, and return in the caller's requested shape: (results, trace) when
+        tracing, else results."""
         if trace is None:
-            return results
-        trace["results"]["discourses"] = len(results)
-        trace["results"]["top_relevance"] = results[0].get("score", 0.0) if results else 0.0
-        assess_quality(trace, results)
-        return results, trace
+            value = results
+        else:
+            trace["results"]["discourses"] = len(results)
+            trace["results"]["top_relevance"] = results[0].get("score", 0.0) if results else 0.0
+            assess_quality(trace, results)
+            value = (results, trace)
+        cache.put(*cache_args, value)
+        return value
 
     with StageTimer(trace, "total"):
         # (a) Quoted-phrase shortcut: try exact match first. search_exact's
@@ -187,11 +202,49 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # retrieval then filters on the passage `occasion` metadata instead of
         # hoping semantic search lands on the right occasions.
         occasion = plan_meta.get("occasion")
-        # It also flags factual/biographical questions so the UI can note that
-        # discourse search matches themes, not facts. Lift it to the top-level
-        # trace where assess_quality reads it.
+        intent = plan_meta.get("intent")
+        # Lift the router fields to the top-level trace where assess_quality and
+        # the frontend read them.
         if trace:
-            trace["intent"] = plan_meta.get("intent")
+            trace["intent"] = intent
+            trace["is_comparison"] = bool(plan_meta.get("is_comparison"))
+            trace["entities"] = plan_meta.get("entities") or []
+
+        # (c.1) Router v2 dispatch. "meta" (a request to the product, e.g. "give me
+        # some follow ups") and "out_of_domain" (unrelated/gibberish) can't be
+        # answered from the discourse corpus, so short-circuit to an honest empty
+        # result + guidance rather than semanticizing them into spurious matches.
+        # Other intents fall through to the semantic route here; the structured
+        # knowledge route (factual/named_text/org_doctrine) is wired in Phase 2.
+        if ROUTER_V2_ENABLED and intent in ("meta", "out_of_domain"):
+            if trace:
+                trace["route"] = "guidance"
+            return _finish([])
+
+        # (c.2) Structured knowledge route: factual/named-text/org-doctrine
+        # questions are looked up in the Entity collection instead of being
+        # semanticized. A "hit" returns canonical discourses; a "gap" abstains
+        # honestly; a "miss" falls through to the semantic route below.
+        if ROUTER_V2_ENABLED and intent in ("factual", "named_text", "org_doctrine"):
+            with StageTimer(trace, "knowledge"):
+                kb = lookup_entity(query, plan_meta.get("entities"))
+            if kb["status"] == "hit":
+                if trace:
+                    trace["route"] = "structured"
+                    if kb["entity"]:
+                        trace["entities"] = [kb["entity"]]
+                return _finish(kb["results"])
+            if kb["status"] == "gap":
+                if trace:
+                    trace["route"] = "structured"
+                    trace["kb_gap"] = True
+                    if kb["entity"]:
+                        trace["entities"] = [kb["entity"]]
+                return _finish([])
+            # miss -> fall through to semantic
+
+        if trace:
+            trace["route"] = "semantic"
 
         def _retrieve_one(q, occ):
             """Retrieve + rerank a single facet. Runs concurrently across facets,

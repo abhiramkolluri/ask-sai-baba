@@ -33,10 +33,18 @@ def get_client():
     weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
     openai_api_key = os.getenv("OPENAI_API_KEY")
 
+    # OpenAI header powers the existing text2vec-openai collections; the Cohere
+    # header (when a key is set) powers the Phase 3 text2vec-cohere Passage_v2
+    # collection. Unused vectorizer headers are ignored, so sending both is safe.
+    headers = {"X-OpenAI-Api-Key": openai_api_key}
+    cohere_key = os.getenv("COHERE_API_KEY")
+    if cohere_key:
+        headers["X-Cohere-Api-Key"] = cohere_key
+
     _client = weaviate.connect_to_weaviate_cloud(
         cluster_url=weaviate_url,
         auth_credentials=Auth.api_key(weaviate_api_key),
-        headers={"X-OpenAI-Api-Key": openai_api_key},
+        headers=headers,
         skip_init_checks=True
     )
     return _client
@@ -96,6 +104,30 @@ def init_schema():
                 ]
             )
             print("Created collection 'Passage'")
+
+        # Entity collection — the structured knowledge layer (Router v2 / Phase 2).
+        # Factual/named-text/org-doctrine questions ("Who was Swami's mother?",
+        # "Tripura Rahasyam", "Nine Point Code of Conduct") are looked up here
+        # instead of being semanticized into spurious thematic matches. Each entry
+        # either points at canonical Article(s) or is flagged not-in-corpus so the
+        # pipeline can abstain honestly. name/aliases/summary are vectorized for
+        # fuzzy match; the rest is metadata.
+        if not client.collections.exists("Entity"):
+            client.collections.create(
+                name="Entity",
+                vectorizer_config=wcd.Configure.Vectorizer.text2vec_openai(
+                    model="text-embedding-3-large"
+                ),
+                properties=[
+                    wcd.Property(name="name", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="aliases", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="summary", data_type=wcd.DataType.TEXT),
+                    wcd.Property(name="entity_type", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="canonical_article_ids", data_type=wcd.DataType.TEXT, skip_vectorization=True),
+                    wcd.Property(name="in_corpus", data_type=wcd.DataType.BOOL, skip_vectorization=True),
+                ]
+            )
+            print("Created collection 'Entity'")
 
         # Create ChatThread collection
         if not client.collections.exists("ChatThread"):

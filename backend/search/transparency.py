@@ -67,9 +67,17 @@ def new_trace(query, history=None):
         # True when every retrieval failed to reach the search service — an
         # infrastructure error, distinct from a genuinely empty result.
         "service_error": False,
-        # Planner-detected question intent, e.g. "factual" for biographical/who/
-        # when questions the discourse search can't directly answer. None otherwise.
+        # Router v2 fields. `intent` is the classified question type (see
+        # query_planning.KNOWN_INTENTS); `route` is which strategy handled it
+        # ("semantic" | "structured" | "guidance"); `is_comparison` marks
+        # compare/which-is-better questions; `entities` are named things detected.
         "intent": None,
+        "route": None,
+        "is_comparison": False,
+        "entities": [],
+        # Set by the structured route when a matched entity is a known corpus gap
+        # (e.g. a named text the discourses don't cover) -> honest abstention.
+        "kb_gap": False,
         "retrieval": {"facet_results": [], "merged_candidates": 0},
         "grading": {
             "model": None,
@@ -143,22 +151,44 @@ def assess_quality(trace, results):
 
     if num == 0:
         trace["quality"] = "none"
-    elif trace.get("exact_phrase", {}).get("matched"):
-        # A verified exact-phrase match is a perfect outcome regardless of count —
-        # 2 discourses containing the user's exact phrase is not a "partial" result.
+    elif trace.get("exact_phrase", {}).get("matched") or trace.get("route") == "structured":
+        # A verified exact-phrase match OR a canonical entity lookup is a precise
+        # outcome regardless of count — one canonical discourse for "Nine Point
+        # Code of Conduct" is a strong result, not "partial".
         trace["quality"] = "strong"
     elif num >= QUALITY_STRONG_MIN_RESULTS and top_rel >= QUALITY_STRONG_MIN_RELEVANCE:
         trace["quality"] = "strong"
     else:
         trace["quality"] = "partial"
 
-    # A factual/biographical question (who/when/where) gets an honest note even
-    # when results are strong — the discourse search matches themes, not facts,
-    # so "Who was Swami's mother?" surfaces mother-themed discourses, not an
-    # answer. Emitted regardless of quality (unlike the weak-result reasons below).
+    # Some notes are shown regardless of quality (unlike the weak-result reasons
+    # below), because they're about the KIND of question, not a retrieval miss:
+    #  - factual/biographical -> discourse search matches themes, not facts;
+    #  - comparative -> we surface both sides but don't compose a comparison;
+    #  - meta -> a request to the product, not the corpus.
     base_reasons = []
-    if trace.get("intent") == "factual":
+    intent = trace.get("intent")
+    if intent == "factual":
         base_reasons.append({"code": "FACTUAL_QUESTION"})
+    if trace.get("is_comparison"):
+        base_reasons.append({"code": "COMPARISON_BOTH_SIDES"})
+
+    # Structured route determined the corpus doesn't cover this entity -> abstain
+    # honestly with a single clean note (not a pile of refinement tips).
+    if trace.get("kb_gap"):
+        entity = (trace.get("entities") or [None])[0]
+        trace["reasons"] = [{"code": "KB_KNOWN_GAP", "data": {"entity": entity}}]
+        return trace
+
+    # Meta / out-of-domain questions were short-circuited before retrieval, so the
+    # retrieval-miss heuristics below (MULTI_TOPIC_DILUTION, etc.) don't apply —
+    # give them a single clean reason instead of a pile of irrelevant tips.
+    if intent == "meta":
+        trace["reasons"] = [{"code": "META_REQUEST"}]
+        return trace
+    if intent == "out_of_domain":
+        trace["reasons"] = base_reasons + ([{"code": "NO_MATCHES"}] if len(results) == 0 else [])
+        return trace
 
     if trace["quality"] == "strong":
         trace["reasons"] = base_reasons

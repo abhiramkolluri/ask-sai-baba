@@ -74,6 +74,26 @@ JUDGE_MODEL = "gpt-4o"  # stronger judge for unified grade + verbatim quote extr
 GRADE_MIN_RELEVANCE = 0.5
 HYBRID_ALPHA = 0.5
 
+# Router v2: when enabled, plan_queries classifies the question's INTENT and
+# search_browse dispatches on it (meta/out-of-domain short-circuit to guidance,
+# factual/named-text/org-doctrine route to the structured knowledge lookup, etc.).
+# Off => the pre-v2 behavior (every query takes the semantic route). Flag lets the
+# richer routing roll out and roll back with one line.
+ROUTER_V2_ENABLED = True
+
+# Which Weaviate collection the passage pipeline reads. Phase 3 re-embeds the
+# corpus into "Passage_v2" (Cohere embed-v4) alongside the original "Passage"
+# (OpenAI text-embedding-3-large); flip this to cut over after the eval harness
+# confirms the new embeddings win, or flip back to roll back instantly.
+PASSAGE_COLLECTION = "Passage"
+
+# Server-side result cache for repeated questions (Phase 4). Off by default — the
+# frontend already caches per-session, so this only helps across users/sessions;
+# enable when you want popular questions ("what is faith") to short-circuit the
+# whole pipeline. Keyed on the normalized question + context.
+SEMANTIC_CACHE_ENABLED = False
+SEMANTIC_CACHE_SIZE = 512
+
 # LLM temperatures. Adversarial probing showed the unpinned default (1.0) made
 # plan_queries interpret the SAME question differently run-to-run (e.g. "value of
 # Truth" sometimes kept the aspect, sometimes collapsed to bare "truth") — users

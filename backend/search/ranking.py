@@ -216,7 +216,21 @@ def grade_and_quote_passages(query: str, passages: List[Dict[str, Any]], trace_o
         "Each passage is paired with ITS OWN question. Judge whether each passage DIRECTLY "
         "answers ITS question, and if so extract the exact quote that answers it. A passage "
         "that merely mentions the topic, or is broadly on-theme but does not address its "
-        "question, does NOT answer it. For each passage return its id, `answers` (true/false), "
+        "question, does NOT answer it.\n\n"
+        # Rule added after auditing real questions: for HOW/WHICH questions the grader was
+        # accepting quotes that only NAME a virtue ("Such was his control over his senses!")
+        # instead of ones that teach or decide. Demand substance for these.
+        "If the question asks HOW to do something, or WHICH of several options is better, the "
+        "quote must actually INSTRUCT (give a method, step, or practice) or ADJUDICATE (say "
+        "which one and why). A quote that only names, praises, or asserts the virtue/faculty "
+        "exists — or merely lists items without choosing — does NOT answer such a question.\n\n"
+        # Rule added after auditing real questions: homonym/metaphor traps (physical
+        # 'exercise' vs spiritual exercise/sadhana; pet 'cats' vs 'cats' as a metaphor for
+        # restlessness; a named text vs a same-named concept) were being accepted.
+        "WORD SENSE: if the passage uses a key word from the question in a DIFFERENT SENSE "
+        "than the question intends, it does NOT answer it (mark answers:false) — do not be "
+        "fooled by a shared word used to mean something else.\n\n"
+        "For each passage return its id, `answers` (true/false), "
         "`relevance` (0.0-1.0), and `quote`: the shortest contiguous span of 1 to 3 sentences "
         "copied EXACTLY (verbatim) from the passage that answers its question, or null if it "
         "does not answer it. Never quote generic, introductory, or closing remarks (e.g. 'I "

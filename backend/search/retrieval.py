@@ -23,7 +23,7 @@ import weaviate
 from weaviate_client import get_client
 from weaviate.classes.query import Filter, MetadataQuery
 
-from .config import openai_client, HYBRID_ALPHA, PASSAGE_OVERFETCH, EXCLUDED_COLLECTIONS, WEAVIATE_RETRY_ATTEMPTS
+from .config import openai_client, HYBRID_ALPHA, PASSAGE_OVERFETCH, EXCLUDED_COLLECTIONS, WEAVIATE_RETRY_ATTEMPTS, PASSAGE_COLLECTION
 from .resilience import with_retries
 
 
@@ -100,7 +100,7 @@ def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH, occasion: st
         if not client:
             # Treated as transient: get_client rebuilds the connection on retry.
             raise RuntimeError("Weaviate client not available for passage search.")
-        passages = client.collections.get("Passage")
+        passages = client.collections.get(PASSAGE_COLLECTION)
         response = passages.query.hybrid(
             query=query,
             alpha=HYBRID_ALPHA,
