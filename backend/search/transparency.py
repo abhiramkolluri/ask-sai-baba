@@ -67,6 +67,19 @@ def new_trace(query, history=None):
         # True when every retrieval failed to reach the search service — an
         # infrastructure error, distinct from a genuinely empty result.
         "service_error": False,
+        # True when at least one facet fell back to hybrid-score order because
+        # reranking didn't run (missing key, rate limit, timeout). Results are
+        # still real, just ordered less well. Surfaced because a rate-limited
+        # key previously degraded 28% of searches with no signal at all.
+        "rerank_degraded": False,
+        # True when this result came from the repeated-question cache; the
+        # timings below are the ORIGINAL run's, not this request's.
+        "cached": False,
+        # True for phase 1 of a two-phase search: candidates are reranked but NOT
+        # graded, so quotes are absent and quality is "pending" until the client
+        # posts `pending_passage_ids` to /search/verify.
+        "deferred": False,
+        "pending_passage_ids": [],
         # Router v2 fields. `intent` is the classified question type (see
         # query_planning.KNOWN_INTENTS); `route` is which strategy handled it
         # ("semantic" | "structured" | "guidance"); `is_comparison` marks
@@ -78,6 +91,8 @@ def new_trace(query, history=None):
         # Set by the structured route when a matched entity is a known corpus gap
         # (e.g. a named text the discourses don't cover) -> honest abstention.
         "kb_gap": False,
+        # Set by the listing route: {collection, count, order, not_found}.
+        "listing": None,
         "retrieval": {"facet_results": [], "merged_candidates": 0},
         "grading": {
             "model": None,
@@ -149,12 +164,23 @@ def assess_quality(trace, results):
     num = len(results)
     top_rel = trace["results"].get("top_relevance", 0.0) or 0.0
 
+    # Phase 1 of a two-phase search: nothing has been graded yet, so any verdict
+    # here would be guesswork on a reranker score that isn't on the same scale as
+    # grade relevance. Say "pending" and let phase 2 assess for real — quality
+    # copy shown now and contradicted seconds later is worse than none.
+    if trace.get("deferred"):
+        trace["quality"] = "pending"
+        trace["reasons"] = []
+        return trace
+
     if num == 0:
         trace["quality"] = "none"
-    elif trace.get("exact_phrase", {}).get("matched") or trace.get("route") == "structured":
-        # A verified exact-phrase match OR a canonical entity lookup is a precise
-        # outcome regardless of count — one canonical discourse for "Nine Point
-        # Code of Conduct" is a strong result, not "partial".
+    elif (trace.get("exact_phrase", {}).get("matched")
+          or trace.get("route") == "structured"
+          or trace.get("route") == "listing"):
+        # A verified exact-phrase match, a canonical entity lookup, OR an ordered
+        # collection listing is a precise outcome regardless of count — one
+        # canonical discourse, or 5 requested chapters, is a strong result.
         trace["quality"] = "strong"
     elif num >= QUALITY_STRONG_MIN_RESULTS and top_rel >= QUALITY_STRONG_MIN_RELEVANCE:
         trace["quality"] = "strong"
@@ -172,6 +198,17 @@ def assess_quality(trace, results):
         base_reasons.append({"code": "FACTUAL_QUESTION"})
     if trace.get("is_comparison"):
         base_reasons.append({"code": "COMPARISON_BOTH_SIDES"})
+    # Degraded ranking is reported even on "strong" results: the discourses are
+    # genuine, but their ORDER is only hybrid score, so the top result is less
+    # trustworthy than usual. Silence here is what hid 294 rate-limit failures.
+    if trace.get("rerank_degraded"):
+        base_reasons.append({"code": "RERANK_DEGRADED"})
+
+    # Listing route couldn't find the named collection -> abstain honestly.
+    if (trace.get("listing") or {}).get("not_found"):
+        col = trace["listing"].get("collection")
+        trace["reasons"] = [{"code": "LISTING_NOT_FOUND", "data": {"collection": col}}]
+        return trace
 
     # Structured route determined the corpus doesn't cover this entity -> abstain
     # honestly with a single clean note (not a pile of refinement tips).

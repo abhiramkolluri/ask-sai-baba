@@ -131,6 +131,50 @@ def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH, occasion: st
     # (search_browse) distinguishes this from a genuinely empty result.
     return with_retries(_query, attempts=WEAVIATE_RETRY_ATTEMPTS, what="Passage hybrid search")
 
+def fetch_passages_by_ids(passage_ids: List[str]) -> Dict[str, Dict[str, Any]]:
+    """Fetch passages by Weaviate UUID, returned as {passage_id: passage_dict}.
+
+    This is what keeps the two-phase search stateless: phase 1 hands the client a
+    set of passage ids, and phase 2 re-reads exactly those passages instead of
+    relying on server-side memory that would not survive a second EB instance (or
+    a restart) between the two calls.
+
+    One round trip via an id filter rather than N fetch_object_by_id calls — at
+    ~15 passages the per-call latency would otherwise dominate phase 2.
+    """
+    if not passage_ids:
+        return {}
+
+    def _query():
+        client = get_client()
+        if not client:
+            raise RuntimeError("Weaviate client not available for passage fetch.")
+        passages = client.collections.get(PASSAGE_COLLECTION)
+        response = passages.query.fetch_objects(
+            filters=Filter.by_id().contains_any(list(passage_ids)),
+            limit=len(passage_ids),
+        )
+        out = {}
+        for obj in response.objects:
+            props = obj.properties
+            out[str(obj.uuid)] = {
+                "_id": str(obj.uuid),
+                "article_id": props.get("article_id", ""),
+                "chunk_index": props.get("chunk_index", 0),
+                "content": props.get("content", ""),
+                "title": props.get("title", ""),
+                "location": props.get("location", ""),
+                "occasion": props.get("occasion", ""),
+                "link": props.get("link", ""),
+                "collection_name": props.get("collection_name", ""),
+                "date_authored": props.get("date_authored", ""),
+                "score": 0.0,
+            }
+        return out
+
+    return with_retries(_query, attempts=WEAVIATE_RETRY_ATTEMPTS, what="Passage fetch by id")
+
+
 def _rrf_merge(ranked_lists, k: int = 60) -> List[Dict[str, Any]]:
     """Reciprocal Rank Fusion over several best-first passage lists. Dedupes by
     passage `_id`; each kept passage retains the `source_query` from its best-ranked

@@ -14,7 +14,8 @@ import re
 import json
 import logging
 
-from .config import openai_client, GRADE_MODEL, MAX_PLANNED_QUERIES, PLAN_TEMPERATURE
+from .config import (openai_client, GRADE_MODEL, PLAN_MODEL, MAX_PLANNED_QUERIES,
+                     REASONING_EFFORT, PLAN_IS_REASONING, PLAN_TEMPERATURE)
 
 # The intent taxonomy the router classifies into; search_browse dispatches on it.
 # Anything outside this set normalizes to "conceptual" (the plain semantic route),
@@ -22,6 +23,7 @@ from .config import openai_client, GRADE_MODEL, MAX_PLANNED_QUERIES, PLAN_TEMPER
 KNOWN_INTENTS = {
     "conceptual", "scenario", "aspect", "factual", "named_text",
     "occasion", "comparative", "org_doctrine", "meta", "out_of_domain",
+    "listing",
 }
 
 
@@ -114,16 +116,17 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             "You convert a user's message into search queries for a corpus of "
             "English-translated spiritual discourses by Sathya Sai Baba. Output 1 to 4 "
             'STANDALONE search queries as JSON: '
-            '{"queries":["..."],"occasion":null,"intent":"conceptual","is_comparison":false,"entities":[]}. Rules: '
+            '{"queries":["..."],"occasion":null,"intent":"conceptual","is_comparison":false,"entities":[],'
+            '"collection":null,"list_count":null,"list_order":"first"}. Rules: '
             "(1) Resolve any references to earlier turns so each query stands alone. "
             "(2) Distill long or emotional scenarios down to the underlying spiritual "
             "concept(s) being asked about; drop names and incidental narrative detail. "
-            "(3) For romanized Sanskrit/Telugu terms, EXPAND (never shorten): output BOTH the "
-            "corpus spelling AND the user's spelling AND 3-5 English meaning words. Examples: "
-            "'ahinsa' -> 'ahimsa ahinsa non-violence and not harming others'; 'satya' -> "
-            "'sathya satya truth and truthfulness'; 'moksa' -> 'moksha liberation freedom from "
-            "rebirth'. Rule (2)'s distillation applies to long narratives, NOT to short term "
-            "queries. (4) DEFAULT TO ONE QUERY. Most messages are about a single "
+            "(3) For romanized Sanskrit/Telugu terms, EXPAND (never shorten): output the "
+            "corpus spelling AND the user's spelling (skip the duplicate when they are the "
+            "same) AND 2-3 English meaning words — no more, so the term stays the focus. "
+            "Examples: 'ahinsa' -> 'ahimsa ahinsa non-violence'; 'satya' -> "
+            "'sathya satya truth'; 'moksa' -> 'moksha liberation from rebirth'. Rule (2)'s "
+            "distillation applies to long narratives, NOT to short term queries.(4) DEFAULT TO ONE QUERY. Most messages are about a single "
             "concept -> return a single query (e.g. 'controlling the mind' -> [\"control and "
             "mastery of the mind\"]). Different sub-aspects, synonyms, or rephrasings of the "
             "SAME concept are NOT multiple concepts. Return 2-4 queries ONLY when the message "
@@ -149,15 +152,19 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             "invent a spiritual topic for it. "
             # Rule 9 added after auditing real questions: terse 1-4 word inputs ("commitment
             # to god", "what is faith") retrieved too little because a bare facet misses the
-            # corpus's own vocabulary. Broaden them with synonyms/closely-related terms.
-            "(9) EXPAND SHORT/BARE-TOPIC QUERIES. When the message is a short query or bare "
-            "topic (roughly 1-4 meaningful words, e.g. 'commitment to god', 'letting go', "
-            "'what is faith'), enrich the query with the synonymous and closely-related "
-            "vocabulary the discourses actually use, so retrieval isn't starved. Examples: "
-            "'commitment to god' -> 'commitment surrender dedication self-offering devotion "
-            "to God'; 'faith' -> 'faith trust conviction and confidence in God'; 'letting go' "
-            "-> 'letting go detachment renunciation non-attachment'. This still describes ONE "
-            "concept (keep it a single query unless the message truly spans separate concepts). "
+            # corpus's own vocabulary. Broaden them — but KEEP FOCUS: over-padding a bare
+            # topic with loosely-related words dilutes retrieval so the top result drifts
+            # off-concept (probing: 'faith' -> 'faith trust conviction and confidence in God'
+            # surfaced a passage about trust, not about faith itself).
+            "(9) EXPAND SHORT/BARE-TOPIC QUERIES — BUT KEEP THEM FOCUSED. When the message is "
+            "a short query or bare topic (roughly 1-4 meaningful words, e.g. 'commitment to "
+            "god', 'letting go', 'what is faith'), LEAD with the original topic wording and "
+            "add ONLY 1-2 of the closest synonyms the discourses use — just enough that "
+            "retrieval isn't starved, WITHOUT padding it with loosely-related words that pull "
+            "the search off-topic. Examples: 'commitment to god' -> 'commitment and dedication "
+            "to God'; 'faith' -> 'faith and trust in God'; 'letting go' -> 'letting go and "
+            "detachment'. This still describes ONE concept (keep it a single query unless the "
+            "message truly spans separate concepts). "
             "OCCASION: if the message asks for discourses from a specific occasion or festival, "
             'set "occasion" to that occasion\'s name using the corpus spelling — e.g. "Dasara", '
             '"Shivarathri", "Guru Purnima", "Christmas", "Ugadi", "Onam", "Krishna Jayanthi", '
@@ -170,29 +177,40 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             '"aspect" (asks about a specific aspect of a topic — the value/stages/obstacles/why/how of X); '
             '"factual" (a biographical or factual question about a specific person, place, date, or event — '
             '"Who was Swami\'s mother?", "When was Baba born?", "Where is Puttaparthi?"); '
-            '"named_text" (asks about a specific named text/scripture, or "where is this quote from" — '
-            '"Tripura Rahasyam", a Gita verse, a quoted line to locate); '
+            '"named_text" (asks about a SPECIFIC named text/scripture by name, or "where is this quote from" — '
+            '"Tripura Rahasyam", a Gita verse, a quoted line to locate. A request merely asking for exact quotes '
+            "on a topic — \"give me exact quotes about time management\" — is NOT named_text; classify it by its topic); "
             '"occasion" (asks for discourses from a specific occasion/festival — pair with the occasion field); '
             '"comparative" (compares two things or asks which is better — "difference between bhakti and jnana"); '
             '"org_doctrine" (asks about Sathya Sai organization doctrine/terms — "Nine Point Code of Conduct", '
             '"SSE", "Balvikas", guidelines); '
-            '"meta" (a request to the product itself, not the corpus — "give me some follow ups"); '
-            '"out_of_domain" (unrelated to spiritual discourses, or gibberish — "best pizza"). '
+            '"listing" (asks to enumerate/return the chapters or discourses OF a named collection or book '
+            'in order — "return the first 5 chapters from Prema Vahini", "list the discourses in Summer Showers 1990", '
+            '"show me chapters of the Gita Vahini"); '
+            '"meta" (a request to the PRODUCT/APP itself, not the discourse content — "give me some follow ups", '
+            '"which discourse should I read first", "what is the best discourse to start with", a recommendation '
+            'request, or a remark about the app rather than a spiritual question); '
+            '"out_of_domain" (unrelated to spiritual discourses, gibberish, code/injection, or not a question — "best pizza"). '
             "When unsure between conceptual/scenario/aspect, prefer the most specific that fits. "
             'IS_COMPARISON: set "is_comparison" true when the message compares two or more things or asks '
             "which of them is better/more important. "
             'ENTITIES: list any specific named people, places, texts, org terms, or festivals mentioned '
             '(e.g. ["Easwaramma"], ["Bhagavad Geetha"], ["Nine Point Code of Conduct"]); [] if none. '
+            'LISTING FIELDS (only when intent is "listing"): set "collection" to the named book/series/collection '
+            '(e.g. "Prema Vahini", "Summer Showers 1990"); "list_count" to the number requested ("first 5" -> 5, '
+            '"last 3" -> 3; null if no number given); "list_order" to "first", "last", or "all". For non-listing '
+            "intents leave collection null, list_count null, list_order \"first\". "
             "JSON only, no prose."
         )
         response = openai_client.chat.completions.create(
-            model=GRADE_MODEL,
+            model=PLAN_MODEL,
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": hist_block + "Message: " + message},
             ],
             response_format={"type": "json_object"},
-            temperature=PLAN_TEMPERATURE,
+            **({"reasoning_effort": REASONING_EFFORT} if PLAN_IS_REASONING
+               else {"temperature": PLAN_TEMPERATURE}),
         )
         raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
@@ -213,6 +231,13 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             trace_out["is_comparison"] = bool(data.get("is_comparison"))
             ents = data.get("entities")
             trace_out["entities"] = [e.strip() for e in ents if isinstance(e, str) and e.strip()] if isinstance(ents, list) else []
+            # Listing fields (used only when intent == "listing"), parsed defensively.
+            col = data.get("collection")
+            trace_out["collection"] = col.strip() if isinstance(col, str) and col.strip() else None
+            lc = data.get("list_count")
+            trace_out["list_count"] = lc if isinstance(lc, int) and lc > 0 else None
+            lo = data.get("list_order")
+            trace_out["list_order"] = lo if lo in ("first", "last", "all") else "first"
         return qs[:MAX_PLANNED_QUERIES] or [message]
     except Exception as e:
         logging.error(f"plan_queries failed: {e}; using raw message.")

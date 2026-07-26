@@ -58,21 +58,63 @@ openai_client = OpenAI(api_key=openai_api_key, max_retries=3, timeout=20.0)
 # deployment, set COHERE_API_KEY in the Elastic Beanstalk environment.
 # ===========================================================================
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+VOYAGE_API_KEY = os.getenv("VOYAGE_API_KEY")
+
+# Which reranking provider the pipeline uses: "voyage" or "cohere". Voyage is the
+# default after an audit found the Cohere key was a TRIAL key capped at 10 calls/
+# minute — a single search issues 1-4 rerank calls, so 28% of facet reranks in a
+# real-traffic replay silently fell back to hybrid-score order (294 logged 429s).
+# Voyage rerank-2.5-lite is also ~7.7x cheaper at our 40-document rerank size
+# (token-billed vs Cohere's per-search billing) and scores higher on NDCG@10.
+# Flip this back to "cohere" to roll the swap back in one line.
+RERANK_PROVIDER = os.getenv("RERANK_PROVIDER", "voyage")
 
 # Bound external calls so a hang or blip can't run past the API Gateway timeout.
 # COHERE_TIMEOUT closes the observed 97s rerank hang (client had no timeout);
 # WEAVIATE_RETRY_ATTEMPTS retries transient Weaviate connection drops before the
 # pipeline reports an honest service error rather than a false empty result.
 COHERE_TIMEOUT = 5
+# voyageai.Client defaults to max_retries=0 and no timeout; both are set
+# explicitly so a transient blip retries and a hang stays inside our budget.
+VOYAGE_TIMEOUT = 5
+VOYAGE_MAX_RETRIES = 2
 WEAVIATE_RETRY_ATTEMPTS = 2
 
 PASSAGE_OVERFETCH = 40
 RERANK_KEEP = 15
-RERANK_MODEL = "rerank-v3.5"
-GRADE_MODEL = "gpt-4o-mini"
-JUDGE_MODEL = "gpt-4o"  # stronger judge for unified grade + verbatim quote extraction
+# Per-provider model ids; the active one is chosen by RERANK_PROVIDER.
+RERANK_MODEL = "rerank-2.5-lite"      # voyage
+COHERE_RERANK_MODEL = "rerank-v3.5"   # cohere (rollback path)
+GRADE_MODEL = "gpt-4o-mini"   # cheap utility calls (eval judge, follow-up proposals)
+# The router (plan_queries) and the extractive judge both run on gpt-5-mini.
+# gpt-5-mini is a REASONING model: it rejects `temperature` outright, and its
+# default reasoning effort is far slower than gpt-4o — "minimal" is what makes it
+# a latency win rather than a regression, so treat it as required, not tuning.
+# Env-overridable so a bad model can be rolled back without a code deploy, and
+# so an A/B baseline can be captured against the same golden set.
+# MEASURED, 218-question golden set, clean runs:
+#   gpt-4o judge     : quote 62%, exact_first 62%, total p50 4,298ms
+#   gpt-5-mini judge : quote 52%, exact_first 55%, total p50 8,058ms
+# gpt-5-mini is a reasoning model and carries a multi-second floor even at
+# reasoning_effort="minimal" — ~2x slower on BOTH planner and judge, and worse on
+# quality. Defaults stay on the gpt-4o family; override to re-test.
+PLAN_MODEL = os.getenv("PLAN_MODEL", "gpt-4o-mini")
+JUDGE_MODEL = os.getenv("JUDGE_MODEL", "gpt-4o")
+REASONING_EFFORT = os.getenv("REASONING_EFFORT", "minimal")
+# gpt-4o-family models reject `reasoning_effort` and require `temperature`
+# instead. Detected rather than configured so a rollback is a single env var.
+PLAN_IS_REASONING = PLAN_MODEL.startswith("gpt-5")
+JUDGE_IS_REASONING = JUDGE_MODEL.startswith("gpt-5")
 GRADE_MIN_RELEVANCE = 0.5
 HYBRID_ALPHA = 0.5
+
+# Grading is ~74% of end-to-end latency, and it scales with how much JSON the
+# judge has to serialize — one call over 15 passages emits ~15 verdicts with
+# quotes, in sequence. Sharding into concurrent batches cuts the serialized
+# output per call without changing the model, the prompt, or the token count.
+# Independent of JUDGE_MODEL: keep this even if the model swap is reverted.
+GRADE_BATCH_SIZE = 5
+GRADE_MAX_WORKERS = 3
 
 # Router v2: when enabled, plan_queries classifies the question's INTENT and
 # search_browse dispatches on it (meta/out-of-domain short-circuit to guidance,
@@ -87,19 +129,38 @@ ROUTER_V2_ENABLED = True
 # confirms the new embeddings win, or flip back to roll back instantly.
 PASSAGE_COLLECTION = "Passage"
 
-# Server-side result cache for repeated questions (Phase 4). Off by default — the
-# frontend already caches per-session, so this only helps across users/sessions;
-# enable when you want popular questions ("what is faith") to short-circuit the
-# whole pipeline. Keyed on the normalized question + context.
-SEMANTIC_CACHE_ENABLED = False
+# Server-side result cache for repeated questions. ON: an audit of 3,549 logged
+# questions found 56% of all traffic is a repeat of a question already asked, and
+# the single most common question is 19% of traffic on its own — so this
+# short-circuits the whole plan→retrieve→rerank→grade pipeline for more than half
+# of requests. The frontend cache only covers a single session; this one spans
+# users. Keyed on the normalized question + context; invalidated by process
+# restart, which is also what a corpus re-index requires.
+SEMANTIC_CACHE_ENABLED = True
 SEMANTIC_CACHE_SIZE = 512
 
+# Listing route: how many chapters to return for "list the chapters of X" with no
+# explicit count, and the hard cap for "all chapters of X".
+LISTING_DEFAULT = 10
+LISTING_MAX = 50
+
+# NOTE: PLAN_TEMPERATURE / JUDGE_TEMPERATURE are RETAINED ONLY for a rollback to
+# the gpt-4o family. gpt-5-mini rejects the parameter, so neither is sent while
+# PLAN_MODEL/JUDGE_MODEL point at it. Worth recording why the determinism
+# argument they were added for did not survive contact with reality: measured on
+# gpt-4o-mini at temperature 0.0, plan_queries returned collection=None on one
+# run of "return the first 5 chapters from Prema Vahini" and "Prema Vahini" on
+# the next two. Temperature 0 is not determinism.
+#
 # LLM temperatures. Adversarial probing showed the unpinned default (1.0) made
 # plan_queries interpret the SAME question differently run-to-run (e.g. "value of
 # Truth" sometimes kept the aspect, sometimes collapsed to bare "truth") — users
 # experienced this as flaky search. The planner keeps a little freedom for
 # glossing/decomposition; the grader is a pure judgment call and gets none.
-PLAN_TEMPERATURE = 0.2
+# 0.0 after the fresh probe showed 0.2 still let the router flip intents run-to-run
+# on short/ambiguous inputs ("How do I?" -> scenario one run, meta the next). The
+# router is a classifier; it should be deterministic.
+PLAN_TEMPERATURE = 0.0
 JUDGE_TEMPERATURE = 0.0
 
 # RRF-merge sizing. The merged candidate list is capped, but with multiple facets
@@ -155,4 +216,18 @@ FOLLOWUP_KEEP = 3            # how many verified follow-ups to return
 FOLLOWUP_OVERFETCH = 20      # hybrid candidates fetched per candidate during verification
 FOLLOWUP_RERANK_KEEP = 5     # passages kept after rerank, then graded
 FOLLOWUP_MIN_HITS = 1        # min directly-answering discourses for a candidate to survive
+# Verification threshold on the RERANKER's relevance score (0-1). Candidates are
+# no longer verified with an LLM grade: doing so cost 6 judge calls per question —
+# ~68% of all per-question spend — to produce three suggestion chips. The reranker
+# already scores query↔passage relevance well enough to decide "is this question
+# answerable from the corpus", which is all verification needs to establish.
+# Calibrated on rerank-2.5-lite against the real corpus, not guessed. Measured top
+# scores: answerable questions ("how do I control my anger", "what is devotion")
+# landed 0.781-0.879; unanswerable ones ("how do I eat berries", "when will i get
+# job", "what Indian political party would Swami align with") landed 0.295-0.605.
+# 0.70 sits in that gap with margin on both sides. An earlier 0.5 would have
+# admitted the political-speculation and fortune-telling questions as valid
+# follow-ups.
+# NOTE: this is on Voyage's scale — re-measure if RERANK_PROVIDER or the model changes.
+FOLLOWUP_MIN_RERANK_SCORE = 0.70
 FOLLOWUP_MAX_WORKERS = 5     # bounded concurrency for per-candidate verification

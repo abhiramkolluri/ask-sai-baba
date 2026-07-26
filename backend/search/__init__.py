@@ -56,6 +56,7 @@ from .pipeline import (
     extract_quoted_phrase,
     format_docs,
     search_browse,
+    grade_passages_by_id,
     generate_followups,
     search,
 )
@@ -83,6 +84,7 @@ __all__ = [
     "extract_quoted_phrase",
     "format_docs",
     "search_browse",
+    "grade_passages_by_id",
     "generate_followups",
     "search",
 ]

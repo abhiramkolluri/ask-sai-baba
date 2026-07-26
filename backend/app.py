@@ -4,6 +4,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_mail import Mail, Message
 from dotenv import load_dotenv
 import os
+import logging
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 import json
@@ -22,6 +23,7 @@ from search import (
     check_vector_store_health,
     get_full_article,
     search_browse,
+    grade_passages_by_id,
     generate_followups,
     extract_quoted_phrase,
 )
@@ -626,6 +628,12 @@ def search_endpoint():
         # response, so older clients are unaffected. Same route/body-only change —
         # no API Gateway/OpenAPI update needed.
         include_trace = bool(request.json.get('include_trace'))
+        # Phase 1 of the two-phase response: skip grading and return reranked
+        # candidates immediately, so the UI paints in ~1.4s instead of ~5.7s. The
+        # client is then expected to POST the returned passage ids to
+        # /search/verify. Absent (the default) this is the original single-call
+        # behavior, so an older client keeps working unchanged.
+        defer_grading = bool(request.json.get('defer_grading'))
         if query:
             exact_phrase = extract_quoted_phrase(query)
             # Browse shows more results than chat; allow_empty stays True so an
@@ -633,14 +641,54 @@ def search_endpoint():
             if include_trace:
                 results, trace = search_browse(
                     query, limit=10, exact_phrase=exact_phrase,
-                    history=history, return_trace=True)
+                    history=history, return_trace=True, defer_grading=defer_grading)
                 return jsonify({'results': results, 'trace': trace})
-            results = search_browse(query, limit=10, exact_phrase=exact_phrase, history=history)
+            results = search_browse(query, limit=10, exact_phrase=exact_phrase,
+                                    history=history, defer_grading=defer_grading)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400
     else:
         return jsonify({'error': 'Request must contain JSON data'}), 400
+
+@app.route('/search/verify', methods=['POST'])
+def search_verify_endpoint():
+    """Phase 2 of the two-phase search: turn provisional candidates into quotes.
+
+    The client posts the passage ids it got from a `defer_grading` search, each
+    paired with the facet that surfaced it, and gets back the SAME shape as
+    /search — {results, trace} — so it can replace its provisional list wholesale.
+
+    Passages the grader rejects are simply absent from `results`; that is what
+    removes an unverified card. Always 200 with a (possibly empty) list, matching
+    /followups' contract, so a verification failure degrades to "no verified
+    quotes" rather than breaking the answer the user is already looking at.
+    """
+    if not request.is_json:
+        return jsonify({'error': 'Request must contain JSON data'}), 400
+
+    query = request.json.get('query')
+    if not query:
+        return jsonify({'error': 'Query parameter is missing'}), 400
+
+    passages = request.json.get('passages') or []
+    if not isinstance(passages, list):
+        passages = []
+    # Accept a bare id list too — the client shouldn't have to send facets when
+    # the search only planned one.
+    passages = [
+        {'passage_id': p, 'facet': query} if isinstance(p, str) else p
+        for p in passages
+    ]
+
+    try:
+        results, trace = grade_passages_by_id(
+            query, passages, limit=10, return_trace=True)
+        return jsonify({'results': results, 'trace': trace})
+    except Exception as e:
+        logging.error(f"/search/verify failed: {e}")
+        return jsonify({'results': [], 'trace': None}), 200
+
 
 @app.route('/followups', methods=['POST'])
 def followups_endpoint():

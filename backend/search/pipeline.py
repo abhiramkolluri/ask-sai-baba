@@ -7,6 +7,8 @@ citations. The heavy lifting lives in the stage modules
 
 Public entrypoints:
   - ``search_browse``      — the main discourse search used by ``/search`` and chat.
+  - ``grade_passages_by_id`` — phase 2 of the two-phase response (``/search/verify``):
+    grades the candidates a ``defer_grading=True`` search returned.
   - ``generate_followups`` — propose + verify follow-up questions for an answer.
   - ``search``             — thin compatibility wrapper over ``search_browse``.
   - ``extract_quoted_phrase`` / ``format_docs`` — small query/format helpers used
@@ -25,21 +27,22 @@ from .config import (
     GRADE_MODEL,
     PASSAGE_OVERFETCH,
     RERANK_KEEP,
+    RERANK_PROVIDER,
     MERGE_MIN_PER_FACET,
     MERGE_PER_FACET_CAP,
     FACET_MAX_WORKERS,
     ROUTER_V2_ENABLED,
     CHAT_FALLBACK_DISCOURSES,
-    GRADE_MIN_RELEVANCE,
     FOLLOWUP_CANDIDATES,
     FOLLOWUP_KEEP,
     FOLLOWUP_OVERFETCH,
     FOLLOWUP_RERANK_KEEP,
     FOLLOWUP_MIN_HITS,
+    FOLLOWUP_MIN_RERANK_SCORE,
     FOLLOWUP_MAX_WORKERS,
 )
 from .query_planning import plan_queries
-from .retrieval import search_passages, search_exact, _rrf_merge, phrase_in_text
+from .retrieval import search_passages, search_exact, _rrf_merge, phrase_in_text, fetch_passages_by_ids
 from .ranking import (
     rerank_passages,
     grade_and_quote_passages,
@@ -49,6 +52,7 @@ from .ranking import (
 from .transparency import new_trace, StageTimer, assess_quality
 from .resilience import PipelineServiceError
 from .knowledge import lookup_entity
+from .listing import list_collection
 from . import cache
 
 
@@ -113,7 +117,7 @@ def format_docs(docs):
 # Main discourse search — plan → retrieve → rerank → fuse → grade → aggregate
 # ===========================================================================
 
-def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_empty: bool = True, history=None, return_trace: bool = False):
+def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_empty: bool = True, history=None, return_trace: bool = False, defer_grading: bool = False):
     """Search discourses via the passage pipeline (hybrid -> rerank -> grade -> aggregate).
 
     Keeps the quoted-phrase exact-match shortcut from the legacy implementation.
@@ -121,6 +125,12 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
       - True (browse): return [] when nothing directly answers the query.
       - False (chat): fall back to the top reranked passages so the generator
         still has grounding context.
+
+    `defer_grading` (opt-in): when True this is phase 1 of the two-phase response —
+    candidates are retrieved and reranked but NOT graded, so the call returns in
+    roughly a quarter of the usual time. Results are provisional: no quotes, and
+    `trace.deferred` is set. The caller is expected to post
+    `trace.pending_passage_ids` to ``grade_passages_by_id`` for verified quotes.
 
     `return_trace` (opt-in): when True, returns a ``(results, trace)`` tuple where
     ``trace`` is the transparency dict (see search/transparency.py) describing how
@@ -140,9 +150,16 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
     # Repeated-question cache (Phase 4, off by default). Keyed on the original
     # args before `query` is reassigned by the exact-phrase branch. A hit returns
     # the exact prior value; a miss/disabled cache returns None.
-    cache_args = (query, history, exact_phrase, allow_empty, return_trace)
+    cache_args = (query, history, exact_phrase, allow_empty, return_trace, defer_grading)
     cached = cache.get(*cache_args)
     if cached is not None:
+        # Tag the trace so the stage timings below aren't misread as this
+        # request's work — they belong to the original run that populated the
+        # entry. Copied rather than mutated in place so concurrent requests
+        # never share a half-written dict.
+        if return_trace and isinstance(cached, tuple) and len(cached) == 2:
+            results, trace = cached
+            return results, {**trace, "cached": True}
         return cached
 
     trace = new_trace(query, history) if return_trace else None
@@ -155,12 +172,26 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         tracing, else results."""
         if trace is None:
             value = results
+            cacheable = True
         else:
             trace["results"]["discourses"] = len(results)
             trace["results"]["top_relevance"] = results[0].get("score", 0.0) if results else 0.0
             assess_quality(trace, results)
             value = (results, trace)
-        cache.put(*cache_args, value)
+            # NEVER cache a failure. An empty result from an honest abstention
+            # (out-of-domain, a known corpus gap) is deterministic and worth
+            # caching — but a service error, or a listing whose collection the
+            # planner failed to extract, is transient. Caching those freezes one
+            # bad roll of the dice into every future request for that question
+            # until the process restarts. Observed: a planner flake on "the first
+            # 5 chapters from Prema Vahini" was served from cache indefinitely.
+            cacheable = not (
+                trace.get("service_error")
+                or trace.get("quality") == "error"
+                or (trace.get("listing") or {}).get("not_found")
+            )
+        if cacheable:
+            cache.put(*cache_args, value)
         return value
 
     with StageTimer(trace, "total"):
@@ -221,6 +252,42 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
                 trace["route"] = "guidance"
             return _finish([])
 
+        # (c.1b) Listing route: "return the first 5 chapters from Prema Vahini" —
+        # enumerate a named collection's chapters IN READING ORDER (filter+sort on
+        # the backfilled chapter_index), not a relevance search. Abstains honestly
+        # when the collection isn't found.
+        # A "listing" intent with no collection name is an INCOMPLETE plan, not a
+        # missing collection. PLAN_TEMPERATURE=0.0 does not actually make
+        # gpt-4o-mini deterministic — measured ~1-in-3 on "return the first 5
+        # chapters from Prema Vahini", where the same question yielded
+        # collection=None on one run and "Prema Vahini" on the next. Routing the
+        # incomplete plan to the listing route made us tell the user we couldn't
+        # find a collection they had named correctly. Falling through to semantic
+        # search returns something useful instead of a confident falsehood.
+        if ROUTER_V2_ENABLED and intent == "listing" and not plan_meta.get("collection"):
+            logging.warning(
+                f"listing intent with no collection for {query!r}; "
+                "falling through to semantic route (incomplete plan)."
+            )
+            intent = "conceptual"
+            if trace:
+                trace["intent"] = intent
+
+        if ROUTER_V2_ENABLED and intent == "listing":
+            with StageTimer(trace, "listing"):
+                lst = list_collection(plan_meta.get("collection"),
+                                      plan_meta.get("list_count"),
+                                      plan_meta.get("list_order"))
+            if trace:
+                trace["route"] = "listing"
+                trace["listing"] = {
+                    "collection": lst.get("collection") or plan_meta.get("collection"),
+                    "count": len(lst.get("results", [])),
+                    "order": plan_meta.get("list_order") or "first",
+                    "not_found": lst["status"] != "found",
+                }
+            return _finish(lst.get("results", []))
+
         # (c.2) Structured knowledge route: factual/named-text/org-doctrine
         # questions are looked up in the Entity collection instead of being
         # semanticized. A "hit" returns canonical discourses; a "gap" abstains
@@ -261,20 +328,24 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
             except PipelineServiceError as e:
                 logging.error(f"facet retrieval errored for {q!r}: {e}")
                 return [], {"facet": q, "retrieved": 0, "kept_after_rerank": 0,
-                            "reranker": "n/a", "ms": int((time.perf_counter() - started) * 1000),
+                            "reranker": "n/a", "rerank_degraded": False,
+                            "ms": int((time.perf_counter() - started) * 1000),
                             "errored": True}
             rl = rerank_passages(q, cands, RERANK_KEEP)
             for p in rl:
                 p["source_query"] = q
-            # Which reranker actually ran, inferred without touching rerank_passages:
-            # the Cohere path is the only one that sets `rerank_score`; both the
-            # no-key and exception fallbacks omit it -> hybrid-score order.
-            reranker = "n/a" if not rl else ("cohere" if "rerank_score" in rl[0] else "hybrid_score")
+            # Whether reranking actually ran. rerank_passages stamps every passage
+            # with `rerank_degraded` when it fell back to hybrid-score order, so
+            # this is read from an explicit flag rather than inferred from the
+            # presence of a score field.
+            degraded = bool(rl) and rl[0].get("rerank_degraded", False)
+            reranker = "n/a" if not rl else ("hybrid_score" if degraded else RERANK_PROVIDER)
             stat = {
                 "facet": q,
                 "retrieved": len(cands),
                 "kept_after_rerank": len(rl),
                 "reranker": reranker,
+                "rerank_degraded": degraded,
                 "ms": int((time.perf_counter() - started) * 1000),
                 "errored": False,
             }
@@ -311,6 +382,10 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # short-circuit on a service error below.
         if trace:
             trace["retrieval"]["facet_results"] = facet_stats
+            # One degraded facet is enough to caveat the ordering of the whole
+            # merged list, since RRF fuses them together.
+            if any(s.get("rerank_degraded") for s in facet_stats):
+                trace["rerank_degraded"] = True
             if occasion:
                 trace["metadata_filter"] = {
                     "occasion": occasion,
@@ -341,6 +416,25 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         if trace:
             trace["retrieval"]["merged_candidates"] = len(reranked)
 
+        # (c.5) Deferred grading — phase 1 of the two-phase response. Grading is
+        # ~74% of this pipeline's latency, so returning the reranked candidates
+        # now lets the UI paint in about a quarter of the time; the caller then
+        # posts the passage ids to /search/verify to get verified quotes.
+        #
+        # Everything returned here is PROVISIONAL: no passage has been judged, so
+        # `best_sentence` is deliberately left empty rather than filled with an
+        # unverified guess, and results are ordered by reranker score. The caller
+        # must not present these as answers — the trace is marked `deferred` so a
+        # client that ignores phase 2 cannot silently show unverified quotes.
+        if defer_grading:
+            results = aggregate_to_discourses(reranked, limit)
+            if trace:
+                trace["deferred"] = True
+                trace["pending_passage_ids"] = [
+                    r["passage_id"] for r in results if r.get("passage_id")
+                ]
+            return _finish(results)
+
         # Unified extractive grade: judges relevance AND extracts the verbatim answering
         # quote per passage against its own facet, attaching `best_sentence` to each kept one.
         with StageTimer(trace, "grading"):
@@ -359,6 +453,69 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # Quotes are already attached by the unified grade step.
         return _finish(results)
 
+def grade_passages_by_id(query: str, passage_specs, limit: int = 10, return_trace: bool = False):
+    """Phase 2 of the two-phase response: grade the candidates phase 1 returned.
+
+    `passage_specs` is a list of ``{"passage_id": str, "facet": str}`` — the ids
+    come from phase 1's ``trace.pending_passage_ids`` (or each citation's
+    ``passage_id``), and `facet` is the sub-query that surfaced it, so each
+    passage is still judged against the question it was actually retrieved for
+    rather than the raw user message.
+
+    Stateless by design: the passages are re-read from Weaviate rather than held
+    in memory between the two calls, so this works across EB instances and
+    restarts. Returns the same ``(results, trace)`` shape as ``search_browse`` so
+    the client can swap phase 1's provisional list for this one wholesale.
+
+    Passages the grader rejects are simply absent from the result — that is what
+    makes a provisional card disappear, and it is the honest outcome.
+    """
+    trace = new_trace(query, None) if return_trace else None
+    grade_meta = trace["grading"] if trace else None
+
+    def _finish(results):
+        if trace is None:
+            return results
+        trace["results"]["discourses"] = len(results)
+        trace["results"]["top_relevance"] = results[0].get("score", 0.0) if results else 0.0
+        trace["route"] = "semantic"
+        assess_quality(trace, results)
+        return results, trace
+
+    ids, facet_by_id = [], {}
+    for spec in passage_specs or []:
+        if not isinstance(spec, dict):
+            continue
+        pid = (spec.get("passage_id") or "").strip()
+        if pid:
+            ids.append(pid)
+            facet_by_id[pid] = (spec.get("facet") or query).strip() or query
+    if not ids:
+        return _finish([])
+
+    with StageTimer(trace, "total"):
+        with StageTimer(trace, "retrieval"):
+            by_id = fetch_passages_by_ids(ids)
+        # Preserve phase 1's ordering, and drop ids that no longer resolve (a
+        # re-index between the two calls) rather than failing the whole request.
+        passages = []
+        for pid in ids:
+            p = by_id.get(pid)
+            if p is not None:
+                p["source_query"] = facet_by_id[pid]
+                passages.append(p)
+        if not passages:
+            logging.warning(
+                f"/search/verify: none of {len(ids)} passage ids resolved — "
+                "corpus may have been re-indexed since phase 1."
+            )
+            return _finish([])
+
+        with StageTimer(trace, "grading"):
+            graded = grade_and_quote_passages(query, passages, trace_out=grade_meta)
+        return _finish(aggregate_to_discourses(graded, limit))
+
+
 def search(user_query: str, collection=None) -> List[Dict[str, Any]]:
     """Search for documents."""
     return search_browse(user_query)
@@ -370,26 +527,38 @@ def search(user_query: str, collection=None) -> List[Dict[str, Any]]:
 
 def _verify_followup(candidate: str):
     """Run a candidate follow-up through a lightweight version of the search
-    pipeline and report whether it surfaces directly-answering quotes.
+    pipeline and report whether the corpus can answer it.
 
     The candidate is already a standalone question, so plan_queries is skipped and
-    it is treated as its own single facet. Returns (top_relevance, hit_count): the
-    highest grade_relevance among directly-answering discourses and how many cleared
-    the bar. (0.0, 0) means nothing directly answers it -> the candidate is dropped.
+    it is treated as its own single facet. Returns (top_score, hit_count): the
+    highest reranker relevance among candidate passages and how many cleared
+    FOLLOWUP_MIN_RERANK_SCORE. (0.0, 0) means nothing answers it -> dropped.
+
+    Verification is reranker-only. It previously ran the full LLM grader on every
+    candidate, which meant 6 judge calls per user question — the single largest
+    line item in per-question cost — purely to decide which suggestion chips to
+    show. The reranker's score answers the same question ("can this be answered
+    from the corpus?") at ~1/100th the cost.
     """
     try:
         cands = search_passages(candidate, FOLLOWUP_OVERFETCH)
         reranked = rerank_passages(candidate, cands, FOLLOWUP_RERANK_KEEP)
-        graded = grade_and_quote_passages(candidate, reranked)
-        # grade_and_quote_passages only keeps passages with a verbatim answering
-        # quote and relevance >= GRADE_MIN_RELEVANCE, so anything returned here is a
-        # genuine hit. (Its rare fallback path can return ungraded passages without
-        # grade_relevance; treat those as not-verified by reading .get default 0.)
-        relevances = [p.get("grade_relevance", 0.0) for p in graded]
-        relevances = [r for r in relevances if r >= GRADE_MIN_RELEVANCE]
-        if not relevances:
+        if not reranked:
             return (0.0, 0)
-        return (max(relevances), len(relevances))
+        # A degraded rerank leaves only hybrid scores, which are on a different
+        # (uncalibrated) scale — thresholding them would silently admit or reject
+        # candidates on noise. Treat as unverifiable and drop, loudly.
+        if reranked[0].get("rerank_degraded"):
+            logging.warning(
+                f"follow-up verification skipped for {candidate!r}: reranking degraded, "
+                "no calibrated score to threshold on."
+            )
+            return (0.0, 0)
+        scores = [p.get("rerank_score", 0.0) for p in reranked]
+        scores = [s for s in scores if s >= FOLLOWUP_MIN_RERANK_SCORE]
+        if not scores:
+            return (0.0, 0)
+        return (max(scores), len(scores))
     except Exception as e:
         logging.error(f"_verify_followup failed for {candidate!r}: {e}")
         return (0.0, 0)
@@ -404,10 +573,10 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None) 
           that advance the user's goal and funnel toward higher relevance: narrower
           questions targeting strong subject matter when the current results are weak,
           deeper/adjacent questions when they are strong.
-      (B) Each candidate is verified against the real retrieve->rerank->grade pipeline
-          (concurrently). Only candidates that surface a directly-answering quote
-          survive; survivors are ranked by the top relevance they reach and the best
-          FOLLOWUP_KEEP are returned.
+      (B) Each candidate is verified against the real retrieve->rerank pipeline
+          (concurrently). Only candidates whose top passage clears
+          FOLLOWUP_MIN_RERANK_SCORE survive; survivors are ranked by the score they
+          reach and the best FOLLOWUP_KEEP are returned.
 
     Returns a list of question strings (possibly empty). Never raises — any failure
     returns [] so the UI degrades to showing no follow-ups.
