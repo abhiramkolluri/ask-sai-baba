@@ -31,3 +31,4 @@ Database Vectorizer\.env
 /backend/entities_extract_checkpoint.json
 /backend/golden_questions_draft.json
 /backend/contextualize_progress.json
+/backend/eval_results_*.json
