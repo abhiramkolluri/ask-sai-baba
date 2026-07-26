@@ -500,15 +500,19 @@ def main():
                     "_canonical_titles": [a["title"] for a in kept],
                 })
 
-    entities.sort(key=lambda e: -e["_article_count"])
-
     for gap in KNOWN_GAPS:
         entities.append({**gap, "canonical_article_ids": "[]", "in_corpus": False,
                          "_article_count": 0, "_title_match": False,
                          "_selected_by": "curated_gap", "_canonical_titles": []})
 
+    # Alphabetical, so a human reviewing 1,000+ rows can find a specific entity
+    # instead of scanning. Case- and punctuation-insensitive so "Bal Vikas" and
+    # "bhajan" sort where a reader expects, not by codepoint. Demand is still
+    # legible per row via _article_count.
+    entities.sort(key=lambda e: (_norm(e["name"]), e["name"]))
+    rejected.sort(key=lambda r: (_norm(r["name"]), r["name"]))
+
     json.dump(entities, open(OUT_FILE, "w"), indent=2)
-    rejected.sort(key=lambda r: -r["_article_count"])
     json.dump(rejected, open(REJECTED_FILE, "w"), indent=2)
 
     found = {_norm(e["name"]) for e in entities}
@@ -520,7 +524,10 @@ def main():
     print("  by type:", dict(collections.Counter(e["entity_type"] for e in entities)))
     print(f"\nWrote {REJECTED_FILE}: {len(rejected)} entities held back "
           "(no discourse is titled after them — semantic search serves these better)")
-    for r in rejected[:6]:
+    # The FILES are alphabetical for review; this summary still ranks by demand,
+    # because "which held-back entity is most discussed" is the question you ask
+    # when deciding whether the gate is too strict.
+    for r in sorted(rejected, key=lambda x: -x["_article_count"])[:6]:
         print(f"    {r['name'][:28]:28s} ({r['_article_count']} articles) e.g. {r['_sample_titles'][:1]}")
     if missing:
         print(f"\n  !! {len(missing)} priority entities NOT found — investigate before ingest:")

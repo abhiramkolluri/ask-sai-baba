@@ -1,205 +1,5 @@
 [
   {
-    "name": "Kashi",
-    "entity_type": "place",
-    "_article_count": 33,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "Nama-smarana Gives Peace And Bliss",
-      "Gurus Not Teachers"
-    ]
-  },
-  {
-    "name": "Yamuna",
-    "entity_type": "place",
-    "_article_count": 29,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "Happy Ayodhya",
-      "Seek God Within"
-    ]
-  },
-  {
-    "name": "Madras",
-    "entity_type": "place",
-    "_article_count": 18,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "All Parties Should Unite To Make Bhaarat Strong",
-      "Human Values in Business Management"
-    ]
-  },
-  {
-    "name": "Hasthinapura",
-    "entity_type": "place",
-    "_article_count": 16,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.73 < 0.65)",
-    "_sample_titles": [
-      "Dhritarashtra Transformed",
-      "The Indweller Is God Himself"
-    ]
-  },
-  {
-    "name": "Andhra Pradesh",
-    "entity_type": "place",
-    "_article_count": 14,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.56 < 0.65)",
-    "_sample_titles": [
-      "Inauguration of the Prasanthi Nilayam Township",
-      "Love Must Win"
-    ]
-  },
-  {
-    "name": "Bible",
-    "entity_type": "text",
-    "_article_count": 11,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.46 < 0.65)",
-    "_sample_titles": [
-      "Bhajans and Bliss",
-      "Develop Devotion To Dharma"
-    ]
-  },
-  {
-    "name": "Quran",
-    "entity_type": "text",
-    "_article_count": 10,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.49 < 0.65)",
-    "_sample_titles": [
-      "Bhajans and Bliss",
-      "Develop Devotion To Dharma"
-    ]
-  },
-  {
-    "name": "Nakula",
-    "entity_type": "person",
-    "_article_count": 9,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Chitta Shuddhi Yoga",
-      "The path to the presence"
-    ]
-  },
-  {
-    "name": "Bombay",
-    "entity_type": "place",
-    "_article_count": 9,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "The Pompous Person",
-      "From Creation To Creator"
-    ]
-  },
-  {
-    "name": "Haridwar",
-    "entity_type": "place",
-    "_article_count": 8,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Transmute Every Minute",
-      "The Profound Pastime"
-    ]
-  },
-  {
-    "name": "Bhagavata Vahini",
-    "entity_type": "text",
-    "_article_count": 7,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Serpent Kaliya",
-      "Child Parikshit and the Prophecy"
-    ]
-  },
-  {
-    "name": "Badrinath",
-    "entity_type": "place",
-    "_article_count": 7,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Resolve",
-      "Sarvatah Panipadam"
-    ]
-  },
-  {
-    "name": "Dhyana Vahini",
-    "entity_type": "text",
-    "_article_count": 7,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.52 < 0.65)",
-    "_sample_titles": [
-      "The Object of Meditation is the Elimination of Vasanas (Tendencies)",
-      "Developing Virtues is Prime Objective of a Meditator"
-    ]
-  },
-  {
-    "name": "Rishikesh",
-    "entity_type": "place",
-    "_article_count": 7,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "The Profound Pastime",
-      "Dharma Never Declines. It Is The Practice Of Dharma That Declines"
-    ]
-  },
-  {
-    "name": "Hyderabad",
-    "entity_type": "place",
-    "_article_count": 6,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "Chapter 5",
-      "Chitta Shuddhi Yoga"
-    ]
-  },
-  {
-    "name": "Damodara",
-    "entity_type": "text",
-    "_article_count": 6,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "Ananya-bhakti",
-      "Develop Friendship with God"
-    ]
-  },
-  {
-    "name": "Itihasas",
-    "entity_type": "text",
-    "_article_count": 6,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Know Who You Are. Do Not Ask Another Who He Is",
-      "Faith Leads to Experience of Divinity"
-    ]
-  },
-  {
-    "name": "Mary",
-    "entity_type": "person",
-    "_article_count": 6,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "Love- The Key To Human Unity",
-      "Realise God Through Love"
-    ]
-  },
-  {
-    "name": "Sastras",
-    "entity_type": "text",
-    "_article_count": 5,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
-    "_sample_titles": [
-      "Sankara's Nondualism",
-      "Not Above, But Around"
-    ]
-  },
-  {
-    "name": "Viswamitra",
-    "entity_type": "person",
-    "_article_count": 5,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.80 < 0.65)",
-    "_sample_titles": [
-      "Let Your Prema And Tyaga Be Your Ideals",
-      "Anger - The Greatest Enemy"
-    ]
-  },
-  {
     "name": "Akbar",
     "entity_type": "person",
     "_article_count": 5,
@@ -207,616 +7,6 @@
     "_sample_titles": [
       "Three Cardinal Vices",
       "Ishwara grants Aishwaryam"
-    ]
-  },
-  {
-    "name": "Mohammed",
-    "entity_type": "person",
-    "_article_count": 5,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Name, The Never-Failing Fountain",
-      "Man and God"
-    ]
-  },
-  {
-    "name": "Upanishadhs",
-    "entity_type": "text",
-    "_article_count": 5,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "The faith and the ideal",
-      "Jeeva and Dheva"
-    ]
-  },
-  {
-    "name": "Uttar Pradesh",
-    "entity_type": "place",
-    "_article_count": 5,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "Light the Antahkarana"
-    ]
-  },
-  {
-    "name": "Telugu Poem",
-    "entity_type": "text",
-    "_article_count": 5,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Sacrifice And Selflessness Are The Hallmarks Of True Love",
-      "Do Not Allow Politics to Enter Villages"
-    ]
-  },
-  {
-    "name": "Sanskrit",
-    "entity_type": "text",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Be Prepared For A Life Of Sacrifice",
-      "Spirituality Is The Basis Of All Types Of Knowledge"
-    ]
-  },
-  {
-    "name": "Maharashtra",
-    "entity_type": "place",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.56 < 0.65)",
-    "_sample_titles": [
-      "Sharanagati",
-      "The Life Of Samartha Ramdas"
-    ]
-  },
-  {
-    "name": "Vidya Vahini",
-    "entity_type": "text",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.55 < 0.65)",
-    "_sample_titles": [
-      "Remedies For Inner Sadhana",
-      "Selfless Service \u2013 The Purpose of Vidya"
-    ]
-  },
-  {
-    "name": "Kashmir",
-    "entity_type": "place",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "Isa",
-      "Teaching in ancient India"
-    ]
-  },
-  {
-    "name": "Kodaikanal",
-    "entity_type": "place",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Everlasting Relationship",
-      "Realise The Oneness Of The Atmic Principle"
-    ]
-  },
-  {
-    "name": "Puri",
-    "entity_type": "place",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Be Full of Prema",
-      "Step By Step"
-    ]
-  },
-  {
-    "name": "Karnataka",
-    "entity_type": "place",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "Light the Lamp of Morality in Your Hearts",
-      "Tat-tvam"
-    ]
-  },
-  {
-    "name": "Kedarnath",
-    "entity_type": "place",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Attachment to the Self Is True Love",
-      "Step By Step"
-    ]
-  },
-  {
-    "name": "Gokula",
-    "entity_type": "place",
-    "_article_count": 4,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Krishna thrishna",
-      "Krishna - An Infinite Ocean\u2026 Gopikas - Merging Tributaries"
-    ]
-  },
-  {
-    "name": "Kubera",
-    "entity_type": "person",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Happy Ayodhya",
-      "What the Avatars Mean"
-    ]
-  },
-  {
-    "name": "Delhi",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "The Basic Error",
-      "The Wise and the Envious"
-    ]
-  },
-  {
-    "name": "Indraprastha",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Pandavas\u2019 Grief",
-      "The Birth of a Bhagavata"
-    ]
-  },
-  {
-    "name": "Kathopanishad",
-    "entity_type": "text",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.69 < 0.65)",
-    "_sample_titles": [
-      "Mastery of the Senses",
-      "Honour The Plighted Word"
-    ]
-  },
-  {
-    "name": "Thukaram",
-    "entity_type": "person",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "How old are you really?",
-      "Sathya Sai Gita (iii)"
-    ]
-  },
-  {
-    "name": "Gokul",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Serpent Kaliya",
-      "Jumping To Conclusions"
-    ]
-  },
-  {
-    "name": "Tulasi",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Gurus Not Teachers",
-      "Rukmini weighing Krishna"
-    ]
-  },
-  {
-    "name": "Naradha",
-    "entity_type": "person",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Discrimination and detachment",
-      "The dying lament the dead"
-    ]
-  },
-  {
-    "name": "Bhadrapada",
-    "entity_type": "festival",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Onam: The Message Of Sacrifice",
-      "Significance of Ganesha Worship"
-    ]
-  },
-  {
-    "name": "Nuzvid",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Chapter 5",
-      "Training"
-    ]
-  },
-  {
-    "name": "Prasanthi Council",
-    "entity_type": "org_term",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "SSIO Guidelines \u2014 Chapter 5: Unity Within the SSIO",
-      "SSIO Guidelines \u2014 Chapter 6: Sathya Sai Centres \u2013 Programmes and Practices (Part 1)"
-    ]
-  },
-  {
-    "name": "Nandanar",
-    "entity_type": "person",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "Sathya Sai Geeta (III)",
-      "Chapter XX"
-    ]
-  },
-  {
-    "name": "Raamayana",
-    "entity_type": "text",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
-    "_sample_titles": [
-      "Power of the Divine Name",
-      "Passion Is Disease \u2013 Renunciation Is Yoga"
-    ]
-  },
-  {
-    "name": "Germany",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.48 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "Spiritual Significance Of Ganesha Worship"
-    ]
-  },
-  {
-    "name": "Gunasa",
-    "entity_type": "concept",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.52 < 0.65)",
-    "_sample_titles": [
-      "Paramashanti is the Basis to Achieve Mahattattvam",
-      "Developing Virtues is Prime Objective of a Meditator"
-    ]
-  },
-  {
-    "name": "Bharatha matha",
-    "entity_type": "concept",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Three types of road",
-      "Aspire for the nobler role"
-    ]
-  },
-  {
-    "name": "Thirupathi",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "Faith is the foundation",
-      "The Godward march"
-    ]
-  },
-  {
-    "name": "Hampi",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Reminiscence of the Divine",
-      "The Life Of Samartha Ramdas"
-    ]
-  },
-  {
-    "name": "Geetha Vahini",
-    "entity_type": "text",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "The Concept Of Spiritual Education",
-      "Nara and Narayana"
-    ]
-  },
-  {
-    "name": "America",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.51 < 0.65)",
-    "_sample_titles": [
-      "The Toughest Armour",
-      "Love Is God; Live In Love"
-    ]
-  },
-  {
-    "name": "Dakshineshwar",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Horn and Tusk",
-      "Sneha"
-    ]
-  },
-  {
-    "name": "Newton",
-    "entity_type": "person",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.55 < 0.65)",
-    "_sample_titles": [
-      "Reduce Your Desires",
-      "Eternal Truths"
-    ]
-  },
-  {
-    "name": "Pareekshith",
-    "entity_type": "person",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Nama and Nami",
-      "Kare kankanam"
-    ]
-  },
-  {
-    "name": "Kurma",
-    "entity_type": "concept",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "The Bhagavata Path",
-      "The Pancha Kosas"
-    ]
-  },
-  {
-    "name": "Panchendriyas",
-    "entity_type": "concept",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Only Love For God Is True Love",
-      "The Pancha Kosas"
-    ]
-  },
-  {
-    "name": "Kaveri",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "The Saints of Tamil Nadu",
-      "You Are All I"
-    ]
-  },
-  {
-    "name": "Japan",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.48 < 0.65)",
-    "_sample_titles": [
-      "The Gospel of Work, Love and Sacrifice",
-      "Spiritual Significance Of Ganesha Worship"
-    ]
-  },
-  {
-    "name": "Brindhavan",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
-    "_sample_titles": [
-      "Krishna thrishna",
-      "The Rain Clouds"
-    ]
-  },
-  {
-    "name": "thamas",
-    "entity_type": "concept",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.00 < 0.65)",
-    "_sample_titles": [
-      "Near And Far",
-      "Limits And Progress"
-    ]
-  },
-  {
-    "name": "Lions Club",
-    "entity_type": "org_term",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Service and Sadhana",
-      "Whom To Serve?"
-    ]
-  },
-  {
-    "name": "Mysore",
-    "entity_type": "place",
-    "_article_count": 3,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Start Satsangam",
-      "Start Good Associations"
-    ]
-  },
-  {
-    "name": "Siddhis",
-    "entity_type": "concept",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Tapas",
-      "Remembering the Lord\u2019s Name and Dhyanam Alone Sever All Bondage"
-    ]
-  },
-  {
-    "name": "Winston Churchill",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "New Horizons For The Sai Institute",
-      "Love is the Essence of Divine Life"
-    ]
-  },
-  {
-    "name": "Punjab",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
-    "_sample_titles": [
-      "Valour of the Spirit",
-      "Pandavas\u2019 Grief"
-    ]
-  },
-  {
-    "name": "Bhisma",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.80 < 0.65)",
-    "_sample_titles": [
-      "Pandavas\u2019 Grief",
-      "Asuya and Dwesha: The Deadly Vices"
-    ]
-  },
-  {
-    "name": "Gauri",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "Dedicate Your Lives To The Divine",
-      "Give Place Only To God In Your Heart"
-    ]
-  },
-  {
-    "name": "Granth Saheb",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Bhajans and Bliss",
-      "Holiness \u2013 The Root Cause Of Success"
-    ]
-  },
-  {
-    "name": "Apa",
-    "entity_type": "concept",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "From Annam To Ananda",
-      "Three In One"
-    ]
-  },
-  {
-    "name": "SriRamaNavami",
-    "entity_type": "festival",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
-    "_sample_titles": [
-      "Observance of Silence Develops Spiritual Energy",
-      "Ever Remember the Name of Rama"
-    ]
-  },
-  {
-    "name": "Mathanga",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "Prahladas for the Present Age",
-      "One-fourth And Three-fourths"
-    ]
-  },
-  {
-    "name": "Balakrishna",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "Satyam, Sivam, Sundaram",
-      "Truth, Auspiciousness, Beauty"
-    ]
-  },
-  {
-    "name": "Udaipur",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
-    "_sample_titles": [
-      "Satyam, Sivam, Sundaram",
-      "Truth, Auspiciousness, Beauty"
-    ]
-  },
-  {
-    "name": "Zend Avesta",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "Develop Devotion To Dharma",
-      "Holiness \u2013 The Root Cause Of Success"
-    ]
-  },
-  {
-    "name": "Sah",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Gurus Not Teachers",
-      "The Labyrinth"
-    ]
-  },
-  {
-    "name": "Brindavana",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.73 < 0.65)",
-    "_sample_titles": [
-      "Protection Of Devotees",
-      "The Screen Within"
-    ]
-  },
-  {
-    "name": "Bhaagavatam",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.71 < 0.65)",
-    "_sample_titles": [
-      "Three Cardinal Vices",
-      "Nabhaka, Naabhaka and Ambarisha"
-    ]
-  },
-  {
-    "name": "suprabhatam",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "The Super-Emperor",
-      "Eyelids And The Pupil"
-    ]
-  },
-  {
-    "name": "analam",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "The Teachers Task",
-      "No One Can Separate a Real Devotee from His Lord"
     ]
   },
   {
@@ -830,123 +20,33 @@
     ]
   },
   {
-    "name": "Kartika",
-    "entity_type": "concept",
+    "name": "Amarnath",
+    "entity_type": "place",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
     "_sample_titles": [
-      "Onam: The Message Of Sacrifice",
-      "Goodness Is Godliness"
+      "Sai Youth Should Tread The Ideal Path",
+      "Manifesting Divinity In Lingodbhavam"
     ]
   },
   {
-    "name": "Shiva temple",
+    "name": "America",
     "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.66 < 0.65)",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.51 < 0.65)",
     "_sample_titles": [
-      "Install God\u2019s Feet in Your Heart",
-      "Selfishness Is The Cause Of Man\u2019s Restlessness"
+      "The Toughest Armour",
+      "Love Is God; Live In Love"
     ]
   },
   {
-    "name": "Lal Bagh",
-    "entity_type": "place",
+    "name": "analam",
+    "entity_type": "text",
     "_article_count": 2,
     "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
     "_sample_titles": [
-      "Be Queens!",
-      "Be Maharanis"
-    ]
-  },
-  {
-    "name": "Joseph",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "Love- The Key To Human Unity",
-      "Realise God Through Love"
-    ]
-  },
-  {
-    "name": "Chebrolu",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
-    "_sample_titles": [
-      "Chapter 5",
-      "Siksana"
-    ]
-  },
-  {
-    "name": "burrakatha",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "Chapter 5",
-      "It Will Not Last"
-    ]
-  },
-  {
-    "name": "Churchill",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Tyaga Is Yoga",
-      "Render Unto The People What Is Theirs"
-    ]
-  },
-  {
-    "name": "Mundaka Upanishad",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.71 < 0.65)",
-    "_sample_titles": [
-      "Detachment Is Possible For One and All",
-      "Brahm\u0101nubhava Upani\u1e63at"
-    ]
-  },
-  {
-    "name": "Pakistan",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.49 < 0.65)",
-    "_sample_titles": [
-      "Where and Why?",
-      "The Fruit and the Tree"
-    ]
-  },
-  {
-    "name": "Naga",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Sai As Hridayasthayi",
-      "The Pancha Kosas"
-    ]
-  },
-  {
-    "name": "Rameshwaram",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Sai As Hridayasthayi",
-      "God is the indweller - Eknath's story"
-    ]
-  },
-  {
-    "name": "Shaastras",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Character Is The Goal Of Education",
-      "The Primal Purpose"
+      "The Teachers Task",
+      "No One Can Separate a Real Devotee from His Lord"
     ]
   },
   {
@@ -960,43 +60,23 @@
     ]
   },
   {
-    "name": "Krutayuga",
+    "name": "Andhra Pradesh",
+    "entity_type": "place",
+    "_article_count": 14,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.56 < 0.65)",
+    "_sample_titles": [
+      "Inauguration of the Prasanthi Nilayam Township",
+      "Love Must Win"
+    ]
+  },
+  {
+    "name": "Apa",
     "entity_type": "concept",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.74 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
     "_sample_titles": [
-      "Revere Your Mother And Father As God",
-      "Divine Incarnations Help Man Change Themselves For Better"
-    ]
-  },
-  {
-    "name": "Lakshamana",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.78 < 0.65)",
-    "_sample_titles": [
-      "Sanctify Your Life By Chanting Gayatri Mantra",
-      "Raama the ideal"
-    ]
-  },
-  {
-    "name": "SSEHV",
-    "entity_type": "org_term",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.40 < 0.65)",
-    "_sample_titles": [
-      "SSIO Guidelines \u2014 Chapter 9: Sai Education Initiatives in the Community",
-      "SSIO Guidelines \u2014 Chapter 8: The International Sathya Sai Young Adults"
-    ]
-  },
-  {
-    "name": "Darwin",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "The Teachers and the Students",
-      "The Spark And The Source"
+      "From Annam To Ananda",
+      "Three In One"
     ]
   },
   {
@@ -1010,423 +90,23 @@
     ]
   },
   {
-    "name": "Kosala",
+    "name": "Badrinath",
     "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Glory of Rama Tattvam",
-      "No Progeny From His Loins"
-    ]
-  },
-  {
-    "name": "Isavasya Upanishad",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.73 < 0.65)",
-    "_sample_titles": [
-      "Transform Inertia Into Austerity",
-      "Tamo Gunam, Tapo Gunam"
-    ]
-  },
-  {
-    "name": "Sath-karma",
-    "entity_type": "concept",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Jeeva and Dheva",
-      "Pilgrimage to the throne"
-    ]
-  },
-  {
-    "name": "Chaitra",
-    "entity_type": "festival",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Strive for World Peace and Prosperity",
-      "Happiness Is Holiness"
-    ]
-  },
-  {
-    "name": "Papa Bheeti",
-    "entity_type": "concept",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.79 < 0.65)",
-    "_sample_titles": [
-      "Three In One",
-      "Develop Friendship with God"
-    ]
-  },
-  {
-    "name": "Bhumi",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "The lamp at the door",
-      "Significance Of Yajnas"
-    ]
-  },
-  {
-    "name": "USA",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.45 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "Swami on Abraham Lincoln"
-    ]
-  },
-  {
-    "name": "Himachal Pradesh",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "Himachal"
-    ]
-  },
-  {
-    "name": "Kadapa",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "Respect Mother\u2013First And Foremost"
-    ]
-  },
-  {
-    "name": "Indonesia",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.49 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "The Gospel of Work, Love and Sacrifice"
-    ]
-  },
-  {
-    "name": "Iraq",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.44 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "Develop Educare and Be United"
-    ]
-  },
-  {
-    "name": "Kurnool",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
-    "_sample_titles": [
-      "Disease And Divinity",
-      "Life's balance sheet"
-    ]
-  },
-  {
-    "name": "Vajapeyam Venkateshwara Avadhani",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "World Prosperity",
-      "Loka Kalyanam"
-    ]
-  },
-  {
-    "name": "Sringeri",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Be Full of Prema",
-      "With The Concrete To The Abstract"
-    ]
-  },
-  {
-    "name": "Chidambaram",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Be Full of Prema",
-      "With The Concrete To The Abstract"
-    ]
-  },
-  {
-    "name": "Krita",
-    "entity_type": "concept",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Doubts and Questions",
-      "The New Year Dress"
-    ]
-  },
-  {
-    "name": "Treta",
-    "entity_type": "concept",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Doubts and Questions",
-      "The New Year Dress"
-    ]
-  },
-  {
-    "name": "Garga Rishi",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.76 < 0.65)",
-    "_sample_titles": [
-      "The immoral Bhaktas",
-      "The Immortal Bhaktas"
-    ]
-  },
-  {
-    "name": "Patel",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "Hospitals Are Meant To Serve The Poor And Needy",
-      "The Shirdi Sai Saga"
-    ]
-  },
-  {
-    "name": "Yashodha",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
-    "_sample_titles": [
-      "Kith and kin of all",
-      "Genuine kinsmen"
-    ]
-  },
-  {
-    "name": "Dhuryodhana",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
-    "_sample_titles": [
-      "Why this ashaanthi?",
-      "Amrithasya Puthraah"
-    ]
-  },
-  {
-    "name": "Sathya Sai Speaks",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
-    "_sample_titles": [
-      "SSIO Guidelines \u2014 Chapter 8: The International Sathya Sai Young Adults",
-      "SSIO Guidelines \u2014 Chapter 7: Types of Meetings and Welcoming Newcomers"
-    ]
-  },
-  {
-    "name": "Kanva's ashram",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Spiritual Pancha Sheela",
-      "Spiritual Pancha-sila"
-    ]
-  },
-  {
-    "name": "Sri Sathya Sai World Foundation",
-    "entity_type": "org_term",
-    "_article_count": 2,
+    "_article_count": 7,
     "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
     "_sample_titles": [
-      "SSIO Guidelines \u2014 Chapter 10: Legal, Administration, and Trust Matters",
-      "SSIO Guidelines \u2014 Chapter 4: Structure of the Sathya Sai International Organisation"
+      "Resolve",
+      "Sarvatah Panipadam"
     ]
   },
   {
-    "name": "Whitefield",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "The Prison Walls",
-      "Tonic For Youth"
-    ]
-  },
-  {
-    "name": "Hrishikesa",
+    "name": "Balakrishna",
     "entity_type": "text",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.55 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
     "_sample_titles": [
-      "The Five D's",
-      "Krishna's Prema Tathwa"
-    ]
-  },
-  {
-    "name": "Bhadhrachalam",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "The Godward march",
-      "Stagnation in the same class"
-    ]
-  },
-  {
-    "name": "Markandeya Sanskrit College",
-    "entity_type": "org_term",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Sathya Sai Gita (ii)",
-      "Sathya Sai Geeta (II)"
-    ]
-  },
-  {
-    "name": "Nataraja",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
-    "_sample_titles": [
-      "Significance of Ganesha Worship",
-      "The Five Hoods"
-    ]
-  },
-  {
-    "name": "Takshashila",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "Excellence of Ancient Indian System of Education",
-      "True Education Liberates"
-    ]
-  },
-  {
-    "name": "Sharada",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Sathya Sai Geeta (II)",
-      "Give Up Dehabhimanam, Develop Atmabhimanam"
-    ]
-  },
-  {
-    "name": "Amarnath",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
-    "_sample_titles": [
-      "Sai Youth Should Tread The Ideal Path",
-      "Manifesting Divinity In Lingodbhavam"
-    ]
-  },
-  {
-    "name": "brihadaranyakopanishat",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.72 < 0.65)",
-    "_sample_titles": [
-      "Brahmavidya and Women",
-      "All Are Entitled to the Heritage of Brahmavidya"
-    ]
-  },
-  {
-    "name": "Yagnyavalkya",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Brahmavidya and Women",
-      "Consciousness, Not Matter, Is The Primal Cause Of The Cosmos"
-    ]
-  },
-  {
-    "name": "Taitriya Upanishad",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.69 < 0.65)",
-    "_sample_titles": [
-      "Vital Role of the Buddhi",
-      "The Significance of Vinayaka Worship"
-    ]
-  },
-  {
-    "name": "Malaysia",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.47 < 0.65)",
-    "_sample_titles": [
-      "The Gospel of Work, Love and Sacrifice",
-      "Love Is My Only Wealth"
-    ]
-  },
-  {
-    "name": "Mithilapura",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
-    "_sample_titles": [
-      "Cultivate Discipline and Love",
-      "Detachment Is Possible For One and All"
-    ]
-  },
-  {
-    "name": "Prabhava",
-    "entity_type": "festival",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
-    "_sample_titles": [
-      "Make Your Heart the Temple of God",
-      "Human Birth Is To Experience Atmic Bliss"
-    ]
-  },
-  {
-    "name": "Bhagawatham",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Why the Avatar Comes",
-      "The Unique Treasures Of Mankind"
-    ]
-  },
-  {
-    "name": "Telugu",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.51 < 0.65)",
-    "_sample_titles": [
-      "Soldiers and Generals",
-      "The Inner Prompting"
-    ]
-  },
-  {
-    "name": "Bharatam",
-    "entity_type": "text",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
-    "_sample_titles": [
-      "Inner Meaning for Every Story In Puranas",
-      "Chapter 3"
-    ]
-  },
-  {
-    "name": "Jagannath",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
-    "_sample_titles": [
-      "Wealth Or Grace?",
-      "What Great Mothers Mean To The Nation"
+      "Satyam, Sivam, Sundaram",
+      "Truth, Auspiciousness, Beauty"
     ]
   },
   {
@@ -1440,103 +120,363 @@
     ]
   },
   {
-    "name": "Muhammad",
-    "entity_type": "person",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
-    "_sample_titles": [
-      "The way of Jesus",
-      "Unity and Purity"
-    ]
-  },
-  {
-    "name": "Narmada",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "Happiness Is Union With God",
-      "Swami on Emperor Bali and Vamana"
-    ]
-  },
-  {
-    "name": "Jnana Vahini",
+    "name": "Bhaagavatam",
     "entity_type": "text",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.71 < 0.65)",
     "_sample_titles": [
-      "Mind Alone Causes Bondage and Liberation",
-      "The Triune of Bhakti, Jnana and Vairagya Leads to Liberation"
+      "Three Cardinal Vices",
+      "Nabhaka, Naabhaka and Ambarisha"
     ]
   },
   {
-    "name": "Ooty",
-    "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
-    "_sample_titles": [
-      "The Devotee\u2019s Ordeals and God\u2019s Grace",
-      "Who Is The Greatest?"
-    ]
-  },
-  {
-    "name": "Rayalaseema",
+    "name": "Bhadhrachalam",
     "entity_type": "place",
     "_article_count": 2,
     "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
     "_sample_titles": [
-      "Overcome Jealousy With Love",
-      "The tree of life"
+      "The Godward march",
+      "Stagnation in the same class"
     ]
   },
   {
-    "name": "Yelamanchili",
-    "entity_type": "place",
+    "name": "Bhadrapada",
+    "entity_type": "festival",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Onam: The Message Of Sacrifice",
+      "Significance of Ganesha Worship"
+    ]
+  },
+  {
+    "name": "Bhagavata Vahini",
+    "entity_type": "text",
+    "_article_count": 7,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Serpent Kaliya",
+      "Child Parikshit and the Prophecy"
+    ]
+  },
+  {
+    "name": "Bhagawatham",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Why the Avatar Comes",
+      "The Unique Treasures Of Mankind"
+    ]
+  },
+  {
+    "name": "Bharatam",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Inner Meaning for Every Story In Puranas",
+      "Chapter 3"
+    ]
+  },
+  {
+    "name": "Bharatha matha",
+    "entity_type": "concept",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Three types of road",
+      "Aspire for the nobler role"
+    ]
+  },
+  {
+    "name": "Bhisma",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.80 < 0.65)",
+    "_sample_titles": [
+      "Pandavas\u2019 Grief",
+      "Asuya and Dwesha: The Deadly Vices"
+    ]
+  },
+  {
+    "name": "Bhumi",
+    "entity_type": "person",
     "_article_count": 2,
     "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
     "_sample_titles": [
-      "Maanasa Sarovar",
-      "Manasa Sarovar"
+      "The lamp at the door",
+      "Significance Of Yajnas"
     ]
   },
   {
-    "name": "Vedic",
+    "name": "Bible",
+    "entity_type": "text",
+    "_article_count": 11,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.46 < 0.65)",
+    "_sample_titles": [
+      "Bhajans and Bliss",
+      "Develop Devotion To Dharma"
+    ]
+  },
+  {
+    "name": "Bombay",
+    "entity_type": "place",
+    "_article_count": 9,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "The Pompous Person",
+      "From Creation To Creator"
+    ]
+  },
+  {
+    "name": "brihadaranyakopanishat",
     "entity_type": "text",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.72 < 0.65)",
     "_sample_titles": [
-      "Foster Firm Faith in God",
-      "Cells of the Body of God"
+      "Brahmavidya and Women",
+      "All Are Entitled to the Heritage of Brahmavidya"
     ]
   },
   {
-    "name": "Kakinada",
+    "name": "Brindavana",
     "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.73 < 0.65)",
+    "_sample_titles": [
+      "Protection Of Devotees",
+      "The Screen Within"
+    ]
+  },
+  {
+    "name": "Brindhavan",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
+    "_sample_titles": [
+      "Krishna thrishna",
+      "The Rain Clouds"
+    ]
+  },
+  {
+    "name": "burrakatha",
+    "entity_type": "text",
     "_article_count": 2,
     "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
     "_sample_titles": [
-      "This joy and that",
-      "Types of road to God"
+      "Chapter 5",
+      "It Will Not Last"
     ]
   },
   {
-    "name": "Sunandamma",
-    "entity_type": "person",
+    "name": "Chaitra",
+    "entity_type": "festival",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
     "_sample_titles": [
-      "Orphan But Protected",
-      "Building Or Begging?"
+      "Strive for World Peace and Prosperity",
+      "Happiness Is Holiness"
     ]
   },
   {
-    "name": "Kamarpukur",
+    "name": "Chebrolu",
     "entity_type": "place",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.70 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
     "_sample_titles": [
-      "Sneha",
-      "Sneha, The True Friendship"
+      "Chapter 5",
+      "Siksana"
+    ]
+  },
+  {
+    "name": "Chidambaram",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Be Full of Prema",
+      "With The Concrete To The Abstract"
+    ]
+  },
+  {
+    "name": "Churchill",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Tyaga Is Yoga",
+      "Render Unto The People What Is Theirs"
+    ]
+  },
+  {
+    "name": "Dakshineshwar",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Horn and Tusk",
+      "Sneha"
+    ]
+  },
+  {
+    "name": "Damodara",
+    "entity_type": "text",
+    "_article_count": 6,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
+    "_sample_titles": [
+      "Ananya-bhakti",
+      "Develop Friendship with God"
+    ]
+  },
+  {
+    "name": "Darwin",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "The Teachers and the Students",
+      "The Spark And The Source"
+    ]
+  },
+  {
+    "name": "Delhi",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "The Basic Error",
+      "The Wise and the Envious"
+    ]
+  },
+  {
+    "name": "Dhuryodhana",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
+    "_sample_titles": [
+      "Why this ashaanthi?",
+      "Amrithasya Puthraah"
+    ]
+  },
+  {
+    "name": "Dhyana Vahini",
+    "entity_type": "text",
+    "_article_count": 7,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.52 < 0.65)",
+    "_sample_titles": [
+      "The Object of Meditation is the Elimination of Vasanas (Tendencies)",
+      "Developing Virtues is Prime Objective of a Meditator"
+    ]
+  },
+  {
+    "name": "Druva",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.00 < 0.65)",
+    "_sample_titles": [
+      "Objective Desires, The Poison",
+      "The Click of the Camera"
+    ]
+  },
+  {
+    "name": "Garga Rishi",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.76 < 0.65)",
+    "_sample_titles": [
+      "The immoral Bhaktas",
+      "The Immortal Bhaktas"
+    ]
+  },
+  {
+    "name": "Gauri",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "Dedicate Your Lives To The Divine",
+      "Give Place Only To God In Your Heart"
+    ]
+  },
+  {
+    "name": "Geetha Vahini",
+    "entity_type": "text",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
+    "_sample_titles": [
+      "The Concept Of Spiritual Education",
+      "Nara and Narayana"
+    ]
+  },
+  {
+    "name": "Germany",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.48 < 0.65)",
+    "_sample_titles": [
+      "Disease And Divinity",
+      "Spiritual Significance Of Ganesha Worship"
+    ]
+  },
+  {
+    "name": "Gokul",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Serpent Kaliya",
+      "Jumping To Conclusions"
+    ]
+  },
+  {
+    "name": "Gokula",
+    "entity_type": "place",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Krishna thrishna",
+      "Krishna - An Infinite Ocean\u2026 Gopikas - Merging Tributaries"
+    ]
+  },
+  {
+    "name": "Granth Saheb",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Bhajans and Bliss",
+      "Holiness \u2013 The Root Cause Of Success"
+    ]
+  },
+  {
+    "name": "Gunasa",
+    "entity_type": "concept",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.52 < 0.65)",
+    "_sample_titles": [
+      "Paramashanti is the Basis to Achieve Mahattattvam",
+      "Developing Virtues is Prime Objective of a Meditator"
+    ]
+  },
+  {
+    "name": "Hampi",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Reminiscence of the Divine",
+      "The Life Of Samartha Ramdas"
+    ]
+  },
+  {
+    "name": "Haridwar",
+    "entity_type": "place",
+    "_article_count": 8,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Transmute Every Minute",
+      "The Profound Pastime"
     ]
   },
   {
@@ -1550,23 +490,123 @@
     ]
   },
   {
-    "name": "Tata Institute of Science",
+    "name": "Hasthinapura",
     "entity_type": "place",
-    "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
+    "_article_count": 16,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.73 < 0.65)",
     "_sample_titles": [
-      "Do Bhajans With Faith And Fervour",
-      "The Insentient And The Supreme Consciousness"
+      "Dhritarashtra Transformed",
+      "The Indweller Is God Himself"
     ]
   },
   {
-    "name": "Kolkata",
+    "name": "Himachal Pradesh",
     "entity_type": "place",
     "_article_count": 2,
-    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.00 < 0.65)",
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
     "_sample_titles": [
-      "Mother is Your First God",
-      "Ramakrishna Paramahamsa on practice"
+      "Disease And Divinity",
+      "Himachal"
+    ]
+  },
+  {
+    "name": "Hrishikesa",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.55 < 0.65)",
+    "_sample_titles": [
+      "The Five D's",
+      "Krishna's Prema Tathwa"
+    ]
+  },
+  {
+    "name": "Hyderabad",
+    "entity_type": "place",
+    "_article_count": 6,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
+    "_sample_titles": [
+      "Chapter 5",
+      "Chitta Shuddhi Yoga"
+    ]
+  },
+  {
+    "name": "Indonesia",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.49 < 0.65)",
+    "_sample_titles": [
+      "Disease And Divinity",
+      "The Gospel of Work, Love and Sacrifice"
+    ]
+  },
+  {
+    "name": "Indraprastha",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Pandavas\u2019 Grief",
+      "The Birth of a Bhagavata"
+    ]
+  },
+  {
+    "name": "Iraq",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.44 < 0.65)",
+    "_sample_titles": [
+      "Disease And Divinity",
+      "Develop Educare and Be United"
+    ]
+  },
+  {
+    "name": "Isavasya Upanishad",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.73 < 0.65)",
+    "_sample_titles": [
+      "Transform Inertia Into Austerity",
+      "Tamo Gunam, Tapo Gunam"
+    ]
+  },
+  {
+    "name": "Itihasas",
+    "entity_type": "text",
+    "_article_count": 6,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Know Who You Are. Do Not Ask Another Who He Is",
+      "Faith Leads to Experience of Divinity"
+    ]
+  },
+  {
+    "name": "Jagannath",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Wealth Or Grace?",
+      "What Great Mothers Mean To The Nation"
+    ]
+  },
+  {
+    "name": "Japan",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.48 < 0.65)",
+    "_sample_titles": [
+      "The Gospel of Work, Love and Sacrifice",
+      "Spiritual Significance Of Ganesha Worship"
+    ]
+  },
+  {
+    "name": "Jnana Vahini",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
+    "_sample_titles": [
+      "Mind Alone Causes Bondage and Liberation",
+      "The Triune of Bhakti, Jnana and Vairagya Leads to Liberation"
     ]
   },
   {
@@ -1580,13 +620,973 @@
     ]
   },
   {
-    "name": "Druva",
+    "name": "Joseph",
     "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "Love- The Key To Human Unity",
+      "Realise God Through Love"
+    ]
+  },
+  {
+    "name": "Kadapa",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Disease And Divinity",
+      "Respect Mother\u2013First And Foremost"
+    ]
+  },
+  {
+    "name": "Kakinada",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "This joy and that",
+      "Types of road to God"
+    ]
+  },
+  {
+    "name": "Kamarpukur",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.70 < 0.65)",
+    "_sample_titles": [
+      "Sneha",
+      "Sneha, The True Friendship"
+    ]
+  },
+  {
+    "name": "Kanva's ashram",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Spiritual Pancha Sheela",
+      "Spiritual Pancha-sila"
+    ]
+  },
+  {
+    "name": "Karnataka",
+    "entity_type": "place",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "Light the Lamp of Morality in Your Hearts",
+      "Tat-tvam"
+    ]
+  },
+  {
+    "name": "Kartika",
+    "entity_type": "concept",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Onam: The Message Of Sacrifice",
+      "Goodness Is Godliness"
+    ]
+  },
+  {
+    "name": "Kashi",
+    "entity_type": "place",
+    "_article_count": 33,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Nama-smarana Gives Peace And Bliss",
+      "Gurus Not Teachers"
+    ]
+  },
+  {
+    "name": "Kashmir",
+    "entity_type": "place",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
+    "_sample_titles": [
+      "Isa",
+      "Teaching in ancient India"
+    ]
+  },
+  {
+    "name": "Kathopanishad",
+    "entity_type": "text",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.69 < 0.65)",
+    "_sample_titles": [
+      "Mastery of the Senses",
+      "Honour The Plighted Word"
+    ]
+  },
+  {
+    "name": "Kaveri",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "The Saints of Tamil Nadu",
+      "You Are All I"
+    ]
+  },
+  {
+    "name": "Kedarnath",
+    "entity_type": "place",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Attachment to the Self Is True Love",
+      "Step By Step"
+    ]
+  },
+  {
+    "name": "Kodaikanal",
+    "entity_type": "place",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Everlasting Relationship",
+      "Realise The Oneness Of The Atmic Principle"
+    ]
+  },
+  {
+    "name": "Kolkata",
+    "entity_type": "place",
     "_article_count": 2,
     "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.00 < 0.65)",
     "_sample_titles": [
-      "Objective Desires, The Poison",
-      "The Click of the Camera"
+      "Mother is Your First God",
+      "Ramakrishna Paramahamsa on practice"
+    ]
+  },
+  {
+    "name": "Kosala",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Glory of Rama Tattvam",
+      "No Progeny From His Loins"
+    ]
+  },
+  {
+    "name": "Krita",
+    "entity_type": "concept",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Doubts and Questions",
+      "The New Year Dress"
+    ]
+  },
+  {
+    "name": "Krutayuga",
+    "entity_type": "concept",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.74 < 0.65)",
+    "_sample_titles": [
+      "Revere Your Mother And Father As God",
+      "Divine Incarnations Help Man Change Themselves For Better"
+    ]
+  },
+  {
+    "name": "Kubera",
+    "entity_type": "person",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Happy Ayodhya",
+      "What the Avatars Mean"
+    ]
+  },
+  {
+    "name": "Kurma",
+    "entity_type": "concept",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "The Bhagavata Path",
+      "The Pancha Kosas"
+    ]
+  },
+  {
+    "name": "Kurnool",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
+    "_sample_titles": [
+      "Disease And Divinity",
+      "Life's balance sheet"
+    ]
+  },
+  {
+    "name": "Lakshamana",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.78 < 0.65)",
+    "_sample_titles": [
+      "Sanctify Your Life By Chanting Gayatri Mantra",
+      "Raama the ideal"
+    ]
+  },
+  {
+    "name": "Lal Bagh",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Be Queens!",
+      "Be Maharanis"
+    ]
+  },
+  {
+    "name": "Lions Club",
+    "entity_type": "org_term",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Service and Sadhana",
+      "Whom To Serve?"
+    ]
+  },
+  {
+    "name": "Madras",
+    "entity_type": "place",
+    "_article_count": 18,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "All Parties Should Unite To Make Bhaarat Strong",
+      "Human Values in Business Management"
+    ]
+  },
+  {
+    "name": "Maharashtra",
+    "entity_type": "place",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.56 < 0.65)",
+    "_sample_titles": [
+      "Sharanagati",
+      "The Life Of Samartha Ramdas"
+    ]
+  },
+  {
+    "name": "Malaysia",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.47 < 0.65)",
+    "_sample_titles": [
+      "The Gospel of Work, Love and Sacrifice",
+      "Love Is My Only Wealth"
+    ]
+  },
+  {
+    "name": "Markandeya Sanskrit College",
+    "entity_type": "org_term",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Sathya Sai Gita (ii)",
+      "Sathya Sai Geeta (II)"
+    ]
+  },
+  {
+    "name": "Mary",
+    "entity_type": "person",
+    "_article_count": 6,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "Love- The Key To Human Unity",
+      "Realise God Through Love"
+    ]
+  },
+  {
+    "name": "Mathanga",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Prahladas for the Present Age",
+      "One-fourth And Three-fourths"
+    ]
+  },
+  {
+    "name": "Mithilapura",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Cultivate Discipline and Love",
+      "Detachment Is Possible For One and All"
+    ]
+  },
+  {
+    "name": "Mohammed",
+    "entity_type": "person",
+    "_article_count": 5,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Name, The Never-Failing Fountain",
+      "Man and God"
+    ]
+  },
+  {
+    "name": "Muhammad",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "The way of Jesus",
+      "Unity and Purity"
+    ]
+  },
+  {
+    "name": "Mundaka Upanishad",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.71 < 0.65)",
+    "_sample_titles": [
+      "Detachment Is Possible For One and All",
+      "Brahm\u0101nubhava Upani\u1e63at"
+    ]
+  },
+  {
+    "name": "Mysore",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Start Satsangam",
+      "Start Good Associations"
+    ]
+  },
+  {
+    "name": "Naga",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Sai As Hridayasthayi",
+      "The Pancha Kosas"
+    ]
+  },
+  {
+    "name": "Nakula",
+    "entity_type": "person",
+    "_article_count": 9,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Chitta Shuddhi Yoga",
+      "The path to the presence"
+    ]
+  },
+  {
+    "name": "Nandanar",
+    "entity_type": "person",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Sathya Sai Geeta (III)",
+      "Chapter XX"
+    ]
+  },
+  {
+    "name": "Naradha",
+    "entity_type": "person",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Discrimination and detachment",
+      "The dying lament the dead"
+    ]
+  },
+  {
+    "name": "Narmada",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
+    "_sample_titles": [
+      "Happiness Is Union With God",
+      "Swami on Emperor Bali and Vamana"
+    ]
+  },
+  {
+    "name": "Nataraja",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Significance of Ganesha Worship",
+      "The Five Hoods"
+    ]
+  },
+  {
+    "name": "Newton",
+    "entity_type": "person",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.55 < 0.65)",
+    "_sample_titles": [
+      "Reduce Your Desires",
+      "Eternal Truths"
+    ]
+  },
+  {
+    "name": "Nuzvid",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Chapter 5",
+      "Training"
+    ]
+  },
+  {
+    "name": "Ooty",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
+    "_sample_titles": [
+      "The Devotee\u2019s Ordeals and God\u2019s Grace",
+      "Who Is The Greatest?"
+    ]
+  },
+  {
+    "name": "Pakistan",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.49 < 0.65)",
+    "_sample_titles": [
+      "Where and Why?",
+      "The Fruit and the Tree"
+    ]
+  },
+  {
+    "name": "Panchendriyas",
+    "entity_type": "concept",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Only Love For God Is True Love",
+      "The Pancha Kosas"
+    ]
+  },
+  {
+    "name": "Papa Bheeti",
+    "entity_type": "concept",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.79 < 0.65)",
+    "_sample_titles": [
+      "Three In One",
+      "Develop Friendship with God"
+    ]
+  },
+  {
+    "name": "Pareekshith",
+    "entity_type": "person",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Nama and Nami",
+      "Kare kankanam"
+    ]
+  },
+  {
+    "name": "Patel",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Hospitals Are Meant To Serve The Poor And Needy",
+      "The Shirdi Sai Saga"
+    ]
+  },
+  {
+    "name": "Prabhava",
+    "entity_type": "festival",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
+    "_sample_titles": [
+      "Make Your Heart the Temple of God",
+      "Human Birth Is To Experience Atmic Bliss"
+    ]
+  },
+  {
+    "name": "Prasanthi Council",
+    "entity_type": "org_term",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "SSIO Guidelines \u2014 Chapter 5: Unity Within the SSIO",
+      "SSIO Guidelines \u2014 Chapter 6: Sathya Sai Centres \u2013 Programmes and Practices (Part 1)"
+    ]
+  },
+  {
+    "name": "Punjab",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
+    "_sample_titles": [
+      "Valour of the Spirit",
+      "Pandavas\u2019 Grief"
+    ]
+  },
+  {
+    "name": "Puri",
+    "entity_type": "place",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Be Full of Prema",
+      "Step By Step"
+    ]
+  },
+  {
+    "name": "Quran",
+    "entity_type": "text",
+    "_article_count": 10,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.49 < 0.65)",
+    "_sample_titles": [
+      "Bhajans and Bliss",
+      "Develop Devotion To Dharma"
+    ]
+  },
+  {
+    "name": "Raamayana",
+    "entity_type": "text",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
+    "_sample_titles": [
+      "Power of the Divine Name",
+      "Passion Is Disease \u2013 Renunciation Is Yoga"
+    ]
+  },
+  {
+    "name": "Rameshwaram",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Sai As Hridayasthayi",
+      "God is the indweller - Eknath's story"
+    ]
+  },
+  {
+    "name": "Rayalaseema",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Overcome Jealousy With Love",
+      "The tree of life"
+    ]
+  },
+  {
+    "name": "Rishikesh",
+    "entity_type": "place",
+    "_article_count": 7,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "The Profound Pastime",
+      "Dharma Never Declines. It Is The Practice Of Dharma That Declines"
+    ]
+  },
+  {
+    "name": "Sah",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Gurus Not Teachers",
+      "The Labyrinth"
+    ]
+  },
+  {
+    "name": "Sanskrit",
+    "entity_type": "text",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Be Prepared For A Life Of Sacrifice",
+      "Spirituality Is The Basis Of All Types Of Knowledge"
+    ]
+  },
+  {
+    "name": "Sastras",
+    "entity_type": "text",
+    "_article_count": 5,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
+    "_sample_titles": [
+      "Sankara's Nondualism",
+      "Not Above, But Around"
+    ]
+  },
+  {
+    "name": "Sath-karma",
+    "entity_type": "concept",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Jeeva and Dheva",
+      "Pilgrimage to the throne"
+    ]
+  },
+  {
+    "name": "Sathya Sai Speaks",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
+    "_sample_titles": [
+      "SSIO Guidelines \u2014 Chapter 8: The International Sathya Sai Young Adults",
+      "SSIO Guidelines \u2014 Chapter 7: Types of Meetings and Welcoming Newcomers"
+    ]
+  },
+  {
+    "name": "Shaastras",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.61 < 0.65)",
+    "_sample_titles": [
+      "Character Is The Goal Of Education",
+      "The Primal Purpose"
+    ]
+  },
+  {
+    "name": "Sharada",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Sathya Sai Geeta (II)",
+      "Give Up Dehabhimanam, Develop Atmabhimanam"
+    ]
+  },
+  {
+    "name": "Shiva temple",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.66 < 0.65)",
+    "_sample_titles": [
+      "Install God\u2019s Feet in Your Heart",
+      "Selfishness Is The Cause Of Man\u2019s Restlessness"
+    ]
+  },
+  {
+    "name": "Siddhis",
+    "entity_type": "concept",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Tapas",
+      "Remembering the Lord\u2019s Name and Dhyanam Alone Sever All Bondage"
+    ]
+  },
+  {
+    "name": "Sri Sathya Sai World Foundation",
+    "entity_type": "org_term",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "SSIO Guidelines \u2014 Chapter 10: Legal, Administration, and Trust Matters",
+      "SSIO Guidelines \u2014 Chapter 4: Structure of the Sathya Sai International Organisation"
+    ]
+  },
+  {
+    "name": "Sringeri",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Be Full of Prema",
+      "With The Concrete To The Abstract"
+    ]
+  },
+  {
+    "name": "SriRamaNavami",
+    "entity_type": "festival",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "Observance of Silence Develops Spiritual Energy",
+      "Ever Remember the Name of Rama"
+    ]
+  },
+  {
+    "name": "SSEHV",
+    "entity_type": "org_term",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.40 < 0.65)",
+    "_sample_titles": [
+      "SSIO Guidelines \u2014 Chapter 9: Sai Education Initiatives in the Community",
+      "SSIO Guidelines \u2014 Chapter 8: The International Sathya Sai Young Adults"
+    ]
+  },
+  {
+    "name": "Sunandamma",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Orphan But Protected",
+      "Building Or Begging?"
+    ]
+  },
+  {
+    "name": "suprabhatam",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "The Super-Emperor",
+      "Eyelids And The Pupil"
+    ]
+  },
+  {
+    "name": "Taitriya Upanishad",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.69 < 0.65)",
+    "_sample_titles": [
+      "Vital Role of the Buddhi",
+      "The Significance of Vinayaka Worship"
+    ]
+  },
+  {
+    "name": "Takshashila",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "Excellence of Ancient Indian System of Education",
+      "True Education Liberates"
+    ]
+  },
+  {
+    "name": "Tata Institute of Science",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.57 < 0.65)",
+    "_sample_titles": [
+      "Do Bhajans With Faith And Fervour",
+      "The Insentient And The Supreme Consciousness"
+    ]
+  },
+  {
+    "name": "Telugu",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.51 < 0.65)",
+    "_sample_titles": [
+      "Soldiers and Generals",
+      "The Inner Prompting"
+    ]
+  },
+  {
+    "name": "Telugu Poem",
+    "entity_type": "text",
+    "_article_count": 5,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Sacrifice And Selflessness Are The Hallmarks Of True Love",
+      "Do Not Allow Politics to Enter Villages"
+    ]
+  },
+  {
+    "name": "thamas",
+    "entity_type": "concept",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.00 < 0.65)",
+    "_sample_titles": [
+      "Near And Far",
+      "Limits And Progress"
+    ]
+  },
+  {
+    "name": "Thirupathi",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.59 < 0.65)",
+    "_sample_titles": [
+      "Faith is the foundation",
+      "The Godward march"
+    ]
+  },
+  {
+    "name": "Thukaram",
+    "entity_type": "person",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "How old are you really?",
+      "Sathya Sai Gita (iii)"
+    ]
+  },
+  {
+    "name": "Treta",
+    "entity_type": "concept",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Doubts and Questions",
+      "The New Year Dress"
+    ]
+  },
+  {
+    "name": "Tulasi",
+    "entity_type": "place",
+    "_article_count": 3,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.60 < 0.65)",
+    "_sample_titles": [
+      "Gurus Not Teachers",
+      "Rukmini weighing Krishna"
+    ]
+  },
+  {
+    "name": "Udaipur",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.58 < 0.65)",
+    "_sample_titles": [
+      "Satyam, Sivam, Sundaram",
+      "Truth, Auspiciousness, Beauty"
+    ]
+  },
+  {
+    "name": "Upanishadhs",
+    "entity_type": "text",
+    "_article_count": 5,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "The faith and the ideal",
+      "Jeeva and Dheva"
+    ]
+  },
+  {
+    "name": "USA",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.45 < 0.65)",
+    "_sample_titles": [
+      "Disease And Divinity",
+      "Swami on Abraham Lincoln"
+    ]
+  },
+  {
+    "name": "Uttar Pradesh",
+    "entity_type": "place",
+    "_article_count": 5,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "Disease And Divinity",
+      "Light the Antahkarana"
+    ]
+  },
+  {
+    "name": "Vajapeyam Venkateshwara Avadhani",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.64 < 0.65)",
+    "_sample_titles": [
+      "World Prosperity",
+      "Loka Kalyanam"
+    ]
+  },
+  {
+    "name": "Vedic",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Foster Firm Faith in God",
+      "Cells of the Body of God"
+    ]
+  },
+  {
+    "name": "Vidya Vahini",
+    "entity_type": "text",
+    "_article_count": 4,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.55 < 0.65)",
+    "_sample_titles": [
+      "Remedies For Inner Sadhana",
+      "Selfless Service \u2013 The Purpose of Vidya"
+    ]
+  },
+  {
+    "name": "Viswamitra",
+    "entity_type": "person",
+    "_article_count": 5,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.80 < 0.65)",
+    "_sample_titles": [
+      "Let Your Prema And Tyaga Be Your Ideals",
+      "Anger - The Greatest Enemy"
+    ]
+  },
+  {
+    "name": "Whitefield",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "The Prison Walls",
+      "Tonic For Youth"
+    ]
+  },
+  {
+    "name": "Winston Churchill",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.65 < 0.65)",
+    "_sample_titles": [
+      "New Horizons For The Sai Institute",
+      "Love is the Essence of Divine Life"
+    ]
+  },
+  {
+    "name": "Yagnyavalkya",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Brahmavidya and Women",
+      "Consciousness, Not Matter, Is The Primal Cause Of The Cosmos"
+    ]
+  },
+  {
+    "name": "Yamuna",
+    "entity_type": "place",
+    "_article_count": 29,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.63 < 0.65)",
+    "_sample_titles": [
+      "Happy Ayodhya",
+      "Seek God Within"
+    ]
+  },
+  {
+    "name": "Yashodha",
+    "entity_type": "person",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.67 < 0.65)",
+    "_sample_titles": [
+      "Kith and kin of all",
+      "Genuine kinsmen"
+    ]
+  },
+  {
+    "name": "Yelamanchili",
+    "entity_type": "place",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.62 < 0.65)",
+    "_sample_titles": [
+      "Maanasa Sarovar",
+      "Manasa Sarovar"
+    ]
+  },
+  {
+    "name": "Zend Avesta",
+    "entity_type": "text",
+    "_article_count": 2,
+    "_reason": "no discourse titled after it, and no article explained it well enough (best rerank 0.54 < 0.65)",
+    "_sample_titles": [
+      "Develop Devotion To Dharma",
+      "Holiness \u2013 The Root Cause Of Success"
     ]
   }
 ]
