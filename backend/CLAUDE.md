@@ -18,7 +18,9 @@ python app.py            # serves on :8000 (FLASK_RUN_PORT)
 python validate-env.py   # check required env vars before running
 ```
 
-Required env (from `.env`): `WEAVIATE_URL`, `WEAVIATE_API_KEY`, `OPENAI_API_KEY`, plus `MONGO_URI`, `JWT_SECRET_KEY`, `GOOGLE_CLIENT_ID`, and `MAIL_*` for password-reset email. `FRONTEND_URL` is a comma-separated CORS allowlist (first entry is the default redirect target).
+Required env (from `.env`): `WEAVIATE_URL`, `WEAVIATE_API_KEY`, `OPENAI_API_KEY`, **`VOYAGE_API_KEY`** (reranking), plus `MONGO_URI`, `JWT_SECRET_KEY`, `GOOGLE_CLIENT_ID`, and `MAIL_*` for password-reset email. `FRONTEND_URL` is a comma-separated CORS allowlist (first entry is the default redirect target).
+
+**`VOYAGE_API_KEY` must be set in every environment, including EB.** Without it reranking silently falls back to hybrid-score order and follow-ups return empty. It degrades rather than crashes, so the only signal is `rerank_degraded` on the trace and an ERROR in the log — this is exactly how a rate-limited key went unnoticed across 294 failures. Optional overrides: `RERANK_PROVIDER` (`voyage`|`cohere`), `PLAN_MODEL`, `JUDGE_MODEL`.
 
 ## Testing
 
@@ -29,6 +31,25 @@ BASE_URL=http://localhost:8000 python test_endpoints.py   # configurable via env
 python test_backend.py                                    # has hardcoded EB/Gateway URLs
 python test_weaviate_connection.py                        # checks Weaviate connectivity
 ```
+
+### Evaluating search changes — do not skip this
+
+`eval_ragas.py` runs a 218-question golden set (sampled from real traffic, weighted by the measured question taxonomy) against a running backend and gates on three metrics. **No search change ships without it:**
+
+```bash
+python app.py &                                     # harness needs a live server
+python eval_ragas.py --baseline eval_baseline.json  # PASS/FAIL vs the shipped config
+```
+
+- `quote_answers_rate` — does the top quote actually answer the question (LLM-judged, so ±2-3 points is noise)
+- `abstention_correctness` — abstain-labelled questions return nothing, others return something
+- `exact_discourse_first` / `_only` — naming a specific discourse returns **that** discourse first, ideally alone
+
+`eval_baseline.json` is the shipped configuration's run; regenerate it when you intentionally move a metric. Supporting scripts: `build_golden_set.py` (sample + LLM-draft labels), `promote_golden_set.py` (apply reviewed fixes, add exact-discourse cases), `replay_real_questions.py` (bulk replay over harvested traffic), `eval_router.py` / `test_router_unit.py` (routing only).
+
+Two model-choice traps the harness has already caught, both recorded in `config.py`:
+- **Reasoning models carry a latency floor.** gpt-5-mini measured ~2× slower on both planner and judge even at `reasoning_effort="minimal"`, and worse on every quality metric.
+- **Cheap models can blow the gateway budget.** gpt-4.1-mini grades quotes best of anything tested, but 3 of 218 queries exceeded API Gateway's 29s timeout (worst 63s — three client retries against the 20s bound). Check the *worst case*, not just p50.
 
 ## Deployment — use the scripts, never deploy manually
 
@@ -44,14 +65,27 @@ eb deploy <env>                 # asv-dev (staging) or asv-prod (production)
 
 `package_eb.sh` flattens `backend/` to the zip root (so `app.py` is at the archive root, which EB expects) and excludes venv/logs/.env. It warns if `app.py` is newer than `infra/openapi.json`.
 
-**Critical coupling: routes and the API Gateway must stay in sync.** Whenever you add, remove, or change a `@app.route` path, you must regenerate the OpenAPI spec and redeploy the gateway, or the new route will 404 through API Gateway even though EB serves it. `infra/generate_openapi.py` derives `infra/openapi.json` from the Flask routes; `sync_gateway.sh` diffs it against `openapi.json.prev`, runs CDK (`infra/cdk/`), then promotes the spec to `.prev`. Watch for sibling path-variable conflicts in API Gateway (e.g. `/chats/<user_email>` vs `/chats/<thread_id>` — same position, different names collide; recent commits normalized these).
+**Critical coupling: routes and the API Gateway must stay in sync.** Whenever you add, remove, or change a `@app.route` path, you must regenerate the OpenAPI spec and redeploy the gateway, or the new route will 404 through API Gateway even though EB serves it. `infra/generate_openapi.py` derives `infra/openapi.json` **and** `infra/openapi.yaml` from the Flask routes (never hand-edit either — regenerate); `sync_gateway.sh` diffs it against `openapi.json.prev`, runs CDK (`infra/cdk/`), then promotes the spec to `.prev`. Watch for sibling path-variable conflicts in API Gateway (e.g. `/chats/<user_email>` vs `/chats/<thread_id>` — same position, different names collide; recent commits normalized these).
 
 ## Architecture
 
-**Request flow:** Frontend → API Gateway → EB/Flask (`app.py`) → `utils.py` (search + LLM orchestration) → `weaviate_client.py` (Weaviate) + OpenAI.
+**Request flow:** Frontend → API Gateway → EB/Flask (`app.py`) → the `search/` package → `weaviate_client.py` (Weaviate) + OpenAI/Voyage.
 
-- **`app.py`** (~1150 lines) — single-file Flask app holding every route and all auth. Routes group into: health (`/`), auth (`/auth/google/*`, `/register`, `/login`, `/password/reset/*`), search/query (`/search`, `/query`, `/summarize-question`, `/blog/<id>`), saved discourses, chats, conversation memory, and feedback.
-- **`utils.py`** — search and answer generation. The `/search` discourse pipeline (`search_browse`): **`plan_queries`** (gpt-4o-mini — multi-turn resolution + scenario distillation + romanized-term glossing + adaptive decomposition into 1–N standalone queries; supersedes `expand_short_query`) → per-facet `search_passages` (Weaviate hybrid BM25+vector, `HYBRID_ALPHA=0.5`) + Cohere **`rerank-v3.5`** → **`_rrf_merge`** (Reciprocal Rank Fusion, keeps `source_query` provenance) → **`grade_and_quote_passages`** (gpt-4o `JUDGE_MODEL`, extractive — judges/quotes each passage **against its own facet**, drops non-answering ones, attaches verbatim `best_sentence`) → `aggregate_to_discourses`. Output is citations-only. Also: the legacy `handle_user_query` RAG entrypoint (`/query`), `search_exact`, `classify_query`, conversation persistence, and OpenAI calls. `eval_transliteration.py` is the romanized-robustness/`HYBRID_ALPHA` harness.
+> `utils.py` no longer exists — search was split into the `search/` package. Older
+> docs and commit messages referring to it mean `search/`.
+
+- **`app.py`** (~1,370 lines) — single-file Flask app holding every route and all auth. Routes group into: health (`/`), auth (`/auth/google/*`, `/register`, `/login`, `/password/reset/*`), search (`/search`, `/search/verify`, `/followups`, `/query`, `/summarize-question`, `/blog/<id>`), collections, saved discourses, chats, conversation memory, and feedback.
+- **`search/`** — the pipeline, one module per stage. `config.py` is the single source of truth for every model, threshold and flag, and carries the measurements behind each choice; read it before changing a constant.
+  - `query_planning.py::plan_queries` (`PLAN_MODEL`, gpt-4o-mini) — multi-turn resolution, scenario distillation, romanized-term glossing, adaptive decomposition into 1–N facets, **plus Router v2 intent classification** (`conceptual`/`scenario`/`aspect`/`factual`/`named_text`/`occasion`/`comparative`/`org_doctrine`/`meta`/`out_of_domain`/`listing`).
+  - `pipeline.py::search_browse` dispatches on that intent: `meta`/`out_of_domain` short-circuit to guidance; `listing` enumerates a named collection in reading order (`listing.py`); `factual`/`named_text`/`org_doctrine` try the Entity KB (`knowledge.py`, returning hit/gap/miss — a **gap abstains honestly** rather than guessing); everything else takes the semantic route.
+  - Semantic route: per-facet `retrieval.py::search_passages` (Weaviate hybrid BM25+vector, `HYBRID_ALPHA=0.5`) → `ranking.py::rerank_passages` (**Voyage `rerank-2.5-lite`** via a provider-agnostic `_rerank` adapter; `RERANK_PROVIDER=cohere` rolls back) → `_rrf_merge` (keeps `source_query` provenance) → `grade_and_quote_passages` (`JUDGE_MODEL`, **gpt-4.1**, extractive — judges/quotes each passage **against its own facet**, sharded into concurrent batches) → `aggregate_to_discourses`. Output is citations-only.
+  - `transparency.py` builds the opt-in trace (`include_trace: true`) that powers the frontend's "How I searched" panel and refinement guidance.
+  - `cache.py` — normalized-exact result cache, **on** (56% of real traffic is a repeat question). Failures are deliberately never cached.
+  - `resilience.py` — bounded retries; a Weaviate outage raises `PipelineServiceError` so an infra failure is never shown as "no results".
+
+**Two-phase search.** Grading is the latency floor, so `/search` accepts `defer_grading: true` and returns reranked-but-ungraded candidates (~3× faster first paint); the client then POSTs the passage ids to `/search/verify` for verified quotes. That second call is **stateless** — passages are re-read from Weaviate by id, not held in memory — so it survives multiple EB instances. Deferred results carry no quotes and are marked `quality: "pending"`; **never render them as answers.**
+
+**Never let generated text into a quote.** `grade_and_quote_passages` extracts a span that must be located verbatim in the passage (`_locate_verbatim`), and a quote that can't be found is dropped. Anything that changes what lives in a passage's `content` field must preserve this — see the design note at the top of `contextualize_corpus.py` for why contextual retrieval writes to a *separate* field.
 - **`weaviate_client.py`** — singleton Weaviate Cloud client (`get_client`) and `init_schema`, which defines all collections: `Article` and `Passage` (the discourse corpus — `Passage` holds chunked passages, both vectorized with `text-embedding-3-large`), `ChatThread`, `Conversation`, `UserQuery`, `Feedback` (now includes `discourse_title`/`discourse_id`/`discourse_source`), `SavedDiscourse`, `UserAccount`, `PasswordResetToken`. `init_schema` runs at import time in `app.py`, is idempotent (creates only missing collections), and adds newer properties to existing collections (e.g. the Feedback discourse fields).
 
 **Auth model:** Two token types, both checked in `get_verified_identity`:
@@ -60,7 +94,7 @@ eb deploy <env>                 # asv-dev (staging) or asv-prod (production)
 
 Protect routes with the `@require_auth` decorator; read the caller's email with `get_user_email_from_request()`.
 
-**Model:** LLM calls use a fine-tuned model id read at call time from `fine_tuned_model.txt` via `fine_tuning.load_fine_tuned_model_id_from_file()` (currently a fine-tuned `gpt-3.5-turbo`). Embeddings use `text-embedding-3-large`.
+**Models:** the search pipeline's models live in `search/config.py` — `PLAN_MODEL` (gpt-4o-mini, router), `JUDGE_MODEL` (gpt-4.1, extractive grader), `RERANK_MODEL` (Voyage `rerank-2.5-lite`), `GRADE_MODEL` (gpt-4o-mini, cheap utility calls). Both LLM ids are env-overridable for rollback. Embeddings are `text-embedding-3-large`, applied server-side by Weaviate's `text2vec-openai` on the `Passage` collection. Separately, the legacy `/query` chat path still reads a fine-tuned model id from `fine_tuned_model.txt` via `fine_tuning.load_fine_tuned_model_id_from_file()`.
 
 **Proxy awareness:** `ProxyFix` is applied so `request.host_url` reflects the real domain behind the AWS load balancer — relevant for OAuth redirect URIs and password-reset links (`get_base_url`, `get_google_redirect_uri`).
 

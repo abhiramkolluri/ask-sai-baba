@@ -11,9 +11,13 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "pyyaml"])
     import yaml
 
-# Add the correctly mapped backend root to system PATH
-backend_path = "/Users/abhiramkolluri/Projects/ask-sai-baba/backend"
-sys.path.append(backend_path)
+# Add the backend root to sys.path. Derived from this file's location rather
+# than hardcoded: the absolute path that used to be here pointed at a directory
+# that no longer exists (the repo moved under an `asv/` parent), so the script
+# exited with "Error importing app" on every run — and since the gateway spec is
+# only regenerated deliberately, that failure was easy to miss.
+backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, backend_path)
 
 # Fallbacks to guarantee application boots cleanly over dynamic missing envs!
 os.environ.setdefault("FLASK_ENV", "development")

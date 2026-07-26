@@ -375,6 +375,39 @@
         }
       }
     },
+    "/search/verify": {
+      "post": {
+        "summary": "Search Verify Endpoint",
+        "description": "Phase 2 of the two-phase search: turn provisional candidates into quotes.\n\n    The client posts the passage ids it got from a `defer_grading` search, each\n    paired with the facet that surfaced it, and gets back the SAME shape as\n    /search \u2014 {results, trace} \u2014 so it can replace its provisional list wholesale.\n\n    Passages the grader rejects are simply absent from `results`; that is what\n    removes an unverified card. Always 200 with a (possibly empty) list, matching\n    /followups' contract, so a verification failure degrades to \"no verified\n    quotes\" rather than breaking the answer the user is already looking at.",
+        "responses": {
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
     "/followups": {
       "post": {
         "summary": "Followups Endpoint",
