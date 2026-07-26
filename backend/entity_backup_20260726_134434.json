@@ -1,0 +1,47 @@
+[
+  {
+    "in_corpus": true,
+    "aliases": "Prasanthi Nilayam; Swami's birthplace; Parthi",
+    "name": "Puttaparthi",
+    "summary": "Puttaparthi, the village in Andhra Pradesh where Sathya Sai Baba was born and where Prasanthi Nilayam is located.",
+    "entity_type": "place",
+    "canonical_article_ids": "[\"a9e331ca-2654-429f-b43a-422e72206e46\", \"1eb01400-070a-4052-a75b-e9539c142bb4\"]",
+    "_uuid": "12f78366-ed0f-48da-ade1-98de1999c45a"
+  },
+  {
+    "in_corpus": true,
+    "aliases": "Swami's mother; Baba's mother; Eswaramma; mother of Sathya Sai Baba",
+    "name": "Easwaramma",
+    "summary": "Easwaramma was the earthly mother of Sathya Sai Baba.",
+    "entity_type": "person",
+    "canonical_article_ids": "[\"f798d004-6d2f-4458-bf18-085506f79fe1\"]",
+    "_uuid": "2f01dfd2-77ea-4fd2-808b-00a844deafc3"
+  },
+  {
+    "in_corpus": true,
+    "aliases": "SSE; Sathya Sai Education in Human Values; Bal Vikas; Balvikas",
+    "name": "Sathya Sai Education (SSE)",
+    "summary": "Sathya Sai Education / Bal Vikas \u2014 the organization's education-in-human-values programme.",
+    "entity_type": "org_term",
+    "canonical_article_ids": "[\"66f834eb-bdd8-4e69-9f1a-7da4416d2b31\", \"b025b793-6431-4b86-9bd5-42c8c1b1b1ee\", \"6a0eab94-fc18-4716-bf96-6f074ee86ba3\"]",
+    "_uuid": "39b9cd01-bdb7-4dca-b970-c453098f2b09"
+  },
+  {
+    "in_corpus": false,
+    "aliases": "Tripura Rahasyam; Tripurarahasya",
+    "summary": "Tripura Rahasya, a classical Advaita text. Distinct from the 'three cities' (tripura) metaphor.",
+    "name": "Tripura Rahasya",
+    "entity_type": "text",
+    "canonical_article_ids": "[]",
+    "_uuid": "5420a5c7-cc0f-45c4-b4ca-073f345aae67"
+  },
+  {
+    "in_corpus": true,
+    "aliases": "9 point code of conduct; nine point code; code of conduct",
+    "summary": "The Sathya Sai organization's Nine Point Code of Conduct for members.",
+    "name": "Nine Point Code of Conduct",
+    "entity_type": "org_term",
+    "canonical_article_ids": "[\"103500a7-d8f7-4214-bf4a-4252eca00794\"]",
+    "_uuid": "5edccc75-07f8-4936-8b4b-23ae14cd59f3"
+  }
+]

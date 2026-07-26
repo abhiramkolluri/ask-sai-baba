@@ -505,6 +505,36 @@ def main():
                          "_article_count": 0, "_title_match": False,
                          "_selected_by": "curated_gap", "_canonical_titles": []})
 
+    # --- Drop non-identifying aliases -------------------------------------
+    # An alias exists to identify ONE entity. Extraction is per-article, so the
+    # same phrase gets attached to whatever the discourse was discussing:
+    # "Swami's mother" ended up on Devaki, Kunti, Gandhari, Kausalya and Sita as
+    # well as Easwaramma. knowledge.py matches on name + aliases, so shipping
+    # that means "Who was Swami's mother?" can resolve to Krishna's mother.
+    #
+    # Any alias claimed by more than one entity is removed from all of them. The
+    # name is always kept, so nothing becomes unfindable — worst case we lose a
+    # legitimate synonym's recall, which is far cheaper than mis-routing a
+    # factual question. (Some collisions are genuine near-duplicates —
+    # Ajnana/Ajnanam/avidya all glossed "ignorance" — but merging those needs
+    # the same human judgement as the transliteration families, so they are
+    # dropped rather than guessed at.)
+    claims = collections.defaultdict(set)
+    for e in entities:
+        for a in (e["aliases"] or "").split(";"):
+            k = _norm(a)
+            if k:
+                claims[k].add(e["name"])
+    ambiguous = {k for k, v in claims.items() if len(v) > 1}
+    purged = 0
+    for e in entities:
+        kept = [a for a in (e["aliases"] or "").split(";")
+                if a.strip() and _norm(a) not in ambiguous]
+        purged += len((e["aliases"] or "").split(";")) - len(kept) if e["aliases"] else 0
+        e["aliases"] = "; ".join(a.strip() for a in kept)
+    print(f"  purged {purged} non-identifying alias attachments "
+          f"({len(ambiguous)} phrases claimed by >1 entity)")
+
     # Alphabetical, so a human reviewing 1,000+ rows can find a specific entity
     # instead of scanning. Case- and punctuation-insensitive so "Bal Vikas" and
     # "bhajan" sort where a reader expects, not by codepoint. Demand is still

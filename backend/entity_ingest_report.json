@@ -1,0 +1,36 @@
+{
+  "backup": "entity_backup_20260726_134808.json",
+  "inserted": 1059,
+  "failed": 0,
+  "skipped": [
+    {
+      "name": "Balvikas",
+      "covered_by": "Sathya Sai Education (SSE)"
+    },
+    {
+      "name": "Easwaramma",
+      "covered_by": "Easwaramma"
+    },
+    {
+      "name": "Nine Point Code of Conduct",
+      "covered_by": "Nine Point Code of Conduct"
+    },
+    {
+      "name": "Prasanthi",
+      "covered_by": "Puttaparthi"
+    },
+    {
+      "name": "Prasanthi Nilayam",
+      "covered_by": "Puttaparthi"
+    },
+    {
+      "name": "Puttaparthi",
+      "covered_by": "Puttaparthi"
+    },
+    {
+      "name": "Tripura Rahasya",
+      "covered_by": "Tripura Rahasya"
+    }
+  ],
+  "final_count": 1064
+}

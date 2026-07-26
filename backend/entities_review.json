@@ -99,7 +99,7 @@
   },
   {
     "name": "Adhithya",
-    "aliases": "Sun God; the Sun",
+    "aliases": "",
     "summary": "Adhithya is mentioned as the deity presiding over time, who must be propitiated by mantras.",
     "entity_type": "person",
     "canonical_article_ids": "[\"bee0ceff-5698-4e1e-9803-92255d4b8cd5\"]",
@@ -146,7 +146,7 @@
   },
   {
     "name": "Advaita",
-    "aliases": "Advaita darshanam; Advaita philosophy; Adwaitha Darsanam; Non-dual; Non-dual nature of Existence; Non-dualism; Oneness; adwaitha; monism; non-dualism; nondualism; vision of the One",
+    "aliases": "Advaita darshanam; Adwaitha Darsanam; Non-dual; Non-dual nature of Existence; Non-dualism; Oneness; adwaitha; monism; non-dualism; nondualism; vision of the One",
     "summary": "Advaita is the principle taught by Shankara that emphasizes the oneness of the Atma, body, and mind, illustrating that all are interconnected despite appearing different.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9536c401-d073-46d0-a985-3e05fec8ab9f\", \"b1ccf768-3074-4b8c-a109-e23c34c6991d\", \"033c31eb-1e95-48ae-8462-073ca6b43f0a\"]",
@@ -196,7 +196,7 @@
   },
   {
     "name": "Adwaitha darshana",
-    "aliases": "Advaita philosophy",
+    "aliases": "",
     "summary": "Adwaitha darshana refers to the non-dual philosophy that Sanath Kumara emphasized as essential for understanding the nature of the self.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f523e80a-1c7f-4426-9029-d545cc8bfc0e\", \"44d67eb7-9ada-4254-8f66-f08c3098436b\"]",
@@ -212,7 +212,7 @@
   },
   {
     "name": "Agasthya",
-    "aliases": "Agasthya the sage; potborn sage; the sage Agasthya",
+    "aliases": "Agasthya the sage; the sage Agasthya",
     "summary": "Agasthya is mentioned as a sage who drank the ocean dry, illustrating the grandeur of creation.",
     "entity_type": "person",
     "canonical_article_ids": "[\"eb9ad8d8-1a4e-4af1-9a91-ff85c16d6128\", \"2e0905ce-1a51-4970-8cd8-e280e4939d60\", \"53b33272-88d1-4040-a89b-b6a862b8aebc\"]",
@@ -229,7 +229,7 @@
   },
   {
     "name": "Agastya",
-    "aliases": "Agastya the sage; Rishi Agastya; Sage Agastya; potborn sage; sage Agastya",
+    "aliases": "Agastya the sage; Rishi Agastya; Sage Agastya; sage Agastya",
     "summary": "Agastya is a sage who directed Rama and Sita to Panchavati to facilitate the abduction of Sita by Ravana.",
     "entity_type": "person",
     "canonical_article_ids": "[\"d3117d90-3bdd-4162-b74b-26ea88f35afc\", \"0ef7447c-144a-4eaf-80d9-8ca2d36381f9\", \"c986a0d4-4dcb-450b-81fa-2a3dbcee02c3\"]",
@@ -323,7 +323,7 @@
   },
   {
     "name": "Ahamkara",
-    "aliases": "I-am; I-consciousness; ego; ego sense; egoism; pride; self-conceit",
+    "aliases": "I-am; I-consciousness; ego; ego sense; self-conceit",
     "summary": "Ahamkara is described as the ego that causes harm to fellow human beings.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"00e9d75d-7a65-4f5a-a9f4-98d2084ca3a6\", \"f45de11b-7a11-4db8-8f3b-aac95eea1b7a\"]",
@@ -338,7 +338,7 @@
   },
   {
     "name": "Ahamkaram",
-    "aliases": "Egoism; Egotism; I-ness",
+    "aliases": "",
     "summary": "Ahamkaram is the egoism that arises from ignorance and is closely related to the tendencies (Vasanas) that bind individuals.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"56244c3c-0ff2-4406-83a8-00dfe03fb141\", \"36c24cbf-6734-480b-8f32-59df76e17c4d\", \"b9e30bef-b578-4884-87d2-38ac48375e88\"]",
@@ -355,7 +355,7 @@
   },
   {
     "name": "ahankara",
-    "aliases": "I-ness",
+    "aliases": "",
     "summary": "Ahankara refers to egoism, which is a source of human sorrow.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"231eb863-5c22-4af9-aff2-8258e2b4eae4\", \"5102bf4e-5b80-40b8-83b9-3257bc07fdf5\", \"3fcb5df5-93ea-4070-a617-e1895e089c1f\"]",
@@ -389,7 +389,7 @@
   },
   {
     "name": "aj\u00f1ana",
-    "aliases": "Ignorance; ignorance",
+    "aliases": "",
     "summary": "Aj\u00f1ana refers to ignorance, which the sadhaka must overcome to realize their true divine form.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e6fa4c20-4480-4711-b2a2-7b0f90d62d23\", \"a7d69bf9-d9e3-4bd7-b6fa-c96cb8fc26a7\", \"42174a47-cb7d-4d96-8462-c3a893c802b4\"]",
@@ -406,7 +406,7 @@
   },
   {
     "name": "ajna",
-    "aliases": "ignorance",
+    "aliases": "",
     "summary": "Ajna refers to the command or direction given by Swami, which is essential for effective volunteer service.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f388bde2-9346-48ec-8fd1-3eb217a8bc9d\", \"c1848e46-2e52-4b1d-9cde-45f7923cfbd7\", \"61b3fa19-f396-4b8a-9c29-9772b68409ee\"]",
@@ -423,7 +423,7 @@
   },
   {
     "name": "Ajnana",
-    "aliases": "ignorance; spiritual ignorance",
+    "aliases": "spiritual ignorance",
     "summary": "Ajnana refers to spiritual ignorance, which is described as the darkness that prevents individuals from understanding the true purpose of life.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a7d69bf9-d9e3-4bd7-b6fa-c96cb8fc26a7\", \"c9ad2394-8279-4156-b77e-c177c1001e83\", \"1683f3d4-e29c-4ca2-850c-a40e147328d1\"]",
@@ -440,7 +440,7 @@
   },
   {
     "name": "Ajnanam",
-    "aliases": "Ignorance",
+    "aliases": "",
     "summary": "Ajnanam refers to ignorance, which is identified as a cause of human suffering.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"42174a47-cb7d-4d96-8462-c3a893c802b4\", \"8f88f8f5-6831-4866-bf81-75997913af0b\", \"55d6b49b-ad6b-47e9-ae98-38b382cc97cf\"]",
@@ -474,7 +474,7 @@
   },
   {
     "name": "Akasa",
-    "aliases": "Space; ether; space",
+    "aliases": "",
     "summary": "Akasa is described as the basis from which the other four elements have emerged.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"03de4301-ca1e-4492-a019-3afd1e813536\", \"760c93d6-ddcf-466c-875e-d1378735caa5\", \"4db23ab0-716b-4c88-a9c8-48a7ce7946cf\"]",
@@ -491,7 +491,7 @@
   },
   {
     "name": "Akasha",
-    "aliases": "Ether; Space Element; ether; space; the sky; the void above",
+    "aliases": "Space Element; the sky; the void above",
     "summary": "Akasha is mentioned as the divine force that prompts action related to the ear.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9c02d5bc-c9aa-4245-8d16-d48335af089a\", \"2254beb0-3d78-4a06-acf4-47bca599a0eb\", \"3cb9f022-2eaa-408a-9105-b75da76dbd6b\"]",
@@ -636,7 +636,7 @@
   },
   {
     "name": "Amrita",
-    "aliases": "Divine nectar; Eternity",
+    "aliases": "Eternity",
     "summary": "Amrita signifies the state of being eternal, which is associated with acts of Dharma that lead to spiritual fulfillment.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"7dbf21f6-53ef-41c8-9b2e-8fead9f4d13a\", \"274a1cbc-e854-4e47-977d-665b8af24b1c\", \"2d52c197-076b-480e-9c7e-375a5585c331\"]",
@@ -653,7 +653,7 @@
   },
   {
     "name": "Amritam",
-    "aliases": "Divine nectar; immortal nectar; nectar",
+    "aliases": "immortal nectar",
     "summary": "Amritam is described as the essence of Swami's words, which lead to liberation and are compared to divine nectar.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"94078b8d-8dec-45fb-a601-91a1a668b041\"]",
@@ -667,7 +667,7 @@
   },
   {
     "name": "Amritha",
-    "aliases": "nectar",
+    "aliases": "",
     "summary": "Amritha is referred to as the divine nectar that one can partake in if they embody divine qualities.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b6371038-bf94-49c8-80ae-c1e945a05a8d\", \"e2f86647-8ab6-4643-842a-486fd14e17bc\", \"83a32e3c-ccb1-4925-a0c3-357a68ecfa4e\"]",
@@ -684,7 +684,7 @@
   },
   {
     "name": "Ananda",
-    "aliases": "Atmanandam; Atmic Bliss; Bliss of the Self; Buddha's cousin; Buddha's step-brother; Divine Bliss; Divine bliss; Spiritual Bliss; bliss of the Spirit; divine bliss; inner joy; joy; real joy; spiritual bliss; unshakable calm",
+    "aliases": "Atmanandam; Atmic Bliss; Buddha's cousin; Buddha's step-brother; Spiritual Bliss; bliss of the Spirit; inner joy; real joy; spiritual bliss; unshakable calm",
     "summary": "Ananda is described as everlasting bliss that is changeless and full of radiant glory, in contrast to temporary happiness.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0ce42f10-670f-41ec-964f-cbefc97a77a3\", \"0e887b0e-9cf7-4a47-9ccb-43123448d802\", \"9e3b9077-c617-427a-96d7-9f022743127c\"]",
@@ -700,7 +700,7 @@
   },
   {
     "name": "anandam",
-    "aliases": "Divine Bliss; joy",
+    "aliases": "",
     "summary": "Anandam refers to bliss, the ultimate state that devotees seek to merge into.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"56244c3c-0ff2-4406-83a8-00dfe03fb141\", \"0dc0b93e-b5ee-4e92-8e31-055415a15860\", \"dd2dadab-6701-4f26-a84b-94fa3898b21b\"]",
@@ -751,7 +751,7 @@
   },
   {
     "name": "Anandha",
-    "aliases": "Bliss Supreme; Divine Bliss; joy",
+    "aliases": "Bliss Supreme",
     "summary": "Anandha is described as the ultimate happiness that can be attained by training the mind to focus on the Cosmic and the Universal.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"7ccc5cd8-1832-4cd7-92b6-0551a04e5c2a\", \"62b0bf7a-f930-46c3-bf95-bc03fe2458ca\", \"3c1627e1-3922-4810-ad26-f31c6db8e2ec\"]",
@@ -801,7 +801,7 @@
   },
   {
     "name": "Anantapur College",
-    "aliases": "Sathya Sai Institute; Sri Sathya Sai Institute",
+    "aliases": "Sri Sathya Sai Institute",
     "summary": "The teachers of Anantapur College are mentioned as undertaking useful service activities for the physically challenged.",
     "entity_type": "place",
     "canonical_article_ids": "[\"0120d027-64b8-43d6-8d15-97f49e0aac12\", \"d7b594c5-8f46-42f9-b1db-664747b20462\", \"30fa5337-a7a0-48a8-8d12-f5a50e0a16d6\"]",
@@ -944,7 +944,7 @@
   },
   {
     "name": "Annamaya Kosa",
-    "aliases": "food sheath; gross body; the Kosa that is the modification of the food",
+    "aliases": "gross body; the Kosa that is the modification of the food",
     "summary": "The Annamaya Kosa is described as having three qualities: hunger, thirst, and sleep.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9b0383ba-75c1-4c44-bdee-01a7845c5c76\", \"88e54732-05f8-4d05-822d-980d98e57d70\", \"963bd4cb-27aa-4eea-8554-79149bc54be5\"]",
@@ -961,7 +961,7 @@
   },
   {
     "name": "Annamaya Kosha",
-    "aliases": "Annamaya; annamaya; food sheath",
+    "aliases": "Annamaya; annamaya",
     "summary": "Annamaya kosha refers to the material sheath, which is the gross body in the context of the five sheaths of the self.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"ec10efa8-2a0e-4a1f-af4b-125f9d2aa7a4\", \"0e87fb8a-1384-4ea5-b830-a7ad01d657f0\", \"1232de1f-7f35-4f61-a086-97763d7e08d8\"]",
@@ -978,7 +978,7 @@
   },
   {
     "name": "Annapoorna",
-    "aliases": "Food plenty; Goddess Annapoorna; Mother",
+    "aliases": "Food plenty; Goddess Annapoorna",
     "summary": "Annapoorna is referred to as the Goddess of Food Plenty, symbolizing the abundance of resources available to feed the children of India.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"00fbddc9-8162-48eb-a109-baad6cb99095\", \"35cf4f30-76f7-4cc0-a84e-e135e3df1552\", \"8bfa5723-b28e-4e80-a6c9-9949303346fb\"]",
@@ -995,7 +995,7 @@
   },
   {
     "name": "Antahkarana",
-    "aliases": "Indwelling Motivator; Inner Instruments; inner consciousness; inner instrument; inner voice; reflected consciousness",
+    "aliases": "Indwelling Motivator; inner instrument; inner voice; reflected consciousness",
     "summary": "Faith in the Antah-karana is necessary for the development of one's personality and cultivation of the heart.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"4c73ec76-91bc-434e-94e9-f7b294f873ac\", \"877510ec-a0f0-45ba-adc4-9c8e9dd8cda2\", \"a7bcaf57-7b70-44ea-b609-ea88d6272d5e\"]",
@@ -1012,7 +1012,7 @@
   },
   {
     "name": "Antah-karanas",
-    "aliases": "inner instruments",
+    "aliases": "",
     "summary": "Antah-karanas refers to the collective name for the Manas (Mind), Buddhi (Intellect), Chitta (collection of notions, tendencies, ideas and memories), and Ahamkaram (sense of ego).",
     "entity_type": "concept",
     "canonical_article_ids": "[\"74120f57-bdc6-4665-adcc-52454d36e7ee\"]",
@@ -1175,7 +1175,7 @@
   },
   {
     "name": "Asato maa sat gamaya, Tamaso maa jyotir gamaya, Mrityor maa amritam gamaya",
-    "aliases": "Vedic prayer",
+    "aliases": "",
     "summary": "This Vedic prayer leads one from untruth to truth, from darkness to light, and from death to immortality.",
     "entity_type": "text",
     "canonical_article_ids": "[\"46b0b79a-0cf1-4f1a-a6be-50b46dc147a1\", \"e9cefd4b-0c37-49ad-8e11-da2db1f3e048\"]",
@@ -1274,7 +1274,7 @@
   },
   {
     "name": "Ashwamedha",
-    "aliases": "Horse Sacrifice; Horse sacrifice",
+    "aliases": "",
     "summary": "Ashwamedha refers to the Horse Sacrifice that Dharmaraja planned to perform as part of the yajna.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"c97fdb08-a516-45dd-bd56-76bcb245a851\", \"91dbe27e-3025-4b6e-bcc6-47ac7919ff4f\", \"e0ade254-faf9-4751-8988-5b41edca617b\"]",
@@ -1291,7 +1291,7 @@
   },
   {
     "name": "Ashwamedha yaga",
-    "aliases": "horse sacrifice",
+    "aliases": "",
     "summary": "Krishna suggested that Dharmaraja perform the Ashwamedha yaga to overcome his sorrow, despite Dharmaraja's reluctance to engage in further killing.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a9c8f359-df9f-4f20-b82c-80f2689f413d\", \"ce9473f7-b5be-4a56-a192-f27e80e89b84\", \"a0b3c942-e255-489f-80d6-c005c6e65388\"]",
@@ -1341,7 +1341,7 @@
   },
   {
     "name": "Asuras",
-    "aliases": "demons",
+    "aliases": "",
     "summary": "Asuras are the demons who participated in the churning of the ocean.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"abe22432-ed51-4e9c-b108-698254f11611\", \"62ba2557-4565-4f81-8530-6b08fe487224\"]",
@@ -1357,7 +1357,7 @@
   },
   {
     "name": "asuya",
-    "aliases": "jealousy",
+    "aliases": "",
     "summary": "Asuya, or envy, is a negative quality that should be cultivated against to lead a fulfilling life.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e0b6ccb1-1c62-4238-b0a7-14e6653bd9e4\"]",
@@ -1387,7 +1387,7 @@
   },
   {
     "name": "Atharva",
-    "aliases": "Atharvaveda; steady, unmoved person",
+    "aliases": "steady, unmoved person",
     "summary": "Atharva is one of several names for Parabrahma, known for its steady and unchanging nature.",
     "entity_type": "person",
     "canonical_article_ids": "[\"78c81734-1ddc-42a4-817e-c32f91a22e22\", \"b209c798-5c72-4320-8521-e63cf53b8bb7\"]",
@@ -1403,7 +1403,7 @@
   },
   {
     "name": "Atharvanaveda",
-    "aliases": "Atharva; Atharva Veda; Atharvana Veda; Atharvaveda",
+    "aliases": "Atharva; Atharva Veda; Atharvana Veda",
     "summary": "The weapons developed in Germany were based on the texts of the Atharvana-Veda.",
     "entity_type": "text",
     "canonical_article_ids": "[\"3b2253a9-8e02-4899-92a6-759215be5cb8\"]",
@@ -1418,7 +1418,7 @@
   },
   {
     "name": "Atma",
-    "aliases": "Aatma; Absolute; Absolute Consciousness; Absolute Reality; Aham; Aham Brahmasmi; Almighty lord; Atma principle; Atma shabdat; Atma tattvam; Atma thathwam; Atma-tattvam; Atmabhava; Atman; Atmic Essence; Atmic Reality; Atmic experience; Atmic nature; Atmic principle; Basic Substratum; Bhagavan; Brahm; Brahma; Brahma-tattvam; Brahmam; Brahman; Brahman aspect; Brahman-consciousness; Brahmasmi; Chidakasha; Cosmic Self; Deva; Divine Atma; Divine Principle; Divine Self; Divine Spirit; Divine self; Divine spirit; Divinity; Divyatvam; Easwara; Eeshavasyam; Eeshwara; Eternal Brahman; Eternal Spirit; Eternal, Infinite Reality; Ever-Witness; Formless Brahman; God Almighty; God in the form of Atma; Godhead; Highest Atma; Hridayeswara; Hrishikesha; Husband of prosperity; I; I principle; Individualised Atma; Indwelling Spirit; Infinite Consciousness; Inner Self; Innermost Self; Ishvara; Ishvara-tattvam; Ishwara; Jeeva; Jeevatma; Jeevi; Lord Siva; Narayana; Nature's God; Non-dual Supreme Godhead; Omni self; Omni-Self; Omniself; One God; Over-self; Para Brahman; Para-brahman; Parabrahma; Parabrahman; Paramatma; Poorn Atma; Principle of the Self; Purusha; Sai; Sama; Sarvam Khalvidam Brahma; Shankara; Shiva; Shripati; Supreme Absolute; Supreme Atma; Supreme Being; Supreme Giver; Supreme God; Supreme Master; Supreme Reality; Supreme Self; Supreme Soul; Supreme Spirit; Supreme being; Supreme power of the Self; Supreme soul; Swami; The Cause of All Causes; The One Eternal Truth; True Self; Ultimate Reality; Universal Atma; Universal Brahman; Universal Self; Universal Soul; all-pervading Self; almighty God; atma-tattvam; conscience; cosmic Person; cosmic Spirit; cosmic soul; dharmadevata; dharmapalaka; dharmapriya; dharmasthapaka; dharmasvarupa; divine Atma; divine Self; divine essence; divine principle; divine reality; divine spirit; divinity; egotism; eternal Atma; eternal Atmic Principle; final step; individual; individual Atma; individual Self; individualised Soul; individualised or universalised self; individualized Atma; individualized or universalized self; individualized self; indweller Atma; indwelling Atma; infinite consciousness; inner Divine Being; inner motive force; inner self; jeeva; jeevi; jewel of the Atma; mutable entity; nature of the atma; omnipotent God; omnipresent God; principle of Atma; principle of divinity; principle of the Self; sacred Brahman; sacred gem of Divinity; sacredness; self-existent atma; spiritual Self; supreme Atma; supreme being; supreme soul; the Absolute; the Absolute Brahman; the Basis; the Basis of All; the Cosmic Self; the Divine Self; the Eternal; the Form of the Lord; the Highest Overself; the Indwelling Spirit; the Name of God; the ONE; the Omni-Self; the Omni-Will; the One who is repository of all Divine attributes; the Primal Cause; the Sanskrit word for I; the Spirit; the Supreme Absolute; the Supreme Self; the Supreme Spirit; the Universal Absolute; the Universal Atman; the Universe; the all-pervading consciousness; the aspect of Brahman; the basis; the changeless Divine Principle; the common term for divinity; the divine self; the entity indicated by 'All this is verily Brahman'; the essence of the self; the eternal reality; the eternal truth of the atma; the highest self; the individual soul; the invisible Brahman; the nature of Atma; the primordial principle; the principle of Atma; the spirit; the supreme Brahman; the supreme spirit; the ultimate reality; the very substance of the Universe; the word Brahman; the word purusha; true Self; true identity; true self; universal; universal absolute; universal oversoul; witnessing consciousness",
+    "aliases": "Aatma; Absolute; Absolute Consciousness; Absolute Reality; Aham; Aham Brahmasmi; Almighty lord; Atma principle; Atma shabdat; Atma tattvam; Atma thathwam; Atma-tattvam; Atmabhava; Atman; Atmic Essence; Atmic Reality; Atmic experience; Atmic nature; Atmic principle; Basic Substratum; Brahm; Brahma; Brahma-tattvam; Brahmam; Brahman aspect; Brahman-consciousness; Brahmasmi; Chidakasha; Cosmic Self; Divine Atma; Divine Self; Divine Spirit; Divine self; Divine spirit; Divyatvam; Easwara; Eeshavasyam; Eeshwara; Eternal Brahman; Eternal Spirit; Eternal, Infinite Reality; Ever-Witness; Formless Brahman; God Almighty; God in the form of Atma; Godhead; Highest Atma; Hridayeswara; Husband of prosperity; I principle; Individualised Atma; Indwelling Spirit; Infinite Consciousness; Inner Self; Innermost Self; Ishvara-tattvam; Jeeva; Jeevatma; Jeevi; Nature's God; Non-dual Supreme Godhead; Omni self; Omni-Self; Omniself; One God; Over-self; Para Brahman; Para-brahman; Parabrahma; Parabrahman; Poorn Atma; Principle of the Self; Purusha; Sarvam Khalvidam Brahma; Shiva; Shripati; Supreme Absolute; Supreme Atma; Supreme Being; Supreme Giver; Supreme Master; Supreme being; Supreme power of the Self; The Cause of All Causes; The One Eternal Truth; True Self; Ultimate Reality; Universal Atma; Universal Brahman; Universal Self; Universal Soul; all-pervading Self; atma-tattvam; conscience; cosmic Person; cosmic Spirit; cosmic soul; dharmadevata; dharmapalaka; dharmapriya; dharmasthapaka; dharmasvarupa; divine Atma; divine Self; divine essence; divine reality; divine spirit; eternal Atma; eternal Atmic Principle; final step; individual Atma; individualised or universalised self; individualized Atma; individualized or universalized self; individualized self; indweller Atma; indwelling Atma; infinite consciousness; inner Divine Being; inner motive force; inner self; jeeva; jeevi; jewel of the Atma; mutable entity; nature of the atma; omnipotent God; omnipresent God; principle of Atma; principle of divinity; principle of the Self; sacred Brahman; sacred gem of Divinity; sacredness; self-existent atma; spiritual Self; supreme Atma; supreme being; the Absolute; the Absolute Brahman; the Basis; the Basis of All; the Cosmic Self; the Divine Self; the Eternal; the Form of the Lord; the Highest Overself; the Indwelling Spirit; the Name of God; the Omni-Self; the Omni-Will; the One who is repository of all Divine attributes; the Primal Cause; the Sanskrit word for I; the Spirit; the Supreme Absolute; the Supreme Spirit; the Universal Absolute; the Universal Atman; the Universe; the all-pervading consciousness; the aspect of Brahman; the basis; the changeless Divine Principle; the common term for divinity; the divine self; the entity indicated by 'All this is verily Brahman'; the essence of the self; the eternal reality; the eternal truth of the atma; the highest self; the individual soul; the invisible Brahman; the nature of Atma; the primordial principle; the principle of Atma; the spirit; the supreme Brahman; the supreme spirit; the ultimate reality; the very substance of the Universe; the word Brahman; the word purusha; true Self; true identity; true self; universal; universal absolute; universal oversoul; witnessing consciousness",
     "summary": "Atma, or Spirit, is described as the consciousness that dwells within every human being.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"05f27b5f-ef79-4737-9f42-11b70a033e3d\", \"0b0b2f82-ee67-4807-91a3-43eedf136510\", \"0ef7447c-144a-4eaf-80d9-8ca2d36381f9\"]",
@@ -1434,7 +1434,7 @@
   },
   {
     "name": "Atma Dharma",
-    "aliases": "Dharma of the Self; True Dharma",
+    "aliases": "True Dharma",
     "summary": "Atma Dharma is the fundamental Dharma that must be followed in accordance with the Aachara Dharmas to yield the bliss of following one single Dharma.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"1bb586c1-bc4d-49b0-b813-12970de1c05f\"]",
@@ -1448,7 +1448,7 @@
   },
   {
     "name": "Atma Jnana",
-    "aliases": "Knowledge of the Self; knowledge of the Self; realisation of the Self",
+    "aliases": "realisation of the Self",
     "summary": "Atma Jnana refers to the realization of the Self, which true education must enable one to gain.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"ee1e34fe-26d8-4635-aaca-3e279b1670a8\"]",
@@ -1496,7 +1496,7 @@
   },
   {
     "name": "Atma Vidya",
-    "aliases": "Fundamental Knowledge; Science of Self-control; knowledge of the Self",
+    "aliases": "Fundamental Knowledge; Science of Self-control",
     "summary": "Atma Vidya refers to the knowledge of the all-pervading one Reality, which is central to the teachings of Indian culture.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"6a0eab94-fc18-4716-bf96-6f074ee86ba3\", \"988a363c-9dcc-49fd-b863-330eb016eb3a\", \"a9c8f359-df9f-4f20-b82c-80f2689f413d\"]",
@@ -1513,7 +1513,7 @@
   },
   {
     "name": "Atma-dharma",
-    "aliases": "Dharma of the Self",
+    "aliases": "",
     "summary": "Atmadharma urges concentration on the Athmic reality, regardless of success or failure.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"1bb586c1-bc4d-49b0-b813-12970de1c05f\", \"a90a6fa4-e9a1-4935-9ae1-480af128b1f8\", \"69f0c736-f5ae-46b5-a79a-657da0530904\"]",
@@ -1530,7 +1530,7 @@
   },
   {
     "name": "Atmajnana",
-    "aliases": "knowledge of the Self; self-knowledge; wisdom of the true Self",
+    "aliases": "wisdom of the true Self",
     "summary": "Atmajnana is described as the knowledge of the Self, which is essential for attaining true happiness.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0dc0b93e-b5ee-4e92-8e31-055415a15860\", \"131431e9-040d-4950-bc5d-1dff20e92013\", \"2170acf3-67f8-40d1-8043-4ad151774b82\"]",
@@ -1547,7 +1547,7 @@
   },
   {
     "name": "Atma-jnanam",
-    "aliases": "knowledge of the Self; knowledge of the soul",
+    "aliases": "knowledge of the soul",
     "summary": "Atma-jnanam refers to the knowledge of the Self that can be attained by following one's Dharma.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"8fca7063-adfb-4201-943e-7d035fd4615d\"]",
@@ -1577,7 +1577,7 @@
   },
   {
     "name": "Atmananda",
-    "aliases": "Bliss of the Atman; Bliss of the Self; Blissful state of the Self; Inner joy of the Atman; bliss of the Self",
+    "aliases": "Bliss of the Atman; Blissful state of the Self; Inner joy of the Atman",
     "summary": "Atmananda is mentioned as the bliss that one can attain through proper spiritual practice and service.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"6d81d3f0-338c-426c-bba5-6db59da2ad55\", \"b96337d9-3074-4174-ba27-8de00686384d\", \"9275de21-1ecd-4a42-bb21-f1c531d1a542\"]",
@@ -1594,7 +1594,7 @@
   },
   {
     "name": "Atmanivedanam",
-    "aliases": "total surrender",
+    "aliases": "",
     "summary": "Atmanivedanam refers to the final step of total surrender to the Will of the Lord, which the seeker knows through their own purified intuition.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"8f2bfb5f-fd25-4a35-a6c1-529889750d80\", \"45954466-31dc-44a0-aa25-3f9ec2fa64e1\", \"f72208fe-33b9-4c55-bfc0-e6d574edf6f6\"]",
@@ -1690,7 +1690,7 @@
   },
   {
     "name": "Avatara",
-    "aliases": "incarnation of God",
+    "aliases": "",
     "summary": "Avatara refers to the divine incarnation, which is said to be executed according to the speaker's Sankalpa.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b0bf6b4a-6c02-4dc7-9ca0-2ecf9fb720e1\", \"3c74840e-62cd-4f61-8207-b2d3426cc34c\", \"94cd8f93-f9d8-47a5-be86-bca45b7c41a7\"]",
@@ -1724,7 +1724,7 @@
   },
   {
     "name": "Avathar",
-    "aliases": "Avatar; Form Incarnate; God incarnate; avataar; avatar",
+    "aliases": "Avatar; Form Incarnate; avataar; avatar",
     "summary": "The Avathar comes to offer spiritual guidance and comfort to humanity.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"bd2db356-17db-4bee-9871-4753a261757e\", \"6d214c27-ab11-47d7-abed-76974bf4c92a\", \"3982a0ae-080b-4fe6-9212-caf780c7ec33\"]",
@@ -1741,7 +1741,7 @@
   },
   {
     "name": "avidya",
-    "aliases": "ignorance; lack of knowledge; unawareness",
+    "aliases": "lack of knowledge; unawareness",
     "summary": "Avidya, or ignorance, is the opposite of knowledge and promotes the tamo-guna in man.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"550481e4-605c-4aa8-a07b-2add5adaf871\", \"e8a41524-7b1b-4435-be8c-aa1b5af59bed\", \"a7f2ae98-ce20-4f29-88eb-9ebc54a92b7a\"]",
@@ -1840,7 +1840,7 @@
   },
   {
     "name": "Bal Gangadhar Tilak",
-    "aliases": "Tilak",
+    "aliases": "",
     "summary": "Bal Gangadhar Tilak was approached by a British officer who noted Gandhi's criticism of Western education, and Tilak asserted that he remained unaffected by the system.",
     "entity_type": "person",
     "canonical_article_ids": "[\"82ddd19f-affc-429d-ae85-9cd6dc199481\", \"d0c3ff91-22a5-4917-bc83-b81c659229b4\", \"8470186b-19ff-47d3-b3ba-a865818c218e\"]",
@@ -1857,7 +1857,7 @@
   },
   {
     "name": "Bala Gangadhar Tilak",
-    "aliases": "Tilak",
+    "aliases": "",
     "summary": "Bala Gangadhar Tilak is cited as a national leader whose example was followed by the youth fifty years ago.",
     "entity_type": "person",
     "canonical_article_ids": "[\"d0c3ff91-22a5-4917-bc83-b81c659229b4\", \"b6b9e696-f40e-46e9-9f3c-23db1f775bb3\", \"bce9f137-853a-4254-9b1c-df32700e163f\"]",
@@ -1972,7 +1972,7 @@
   },
   {
     "name": "Bhagavatam",
-    "aliases": "Bhagavata; Bhagavata Purana; Bhagavata Shastra; Bhagavatam, scripture; Bhagavatamu; Bhagavatha; Bhagavatha Purana; Bhagavatham; Srimad Bhagavatam; Srimath Bhagavatham; Story of Glory of Divinity; Telugu Bhagavatam; great Telugu epic poem; supreme Purana; the Bhagavata; the Bhagavatam; the enchanting story of Krishna; the fifth Veda",
+    "aliases": "Bhagavata; Bhagavata Shastra; Bhagavatam, scripture; Bhagavatamu; Bhagavatha; Bhagavatha Purana; Bhagavatham; Srimad Bhagavatam; Srimath Bhagavatham; Story of Glory of Divinity; Telugu Bhagavatam; great Telugu epic poem; supreme Purana; the Bhagavata; the Bhagavatam; the enchanting story of Krishna; the fifth Veda",
     "summary": "The teachings of the Vedas were explained and elaborated in the Bhagavatam, along with the Ramayana and Mahabharatam.",
     "entity_type": "text",
     "canonical_article_ids": "[\"9335dfdb-7156-4217-b00b-b00b526488d1\", \"ad9979f7-3b9f-4b0c-b964-561a30178dc1\"]",
@@ -1987,7 +1987,7 @@
   },
   {
     "name": "Bhagawatam",
-    "aliases": "Bhagavata Purana",
+    "aliases": "",
     "summary": "The Bhagawatam contains the quote by Prahlada asserting that one should not doubt the omnipresence of God.",
     "entity_type": "text",
     "canonical_article_ids": "[\"84d0acb4-dfd2-4a9a-809a-1d941d66fd94\"]",
@@ -2067,7 +2067,7 @@
   },
   {
     "name": "Bhakta",
-    "aliases": "Devotee",
+    "aliases": "",
     "summary": "A Bhakta is a devotee who can master the world through the sacred qualities of Shanti and Prema.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"de226d8a-71f0-4ab2-9c10-b2ffedd2716e\", \"c0b71813-d669-4347-bb84-f0be3462b307\", \"e498eab5-17c0-412c-aec2-f4048c4e798b\"]",
@@ -2167,7 +2167,7 @@
   },
   {
     "name": "Bharat",
-    "aliases": "Bhaarat; Bharat (India); Bharat Varsha; Bharat country; Bharata Desha; Bharata-mata; Bharatadesham; Bharatavarsha; Bharateeya land; Bharath; Bharatha Desham; Bharatha bhumi; Bharathavarsha; Bharathiya; Bharatiya culture; Bharatiyas; Hindustan; India; Indian Nation; Indian subcontinent; Mother Bharat; Mother India; Motherland; ancient Bharat; culture of Bharat; dynasty of Bharat; holy land of Bharat; land of Bharat; mother country; motherland; our country Bharat; our country of Bharat; our motherland; sacred country; sacred land of Bharat; sons of Bharat; the country of Bharat; the land of Bharat; the motherland of many noble souls; this great country of Bharat; this land Bharat; this land of Bharat; this sacred land; valiant son of Bharat; valiant sons of Bharat",
+    "aliases": "Bhaarat; Bharat (India); Bharat Varsha; Bharat country; Bharata Desha; Bharata-mata; Bharatadesham; Bharatavarsha; Bharateeya land; Bharath; Bharatha Desham; Bharatha bhumi; Bharathavarsha; Bharathiya; Hindustan; Indian Nation; Indian subcontinent; Mother Bharat; ancient Bharat; dynasty of Bharat; holy land of Bharat; mother country; our country Bharat; our country of Bharat; our motherland; sacred country; sacred land of Bharat; the country of Bharat; the motherland of many noble souls; this great country of Bharat; this land Bharat; this land of Bharat; this sacred land; valiant son of Bharat; valiant sons of Bharat",
     "summary": "Bharat is referred to as a land that has historically accorded an exalted position to women and has been a place of peace and prosperity.",
     "entity_type": "place",
     "canonical_article_ids": "[\"07a7537d-049d-4191-86f1-351e39a35538\", \"08247dec-424a-4839-8529-7ee294dccf9a\", \"1ab1b4cb-338b-4dab-9bae-fa275b2a637c\"]",
@@ -2183,7 +2183,7 @@
   },
   {
     "name": "Bharat Mata",
-    "aliases": "Mother India; Mother of this Land",
+    "aliases": "Mother of this Land",
     "summary": "Bharat Mata represents the welfare of the nation, which students are encouraged to keep in mind.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0c1866d3-5277-4a1e-93a3-af4b59229f23\", \"7bfd5f4a-4c79-4fae-ae28-85bf8710d9e5\"]",
@@ -2199,7 +2199,7 @@
   },
   {
     "name": "Bharata",
-    "aliases": "Bharata in Ramayana; Bharata the brother of Rama; Bharata's name; Bharata's sandals; Bharata, brother of Rama; Bharatha; Bharatha Rama's brother; Bharatha matha; Bharatha's retinue; Bharati; Bh\u0101rata; India; Prince Bharata; Rama's brother; Swami's brother; brother of Rama; mother India; son of Dasharatha; the embodiment of dharma; younger brother of Rama",
+    "aliases": "Bharata in Ramayana; Bharata the brother of Rama; Bharata's name; Bharata's sandals; Bharata, brother of Rama; Bharatha; Bharatha Rama's brother; Bharatha matha; Bharatha's retinue; Bh\u0101rata; Prince Bharata",
     "summary": "Bharata is another brother of Rama, who is mentioned as part of Rama's close family.",
     "entity_type": "person",
     "canonical_article_ids": "[\"6ec221ec-b538-4648-bccc-d3305e369022\"]",
@@ -2213,7 +2213,7 @@
   },
   {
     "name": "Bharata-bhumi",
-    "aliases": "land of Bharat; the land of Bharat",
+    "aliases": "",
     "summary": "Bharata-bhumi is described as inherently Yoga-bhumi and tyaga-bhumi, representing the land of godliness and sacrifice.",
     "entity_type": "place",
     "canonical_article_ids": "[\"02583166-0f84-471c-8fde-830e3631a912\", \"99316d82-d8e3-4d3d-a48a-395c9f1d2bc8\"]",
@@ -2229,7 +2229,7 @@
   },
   {
     "name": "Bharatamata",
-    "aliases": "Mother India",
+    "aliases": "",
     "summary": "Bharatamata is described as the mother of many revered figures in Indian mythology and history, symbolizing the rich heritage of India.",
     "entity_type": "person",
     "canonical_article_ids": "[\"0c1866d3-5277-4a1e-93a3-af4b59229f23\", \"7188c489-9ffa-4db4-9bbc-d2bda3cf1dfd\", \"62235a3b-4792-4190-a178-1ceb7e207876\"]",
@@ -2246,7 +2246,7 @@
   },
   {
     "name": "Bharathamatha",
-    "aliases": "India; Mother India; Motherland; mother of Vamadeva; motherland; the motherland",
+    "aliases": "mother of Vamadeva; the motherland",
     "summary": "Bharathamatha is described as the mother of several notable figures in Indian mythology, including Vamadeva, Prahladha, and Shuka.",
     "entity_type": "person",
     "canonical_article_ids": "[\"310a9e23-56d2-4887-91e3-3a031930656b\", \"e9894110-2dbd-43dc-adb2-9b4298c6958d\", \"d331355f-ff94-4e77-869a-57c40ed802d7\"]",
@@ -2263,7 +2263,7 @@
   },
   {
     "name": "Bharatiya culture",
-    "aliases": "Bharateeya Culture; Bharathiya culture; Bharatiya; Bharatiya philosophy; Bharatiyas; Culture of Bharat; Hindu culture; Indian; Indian Culture; Indian culture; culture of Bharat",
+    "aliases": "Bharateeya Culture; Bharathiya culture; Bharatiya; Bharatiya philosophy; Hindu culture; Indian",
     "summary": "Bharatiya Culture is characterized by its spiritual wisdom and principles that have historically influenced both the subcontinent and other lands.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"256aed55-8f7a-4182-98e1-ac56328d20d7\", \"5fd27846-ad70-4fdc-9048-6e0e92200602\", \"d2e27df2-8a6b-493c-ad1c-136522fcf403\"]",
@@ -2279,7 +2279,7 @@
   },
   {
     "name": "Bharatiya Samskriti",
-    "aliases": "Bharatiya culture; Indian Culture",
+    "aliases": "",
     "summary": "Bharatiya Samskriti refers to the Indian culture that cleanses and purifies human nature, enabling individuals to pursue their spiritual journey.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"06c6b7ab-ba88-40ad-b394-d1f4832ae62c\", \"60f716b9-888e-4c66-bc49-d71bfdb12c31\", \"f3093f89-4eaa-4ecf-83bc-ad34852e172f\"]",
@@ -2313,7 +2313,7 @@
   },
   {
     "name": "Bharatiyas",
-    "aliases": "Bharateeyas; Bharatiya people; Hinduism; Indians; children of Bharat; people of Bharat; people of India; sons of Bharat",
+    "aliases": "Bharateeyas; Bharatiya people; Indians; children of Bharat; people of Bharat; people of India",
     "summary": "Bharatiyas are urged to cherish their culture and uphold the ideals of morality and integrity.",
     "entity_type": "person",
     "canonical_article_ids": "[\"b6727966-3b9d-436b-9925-5c0be8fec7c9\", \"b0a89539-305a-4b83-b6a8-4e3378be9661\", \"922f89ff-ba03-445e-ba6c-29a5a502a7c3\"]",
@@ -2585,7 +2585,7 @@
   },
   {
     "name": "bhrama",
-    "aliases": "delusion",
+    "aliases": "",
     "summary": "Bhrama is the delusion that must die for one to realize their true nature as Brahman.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"5bfde89e-9235-479c-99d2-9313f79f92c9\"]",
@@ -2647,7 +2647,7 @@
   },
   {
     "name": "Bhudevi",
-    "aliases": "Earth Goddess; Goddess Earth; Mother Earth; mother earth; the Goddess",
+    "aliases": "Earth Goddess; Goddess Earth",
     "summary": "Bhudevi, or Mother Earth, is referred to as Devi in the context of Navaratri, highlighting the vital resources provided by the earth.",
     "entity_type": "person",
     "canonical_article_ids": "[\"d1268678-f292-4a69-9e76-56b14de1a5c2\", \"05417839-ec38-4686-9e50-c4a8fe3eb331\", \"7b2f792d-bc7e-4e50-9721-3d8afd44110c\"]",
@@ -2679,7 +2679,7 @@
   },
   {
     "name": "Bhu-mata",
-    "aliases": "Bhoomatha; Bhoomi; Bhu-maata; Bhuloka; Earth; Mother Earth; Prithvi; bhoomamu; earth; land that grows crops; mother earth",
+    "aliases": "Bhoomatha; Bhoomi; Bhu-maata; Bhuloka; Earth; Prithvi; bhoomamu; earth; land that grows crops",
     "summary": "Prakriti is referred to as Bhu-mata, which means mother earth, highlighting its nurturing aspect.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"28f0e4b5-6f28-4161-976b-a479adedbb5b\", \"68637bc3-67c1-4dba-bb37-3b2bac0877c1\", \"07ef4f25-6168-4e8e-aa2d-f2a2bc19c579\"]",
@@ -2763,7 +2763,7 @@
   },
   {
     "name": "Brahma",
-    "aliases": "Bhrama; Brahma Himself; Brahma Sathyam; Brahma Thathwa; Brahma for creation; Brahma muhurta; Brahma the Creator; Brahma the Supreme Being; Brahma the creator; Brahma's Mind-Born Son; Brahman; Brahmatathva; Brahmic; Chief Priest in a Yaj\u00f1a; Chief Priest in a yajna; Demi God of Creation; Divinity; First Member of the Trinity; Husband of Saraswati; I; Kantha Maala; Lord Brahma; One of the Trinity; the Creator; the First of the Trinity; the Personified Absolute; the Primal Person; the Supreme Sovereign Lord; the all-pervasive cosmic principle; the creator; the creator of the universe; the master of the living and the non-living",
+    "aliases": "Bhrama; Brahma Himself; Brahma Sathyam; Brahma Thathwa; Brahma for creation; Brahma muhurta; Brahma the Creator; Brahma the Supreme Being; Brahma the creator; Brahma's Mind-Born Son; Brahmatathva; Brahmic; Chief Priest in a Yaj\u00f1a; Chief Priest in a yajna; Demi God of Creation; First Member of the Trinity; Husband of Saraswati; Kantha Maala; Lord Brahma; One of the Trinity; the First of the Trinity; the Personified Absolute; the Primal Person; the Supreme Sovereign Lord; the all-pervasive cosmic principle; the creator of the universe; the master of the living and the non-living",
     "summary": "Brahma is associated with speech and is traditionally depicted as seated in a Lotus that emerges from the navel of Vishnu.",
     "entity_type": "person",
     "canonical_article_ids": "[\"5f7adcf8-d8fb-48c0-aab9-a8f2a8b0f833\", \"b144e006-9871-40a9-a92d-09ac5488bc41\", \"e36cfb7a-868a-4350-8758-37542142cae9\"]",
@@ -2779,7 +2779,7 @@
   },
   {
     "name": "Brahma Jnana",
-    "aliases": "knowledge of Brahman; knowledge of Supreme Reality; knowledge of the Absolute",
+    "aliases": "knowledge of Supreme Reality",
     "summary": "Brahma jnana refers to the knowledge of Supreme Reality that is often lost in the journey of life.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9275de21-1ecd-4a42-bb21-f1c531d1a542\", \"d93d8a4d-703d-407a-ada9-051dda28b9db\", \"3406ac06-063c-4d2e-864d-9c498bf2be89\"]",
@@ -2878,7 +2878,7 @@
   },
   {
     "name": "Brahma-jnana",
-    "aliases": "knowledge of the Absolute Reality; knowledge of the Brahman; knowledge of the Supreme; knowledge of the Supreme Being",
+    "aliases": "knowledge of the Absolute Reality; knowledge of the Supreme; knowledge of the Supreme Being",
     "summary": "Brahmajnana is the knowledge that reveals the origin, growth, and dissolution of the Cosmos as due to Brahman, the Supreme Reality.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9275de21-1ecd-4a42-bb21-f1c531d1a542\", \"3406ac06-063c-4d2e-864d-9c498bf2be89\", \"d93d8a4d-703d-407a-ada9-051dda28b9db\"]",
@@ -2895,7 +2895,7 @@
   },
   {
     "name": "Brahma-jnanam",
-    "aliases": "Knowledge of the Brahman; knowledge of Brahman; true knowledge",
+    "aliases": "",
     "summary": "Brahma-jnanam is the realization that all is identical with Brahman, which encompasses cause and effect, being and becoming.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3406ac06-063c-4d2e-864d-9c498bf2be89\", \"2af16407-bcd5-43f0-88e0-f0e3ea3c8c74\"]",
@@ -2911,7 +2911,7 @@
   },
   {
     "name": "Brahma-loka",
-    "aliases": "heaven",
+    "aliases": "",
     "summary": "Brahma-loka is mentioned as a realm where those who reach it need not be born again.",
     "entity_type": "place",
     "canonical_article_ids": "[\"b9b60f44-223b-48a5-bcef-7ee2e79746e6\", \"63b0623c-8cb2-46b6-b22c-c87e3f61e4af\"]",
@@ -2943,7 +2943,7 @@
   },
   {
     "name": "Brahmana",
-    "aliases": "Brahman; Brahmana priests; Brahmanasya mukham asit; Brahmin; Brahmins; Brahmins, the priestly class; the host; the noble man",
+    "aliases": "Brahmana priests; Brahmanasya mukham asit; Brahmin; Brahmins; Brahmins, the priestly class; the host; the noble man",
     "summary": "The Brahmana is described as a person who has realized Brahman and is considered wise.",
     "entity_type": "person",
     "canonical_article_ids": "[\"8bb8303d-ce84-4df5-8798-4edf83571bc3\", \"d713479c-7532-475f-bada-15012d1a60dc\", \"5d182dea-d024-417e-8370-6cda9c6d3500\"]",
@@ -3011,7 +3011,7 @@
   },
   {
     "name": "Brahmanda",
-    "aliases": "Macrocosm; cosmos",
+    "aliases": "Macrocosm",
     "summary": "Brahmanda refers to the cosmos, which is described as a huge workshop where every being has a role to play.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"de30ae18-59d2-4430-9a84-9ec2a76603c9\", \"de7637ef-5dcf-48c9-bb8d-a5034d41b6c1\", \"04922026-ae1e-4358-b988-ee4665754866\"]",
@@ -3125,7 +3125,7 @@
   },
   {
     "name": "Brahma-vidya",
-    "aliases": "Atmavidya; Brahma Vidya; Brahma vidya; Highest Wisdom; Knowledge of Brahman; Knowledge of the Absolute; Knowledge of the Brahman; Science of Awareness of Reality; Self-knowledge; education pertaining to Brahman; knowledge of Brahmam; knowledge of Brahman; knowledge of the Spirit; knowledge of the self; science of the Self; the knowledge of Brahman",
+    "aliases": "Atmavidya; Brahma Vidya; Brahma vidya; Science of Awareness of Reality; education pertaining to Brahman; knowledge of Brahmam; knowledge of the Spirit; science of the Self; the knowledge of Brahman",
     "summary": "Brahmavidya is described as the supreme knowledge that liberates individuals from bondage and leads them to the Omniself.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9f61efee-bef7-446e-ad3a-96c2881591fa\"]",
@@ -3235,7 +3235,7 @@
   },
   {
     "name": "Buddhi",
-    "aliases": "Intellect; intellect; intelligence; the intellect",
+    "aliases": "Intellect; intellect; the intellect",
     "summary": "Buddhi is described as the subtle Sun that illuminates the heart.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"7b2f792d-bc7e-4e50-9721-3d8afd44110c\", \"bd068e4e-2585-4c81-bc6f-d931a04cab49\"]",
@@ -3283,7 +3283,7 @@
   },
   {
     "name": "Chaitanyam",
-    "aliases": "Cosmic Consciousness",
+    "aliases": "",
     "summary": "Chaitanyam is the all-pervasive consciousness present in the cosmos and within the individual mind.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a8e0c985-ded5-4446-bb91-fce1195f78a2\", \"71450164-a1df-4c33-a453-0b4bd788be57\", \"2edccaaf-7103-4c22-9eb8-fe7abe70937f\"]",
@@ -3333,7 +3333,7 @@
   },
   {
     "name": "Chandramati",
-    "aliases": "Chandramati who extinguished wild fire; the pious woman of Bharat",
+    "aliases": "Chandramati who extinguished wild fire",
     "summary": "Chandramati is recognized for her steadfastness in supporting her husband\u2019s determination to sacrifice everything for Truth.",
     "entity_type": "person",
     "canonical_article_ids": "[\"263e5759-5fe2-4af3-a31d-e8cacbc9a63a\", \"982651e2-8657-4758-9c25-f8d359253274\", \"f6fe2a32-3100-4add-a882-1bb09feab73c\"]",
@@ -3430,7 +3430,7 @@
   },
   {
     "name": "Chitta",
-    "aliases": "Memory; Will",
+    "aliases": "Memory",
     "summary": "Chitta, or Memory, presents past and present experiences that help in judging actions against the backdrop of Dharma.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f461268c-ae0f-48bd-8f10-d4f528b87510\", \"6bdc5711-e840-45eb-878d-865740d99696\", \"7518ff4a-4d2a-42cc-8292-5e5079b1a956\"]",
@@ -3464,7 +3464,7 @@
   },
   {
     "name": "chitta-shuddhi",
-    "aliases": "Purity of Mind; pure consciousness",
+    "aliases": "Purity of Mind",
     "summary": "Chitta-shuddhi, or purity of the heart, is essential for the dawn of Atma-jnanam (knowledge of the true Self).",
     "entity_type": "concept",
     "canonical_article_ids": "[\"7adf6d03-c107-47da-ab6c-48d0e72e61ff\", \"f64aac9a-d439-47b1-907e-fdff95b944fa\", \"550f0fbf-f237-4aa9-a2bf-9f5495d532eb\"]",
@@ -3580,7 +3580,7 @@
   },
   {
     "name": "Dakshinamurthy",
-    "aliases": "Lord Dakshinamurthy; Shiva Himself; preceptor",
+    "aliases": "Lord Dakshinamurthy; Shiva Himself",
     "summary": "Dakshinamurthy is referred to as Shiva Himself who comes as a teacher.",
     "entity_type": "person",
     "canonical_article_ids": "[\"80bfb954-5c02-434a-a91e-1ed0ed888aca\", \"4e2d2b75-9765-43f3-a5e2-268a0f636a9a\", \"1aa96ee5-7d9a-4f9e-a99f-4260a4fa31c1\"]",
@@ -3630,7 +3630,7 @@
   },
   {
     "name": "Damayanti",
-    "aliases": "Damayanti who reduced an evil-minded hunter to ashes; the pious woman of Bharat",
+    "aliases": "Damayanti who reduced an evil-minded hunter to ashes",
     "summary": "Damayanti is mentioned as another exemplary woman of virtue.",
     "entity_type": "person",
     "canonical_article_ids": "[\"474e57b4-24ef-468b-b19c-b61d2aaebd88\", \"c5c08e91-be22-4de3-a374-3805bda3c979\", \"ddb78d71-756e-4825-81f9-e040c1cea581\"]",
@@ -3714,7 +3714,7 @@
   },
   {
     "name": "Dasaratha",
-    "aliases": "Dasaratha the king; Emperor Dasaratha; King Dasaratha; Rama's father; Ten-chariot leader; father of Rama",
+    "aliases": "Dasaratha the king; Emperor Dasaratha; King Dasaratha; Ten-chariot leader",
     "summary": "Dasaratha did not invite the king of the Kekayas for consultation regarding Rama's coronation, which was part of the Master Plan.",
     "entity_type": "person",
     "canonical_article_ids": "[\"b772a117-5fc4-4bf2-a8af-f7122c28830d\", \"b46ff0d1-b795-4a69-af81-d419ea0521d7\", \"602a6375-2ace-45c8-8178-bd6deb8688d7\"]",
@@ -3731,7 +3731,7 @@
   },
   {
     "name": "Dasharatha",
-    "aliases": "Emperor Dasharatha; Emperor of Ayodhya; Father Dasharatha; King Dasharatha; King of Ayodhya; Lakshmana's father; Rama's father; emperor Dasharatha; emperor of Ayodhya; father of Rama; king of Ayodhya; the Emperor; the King; the Ruler; the Ten Chariot King",
+    "aliases": "Emperor Dasharatha; Emperor of Ayodhya; Father Dasharatha; King Dasharatha; King of Ayodhya; Lakshmana's father; emperor Dasharatha; emperor of Ayodhya; king of Ayodhya; the Emperor; the Ruler; the Ten Chariot King",
     "summary": "Dasharatha is the king who made promises that resulted in significant consequences for his family, including Rama's exile.",
     "entity_type": "person",
     "canonical_article_ids": "[\"b5dab15a-a299-4beb-86aa-fbb62ab59f98\", \"8e013daf-1659-4649-b896-4bd356c1ea87\", \"373d7e22-cda8-40ff-a1b0-f268b39d747f\"]",
@@ -3782,7 +3782,7 @@
   },
   {
     "name": "Deepavali",
-    "aliases": "Diwali; Festival of Lights",
+    "aliases": "Festival of Lights",
     "summary": "Deepavali is a festival that expresses gratitude for the defeat of demonic tendencies in man, particularly the death of Narakasura.",
     "entity_type": "festival",
     "canonical_article_ids": "[\"62ba2557-4565-4f81-8530-6b08fe487224\", \"56244c3c-0ff2-4406-83a8-00dfe03fb141\", \"38de2c78-be03-45ff-9841-d98f0317d906\"]",
@@ -3865,7 +3865,7 @@
   },
   {
     "name": "Devaki",
-    "aliases": "Devaki the daughter of Devaka; Devaki, daughter of Devaka; Devaki, wife of Vasudeva; Krishna's mother; Swami's mother; the mother of Krishna",
+    "aliases": "Devaki the daughter of Devaka; Devaki, daughter of Devaka; Devaki, wife of Vasudeva; the mother of Krishna",
     "summary": "Devaki is the daughter of Devaka and the wife of Vasudeva, who is prophesied to bear a son that will lead to Kamsa's downfall.",
     "entity_type": "person",
     "canonical_article_ids": "[\"868f49a9-bf62-4814-b5e5-d1a529a0545f\", \"7ff73ed3-f1a9-49b7-b82d-cb6e400c2310\", \"1a463c92-5d7a-402d-a3e5-72eeb4a514d6\"]",
@@ -3930,7 +3930,7 @@
   },
   {
     "name": "dharana",
-    "aliases": "Concentration",
+    "aliases": "",
     "summary": "Dharana is the practice of concentration in yoga.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"38648db5-73f1-4f79-bcf8-09a9d31b2231\", \"f1ccb1c3-b99b-44e4-9b41-57e3487edb54\", \"fc335e34-98a3-4815-9e0f-f901367c4191\"]",
@@ -3962,7 +3962,7 @@
   },
   {
     "name": "Dharma",
-    "aliases": "Artha; Four Goals of Human life; God of lust; Justice; Kama; Liberation; Liberation from the Cycle of Birth and Death; Moksha; Morality; Right Conduct; Righteous Conduct; Salvation; achievement of desires; acquisition of material things; artha; brother; code of conduct; code of virtuous conduct; demon of desire; desire; desires; kama; liberation; liberation from birth and death; liberation from night; lust; material well-being; moksha; moral conduct; moral excellence; prescribed conduct; release; right action; right conduct; rules of righteousness; satisfaction of desires; that which supports; the prescribed code of conduct; the upholding principle; ultimate liberation; upholding principle; wealth",
+    "aliases": "Artha; Four Goals of Human life; God of lust; Kama; Liberation from the Cycle of Birth and Death; Moksha; Morality; Right Conduct; Righteous Conduct; Salvation; achievement of desires; acquisition of material things; artha; code of virtuous conduct; demon of desire; kama; liberation from birth and death; liberation from night; lust; material well-being; moksha; moral conduct; moral excellence; prescribed conduct; release; right action; right conduct; rules of righteousness; satisfaction of desires; that which supports; the prescribed code of conduct; the upholding principle; ultimate liberation; upholding principle; wealth",
     "summary": "Dharma is the principle of righteousness that Rama embodied and upheld through his actions.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3e2af759-3430-4251-8439-127aa552e03f\", \"4439e531-f1a9-45da-bc29-07ca0bcf4250\", \"4e954f0a-0742-4103-bfe2-1b3110e34330\"]",
@@ -4010,7 +4010,7 @@
   },
   {
     "name": "Dharmapatni",
-    "aliases": "virtuous companion of the husband; wife",
+    "aliases": "virtuous companion of the husband",
     "summary": "Dharmapatni refers to the virtuous role of a wife in fulfilling the duties of married life.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"46a10cda-f1ba-4444-a4df-c8068856877b\", \"2875f7ff-32ed-4442-8b46-574e4d233665\", \"483b70b6-41e1-46e8-b88d-4c5b55e62cbd\"]",
@@ -4027,7 +4027,7 @@
   },
   {
     "name": "Dharmaraja",
-    "aliases": "Dharmaja; Dharmaja the elder; Dharmaraja the Head; Disciple Parikshit; Emperor Parikshit; He who is engaged in pareeksha; King; King Dharmaraja; King Parikshit; Maharaja; Maharaja Parikshit; Parikshit; Parikshit's grandfather; Yudhishthira; Yudhishtira; Yudhishtira, eldest of the Pandavas; Yudhisthira; eldest Pandava brother; eldest brother of Bhima; eldest of Pandavas; eldest of the Pandava Brothers; eldest of the Pandava brothers; eldest of the five Pandavas; emperor Parikshit; granduncle; king; the King; the child; the eldest among the Pandavas; the eldest brother; the great Maharaja; the king; the little boy with the crown; the young lad; young Parikshit",
+    "aliases": "Dharmaja; Dharmaja the elder; Dharmaraja the Head; Disciple Parikshit; Emperor Parikshit; He who is engaged in pareeksha; King; King Dharmaraja; King Parikshit; Maharaja; Maharaja Parikshit; Parikshit; Parikshit's grandfather; Yudhishthira; Yudhishtira; Yudhishtira, eldest of the Pandavas; Yudhisthira; eldest Pandava brother; eldest brother of Bhima; eldest of Pandavas; eldest of the Pandava Brothers; eldest of the Pandava brothers; eldest of the five Pandavas; emperor Parikshit; granduncle; king; the child; the eldest among the Pandavas; the eldest brother; the great Maharaja; the little boy with the crown; young Parikshit",
     "summary": "Dharmaraja, also known as Yudhishthira, is the eldest of the Pandava brothers in the Mahabharata.",
     "entity_type": "person",
     "canonical_article_ids": "[\"4a9864df-7a15-407c-82d9-2acee73625ba\", \"68d6296f-fa49-4c1c-9a87-d6f51b862600\", \"18465789-0b1f-42b3-9e44-b2c5d5b408eb\"]",
@@ -4106,7 +4106,7 @@
   },
   {
     "name": "Dhyaana",
-    "aliases": "meditation",
+    "aliases": "",
     "summary": "Dhyaana is the process of meditation that is often misunderstood and equated with concentration.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e3c5d74b-3756-4579-950e-a208b3b3cce8\"]",
@@ -4120,7 +4120,7 @@
   },
   {
     "name": "Dhyana",
-    "aliases": "Meditation; concentration; meditation; meditation on God",
+    "aliases": "meditation on God",
     "summary": "Dhyana is highlighted as a spiritual practice that, along with Japa, helps in achieving spiritual goals.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3f05f269-a252-4485-8f9b-b35b25fa39a8\", \"74120f57-bdc6-4665-adcc-52454d36e7ee\", \"f9b46d80-5341-45bd-9d02-4f9129251547\"]",
@@ -4136,7 +4136,7 @@
   },
   {
     "name": "Dhyanam",
-    "aliases": "Dhyanam; Japam; Meditation; Repetition of God\u2019s name; Sadhana of Japam and Dhyanam; meditation; recitation; recitation of God's Names; reciting name; repetition of God's name; repetition of Lord\u2019s name; repetition of the Divine name; repetition of the Lord\u2019s name; repetition of the holy name",
+    "aliases": "Dhyanam; Japam; Repetition of God\u2019s name; Sadhana of Japam and Dhyanam; recitation; recitation of God's Names; reciting name; repetition of God's name; repetition of Lord\u2019s name; repetition of the Divine name; repetition of the Lord\u2019s name; repetition of the holy name",
     "summary": "Japa is mentioned as a spiritual practice that aids in the pursuit of spiritual cleanliness and devotion.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0318f95b-3b5e-49ef-aeb2-201d2cc87275\", \"29b5285e-d2ce-4c62-a6f2-43f40e581f10\", \"76ec0527-23f6-462a-9074-103e32961027\"]",
@@ -4168,7 +4168,7 @@
   },
   {
     "name": "Dipavali",
-    "aliases": "Diwali",
+    "aliases": "",
     "summary": "Dipavali is a joyous festival that celebrates the victory of light over darkness, specifically the destruction of Narakasura by Krishna.",
     "entity_type": "festival",
     "canonical_article_ids": "[\"55e34321-b8c3-418f-908e-0ee88b4e2b61\", \"e1ea2399-6d3a-4719-9ffe-30f47c56fbdc\"]",
@@ -4267,7 +4267,7 @@
   },
   {
     "name": "Draupadi",
-    "aliases": "Dhroupadhi; Dhroupadi; Draupadi the queen; Draupadi's father; Draupadi, the wife of Dharmaja; Draupati; Droupadhi; Droupadi; Krishna's devotee; Paanchali; Panchali; Pandava Queen; Queen Draupadi; Queen of the Pandavas; Sister Draupadi; Swami's devotee; Swami's queen; consort of Pandavas; grandmother; the bereaved mother; the dutiful wife; the ideal housewife; the wife of the Pandavas; the wife of the five Pandavas",
+    "aliases": "Dhroupadhi; Dhroupadi; Draupadi the queen; Draupadi's father; Draupadi, the wife of Dharmaja; Draupati; Droupadhi; Droupadi; Krishna's devotee; Paanchali; Panchali; Pandava Queen; Queen Draupadi; Queen of the Pandavas; Sister Draupadi; Swami's queen; consort of Pandavas; grandmother; the bereaved mother; the dutiful wife; the ideal housewife; the wife of the Pandavas; the wife of the five Pandavas",
     "summary": "Draupadi is described as a noble character who practiced the cultural values of Bharat and reacted with laughter during Bhishma's teachings.",
     "entity_type": "person",
     "canonical_article_ids": "[\"26149008-ca44-4c59-a392-749112e66903\"]",
@@ -4521,7 +4521,7 @@
   },
   {
     "name": "Dwesha",
-    "aliases": "Hatred; hatred",
+    "aliases": "",
     "summary": "Dwesha is the hatred that arises when one's expectations of help from others are not met.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e0b6ccb1-1c62-4238-b0a7-14e6653bd9e4\"]",
@@ -4552,7 +4552,7 @@
   },
   {
     "name": "Easwaramma",
-    "aliases": "Baba's mother; Mother Eashwaramma; Swami's mother",
+    "aliases": "Baba's mother; Mother Eashwaramma",
     "summary": "Easwaramma experienced a divine voice announcing its entry into her body for the welfare of the world.",
     "entity_type": "person",
     "canonical_article_ids": "[\"f798d004-6d2f-4458-bf18-085506f79fe1\"]",
@@ -4611,7 +4611,7 @@
   },
   {
     "name": "Ekagrata",
-    "aliases": "Concentration; One-pointedness; one-pointedness",
+    "aliases": "One-pointedness; one-pointedness",
     "summary": "Ekagrata refers to the state of concentration or one-pointedness that signifies progress in Dhyana.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"76ec0527-23f6-462a-9074-103e32961027\"]",
@@ -4788,7 +4788,7 @@
   },
   {
     "name": "Gandhari",
-    "aliases": "Duryodhana's mother; Gandhari, mother of the Kauravas; Kauravas' mother; Swami's mother; mother of Duryodhana and Dussasana; queen Gandhari",
+    "aliases": "Duryodhana's mother; Gandhari, mother of the Kauravas; Kauravas' mother; mother of Duryodhana and Dussasana; queen Gandhari",
     "summary": "Gandhari, the wife of Dhritarashtra, accompanied her husband and Vidura into the forest, leading to the distress of their family.",
     "entity_type": "person",
     "canonical_article_ids": "[\"41b0f86b-7310-4b3d-af92-8d2065fdc31c\", \"41498a1c-b59a-4bb7-908b-71de19226357\", \"1e5649e6-b950-46d0-9660-e05496cbff9c\"]",
@@ -4934,7 +4934,7 @@
   },
   {
     "name": "Gita",
-    "aliases": "Bhagavad Geeta; Bhagavad Geetha; Bhagavad Gita; Bhagavad-Gita; Bhagavad-geeta; Bhagavad-gita; Bhagavadh Geetha; Bhagavathgeetha; Bhagawad Geeta; Bhagawad Gita; Bhagawadgeeta; Bhagawadgita; Bhagawat-Geeta; Celestial Song; Geeta; Geeta Vahini; Geeta of Krishna; Geetha; Gita-sastra; Gitacharya; G\u012bt\u0101; Sai Gita; Sathya Sai Gita; The Bhagavad Gita; The Gita; Vibhuti Yoga of the Bhagavad Gita; the Bhagavad Gita; the Geeta; the Gita; the Song of God; the scripture",
+    "aliases": "Bhagavad Geeta; Bhagavad Geetha; Bhagavad Gita; Bhagavad-Gita; Bhagavad-geeta; Bhagavad-gita; Bhagavadh Geetha; Bhagavathgeetha; Bhagawad Geeta; Bhagawad Gita; Bhagawadgeeta; Bhagawadgita; Bhagawat-Geeta; Celestial Song; Geeta; Geeta Vahini; Geeta of Krishna; Geetha; Gita-sastra; G\u012bt\u0101; Sai Gita; Sathya Sai Gita; The Bhagavad Gita; The Gita; Vibhuti Yoga of the Bhagavad Gita; the Bhagavad Gita; the Geeta; the Gita; the Song of God; the scripture",
     "summary": "The Gita emphasizes that true knowledge should become an integral part of one\u2019s being, as illustrated by the phrase 'Panditah samadarshinah' which describes a true man of learning.",
     "entity_type": "text",
     "canonical_article_ids": "[\"0b0b2f82-ee67-4807-91a3-43eedf136510\", \"0d923f80-6982-4ac2-92e5-127ddfa42a77\", \"665a5611-07a0-4358-aa09-a20c210223d4\"]",
@@ -5059,7 +5059,7 @@
   },
   {
     "name": "Gopikas",
-    "aliases": "Gopi; cowherdesses of Gokulam; devotees of Krishna; gopis; milkmaids of Brindavan; the young women of Dwaraka",
+    "aliases": "cowherdesses of Gokulam; devotees of Krishna; gopis; milkmaids of Brindavan; the young women of Dwaraka",
     "summary": "The gopikas are depicted as supreme devotees of Krishna, embodying intense love and devotion.",
     "entity_type": "person",
     "canonical_article_ids": "[\"3a13f539-227a-45a6-b809-0fb26bad2128\", \"b64a5de8-d602-4df3-9a46-1bfe00774615\", \"7d9abc28-c044-495c-aae4-de0810a9e355\"]",
@@ -5175,7 +5175,7 @@
   },
   {
     "name": "Grihastha",
-    "aliases": "Householder stage; householder; householder stage; life as a householder",
+    "aliases": "householder; life as a householder",
     "summary": "Grihastha refers to the stage of a householder in the four stages of life in Indian philosophy.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"707fe0c7-4505-4d16-b7a1-d5689c0cd051\", \"eb9ad8d8-1a4e-4af1-9a91-ff85c16d6128\", \"28f0e4b5-6f28-4161-976b-a479adedbb5b\"]",
@@ -5192,7 +5192,7 @@
   },
   {
     "name": "Grihastha Ashram",
-    "aliases": "householder stage",
+    "aliases": "",
     "summary": "Grihastha Ashram refers to the stage of life focused on family and household responsibilities.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"707fe0c7-4505-4d16-b7a1-d5689c0cd051\", \"ffea7699-2404-4631-85cd-1a011459e24c\", \"28f0e4b5-6f28-4161-976b-a479adedbb5b\"]",
@@ -5259,7 +5259,7 @@
   },
   {
     "name": "Guru",
-    "aliases": "preceptor; teacher",
+    "aliases": "teacher",
     "summary": "A Guru is essential for guiding the pupil in meditation and helping them cultivate concentration.",
     "entity_type": "person",
     "canonical_article_ids": "[\"53159f09-3a3d-4cfe-a291-f090e8352576\", \"67eefccd-9eb1-4697-ac5a-1c9d482d85af\"]",
@@ -5353,7 +5353,7 @@
   },
   {
     "name": "Hari",
-    "aliases": "Lord Hari; Vishnu",
+    "aliases": "Lord Hari",
     "summary": "Lord Hari is referred to as the divine being to whom one should cling instead of relying on the impermanent body.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9410f1fb-4000-4d9c-b106-f68e0af59a76\", \"c0174b6f-de7d-4547-b913-c65fc023b981\", \"b07ae1c6-37bb-4ade-93c3-db817b76d2ff\"]",
@@ -5434,7 +5434,7 @@
   },
   {
     "name": "Hindu dharma",
-    "aliases": "Hinduism",
+    "aliases": "",
     "summary": "Hindu dharma is described as a faith that accepts the doctrines of karma, rebirth, and the characteristics of an Awatar.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"b6727966-3b9d-436b-9925-5c0be8fec7c9\"]",
@@ -5481,7 +5481,7 @@
   },
   {
     "name": "Hiranyakashipu",
-    "aliases": "Hater Of The Lord; Hiranya; Hiranyakashipu, the father of Prahlada; Hiranyakashyapa; Mahabali's great grandfather; Prahlada's father; demon king",
+    "aliases": "Hater Of The Lord; Hiranya; Hiranyakashipu, the father of Prahlada; Hiranyakashyapa; Mahabali's great grandfather; demon king",
     "summary": "Hiranyakashipu is the father of Prahlada, who was reproached for his inability to control his senses despite his power.",
     "entity_type": "person",
     "canonical_article_ids": "[\"89cc815a-672c-49dc-8abc-ff66601e8846\", \"7c772bf9-b9b5-4622-9b2c-331a5f3569c5\", \"aa78ff16-a4a5-4f62-aed2-6c50a184909d\"]",
@@ -5513,7 +5513,7 @@
   },
   {
     "name": "Hiranyakasipu",
-    "aliases": "Hiranyakasipu, the father of Prahlada; Prahlada's father",
+    "aliases": "Hiranyakasipu, the father of Prahlada",
     "summary": "Hiranyakasipu is depicted as an atheist father who questioned his son Prahlada about the existence of Narayana.",
     "entity_type": "person",
     "canonical_article_ids": "[\"61b3fa19-f396-4b8a-9c29-9772b68409ee\", \"e36cfb7a-868a-4350-8758-37542142cae9\", \"5a235839-3008-46dd-90de-70f2995678d2\"]",
@@ -5613,7 +5613,7 @@
   },
   {
     "name": "Ida",
-    "aliases": "Bharati; Bharati (Love towards God); Dipti; Sarasvati; goddess Ida",
+    "aliases": "Bharati (Love towards God); Dipti; Sarasvati; goddess Ida",
     "summary": "Ida is associated with the origin of command and grace, representing a spiritual aspect related to the heart.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a9473175-9139-4882-9af2-47d723d04bee\", \"6b770bed-7f05-4602-a926-ae1a05dd768f\", \"76dff06d-9f21-4a91-89ad-b9776904d8fb\"]",
@@ -5630,7 +5630,7 @@
   },
   {
     "name": "Indra",
-    "aliases": "Indhra; Indra the king of Devas; Indra with the Thunderbolt; Lord of celestial gods; Lord of the abode of Gods; Lord of the gods; lord of celestial Gods; presiding deity of intellect; the God of Rain; the Sovereign of the Gods; the chief God",
+    "aliases": "Indhra; Indra the king of Devas; Indra with the Thunderbolt; Lord of celestial gods; Lord of the abode of Gods; Lord of the gods; lord of celestial Gods; presiding deity of intellect; the God of Rain; the chief God",
     "summary": "Indra is the God of Rain who promised to protect the Khandava Forest and its inhabitants, including Takshaka, from destruction by fire.",
     "entity_type": "person",
     "canonical_article_ids": "[\"bad7d1d2-3bd4-410f-a0a4-d863833bc16d\", \"17376d99-4cc0-4d6b-aba9-b97a088484d3\", \"917dc727-5806-4005-ad15-8a77ffc0f017\"]",
@@ -5779,7 +5779,7 @@
   },
   {
     "name": "Jagat",
-    "aliases": "Cosmos; world",
+    "aliases": "world",
     "summary": "The term 'Jagat' signifies the transient nature of the world.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"341f71b9-bee7-45b8-81c2-15303f7fd957\"]",
@@ -5970,7 +5970,7 @@
   },
   {
     "name": "Jesus",
-    "aliases": "Christ; Esu; Isa; Jesus Christ; Master; Son of God; a Messenger of God; son of Mary and Joseph; the Messenger of God; the Son of God; the embodiment of Love and compassion; the embodiment of compassion; the embodiment of truth",
+    "aliases": "Christ; Esu; Isa; Jesus Christ; Son of God; a Messenger of God; son of Mary and Joseph; the Messenger of God; the Son of God; the embodiment of Love and compassion; the embodiment of compassion; the embodiment of truth",
     "summary": "Jesus came to teach mankind the greatness of divine love and sacrificed his life for the sake of others.",
     "entity_type": "person",
     "canonical_article_ids": "[\"26d08c6e-8d99-4822-9df6-cc5172d52f87\", \"6790ee83-3a6c-4a8d-93de-155389c67a81\", \"94ba9b2a-fefc-48e6-9c07-1f355ed40482\"]",
@@ -6017,7 +6017,7 @@
   },
   {
     "name": "jiva",
-    "aliases": "Individual Being; individual self; the consciousness",
+    "aliases": "the consciousness",
     "summary": "The essence of triputi is the integral, unitive reality of jiva (man), Ishwara (God), and prakriti (world).",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e560a180-7ca2-4a62-81b3-b73f9b5b6e9d\", \"47c1fc64-712a-42ab-90a5-507a6a7a8917\", \"a7bcaf57-7b70-44ea-b609-ea88d6272d5e\"]",
@@ -6051,7 +6051,7 @@
   },
   {
     "name": "Jivatma",
-    "aliases": "individualised soul",
+    "aliases": "",
     "summary": "Jivatma is posited by some as the discriminating faculty of the intellect, contrasting with the view of Brahman as spiritual bliss.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"225f4cae-91dc-47a9-b44f-3f01dde33c3e\", \"f468b00d-7c6f-421f-9a31-993e1e19251a\", \"039cfad7-5e2a-4121-9d61-f97825964b2e\"]",
@@ -6068,7 +6068,7 @@
   },
   {
     "name": "Jivi",
-    "aliases": "Individual Being; individual",
+    "aliases": "",
     "summary": "Jivi refers to the individual being who seeks liberation from the influences of Vasanas and ignorance.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"5ed2ed62-b19b-4735-8e79-bfb80328779d\", \"868174bc-3d8b-4f65-aad7-d47d749ac4a8\", \"ec0c6860-05e6-49cd-9a3b-0b895fcd4882\"]",
@@ -6085,7 +6085,7 @@
   },
   {
     "name": "Jnana",
-    "aliases": "Awareness; Constant Integrated Awareness; Discrimination; Experiential Knowledge; Higher Wisdom; Jnaana; Knowledge about the Self; Knowledge of the Self; Prajnana; Super-knowledge; Supreme Wisdom; Viveka; awakened consciousness; awareness; discrimination; discriminatory wisdom; divine knowledge; divine wisdom; education; experiential wisdom; genuine Vidya; higher knowledge; highest wisdom; knowledge of God; path of knowledge; sacred knowledge; spiritual knowledge; spiritual wisdom; the path of wisdom; true education; true father; true knowledge; vidya",
+    "aliases": "Awareness; Experiential Knowledge; Higher Wisdom; Jnaana; Knowledge about the Self; Prajnana; Super-knowledge; Supreme Wisdom; Viveka; awakened consciousness; awareness; discriminatory wisdom; divine knowledge; divine wisdom; education; experiential wisdom; genuine Vidya; higher knowledge; knowledge of God; path of knowledge; sacred knowledge; spiritual wisdom; the path of wisdom; true education; true father; vidya",
     "summary": "Jnana refers to knowledge and is one of the three potencies associated with human existence.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"33f74f7c-2688-4b40-a3f4-03fbe24ee3cc\", \"a8e0c985-ded5-4446-bb91-fce1195f78a2\", \"f64aac9a-d439-47b1-907e-fdff95b944fa\"]",
@@ -6118,7 +6118,7 @@
   },
   {
     "name": "Jnana Yoga",
-    "aliases": "knowledge yoga",
+    "aliases": "",
     "summary": "Jnana Yoga is a path of knowledge that focuses on the direct experiential understanding of Brahman.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0fd2a950-c280-4c55-be45-ee5e93b37a97\", \"ad7e4d7f-5f43-428e-851d-53b0a22ae15c\", \"ca52c035-e551-4457-8c6b-f233459edc7a\"]",
@@ -6186,7 +6186,7 @@
   },
   {
     "name": "Jnanam",
-    "aliases": "spiritual knowledge",
+    "aliases": "",
     "summary": "Jnanam is described as wisdom and knowledge that leads to understanding the divine principle.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"bffed417-c5c7-4c9f-94d0-5c4b1cd9e05e\", \"5568e28f-526e-4c00-83b9-1576cdb846e4\", \"d3b091ea-8188-445c-aa89-bbdb01923f2a\"]",
@@ -6203,7 +6203,7 @@
   },
   {
     "name": "jnana-yoga",
-    "aliases": "knowledge yoga",
+    "aliases": "",
     "summary": "Jnana-yoga is described as the royal road leading man to his sublime goal of divine realization.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0fd2a950-c280-4c55-be45-ee5e93b37a97\", \"ca52c035-e551-4457-8c6b-f233459edc7a\", \"ad7e4d7f-5f43-428e-851d-53b0a22ae15c\"]",
@@ -6416,7 +6416,7 @@
   },
   {
     "name": "Kaivalyam",
-    "aliases": "liberation",
+    "aliases": "",
     "summary": "Kaivalyam is described as the divine status where the Divine is experienced as all-comprehensive, requiring the suppression of ignorance and cultivation of purity.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"72d4de00-8ee3-4d96-a288-069c6282ce0f\", \"f13abefe-25e4-4ded-9b5b-7ac84366161c\", \"6deea157-9358-48b0-945e-8e01d1e8de44\"]",
@@ -6526,7 +6526,7 @@
   },
   {
     "name": "Kalpataru",
-    "aliases": "tree that grants all wishes; wish-fulfilling tree",
+    "aliases": "tree that grants all wishes",
     "summary": "The tree that grants all wishes (kalpataru) was one of the results of the churning of the Ocean of milk.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"27a52b1f-913d-4eae-b01e-245212a22aec\", \"6f6c8578-7188-49fb-a916-472ba5d481df\", \"7becb621-6646-433c-9d84-20b151a49011\"]",
@@ -6543,7 +6543,7 @@
   },
   {
     "name": "Kalpavriksha",
-    "aliases": "wish fulfilling tree; wish-fulfilling tree",
+    "aliases": "wish fulfilling tree",
     "summary": "Every tree is described as a Kalpavriksha, symbolizing the manifestation of the Divine.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9592d7d5-820f-476f-83d6-35c631190d56\", \"edc0c07e-8325-4b2b-a3fd-48349d561cc9\", \"ce12a9e6-9528-42f1-9e94-6feb3c67c731\"]",
@@ -6560,7 +6560,7 @@
   },
   {
     "name": "Kalpavriksham",
-    "aliases": "Wish-fulfilling Tree; wish-fulfilling tree",
+    "aliases": "",
     "summary": "Kalpavriksham is a metaphorical tree in the heart that grants all desires, which can be seen when one removes the weeds of ignorance.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"1c363706-ab56-4ec9-8fe2-c44740c40e06\", \"b70c6e1f-8014-43bd-a1e7-76294222d402\", \"b376a419-8a29-41ae-8e95-d0b2c9ce64c1\"]",
@@ -6640,7 +6640,7 @@
   },
   {
     "name": "Kamsa",
-    "aliases": "Kamsa the cruel; Kamsa, son of Ugrasena; the king",
+    "aliases": "Kamsa the cruel; Kamsa, son of Ugrasena",
     "summary": "Kamsa was a powerful character who, despite his capabilities, was defeated due to his worldly attachments.",
     "entity_type": "person",
     "canonical_article_ids": "[\"868f49a9-bf62-4814-b5e5-d1a529a0545f\", \"1a463c92-5d7a-402d-a3e5-72eeb4a514d6\", \"7ff73ed3-f1a9-49b7-b82d-cb6e400c2310\"]",
@@ -6902,7 +6902,7 @@
   },
   {
     "name": "Kasturi",
-    "aliases": "Swami's devotee",
+    "aliases": "",
     "summary": "Kasturi is one of the authors who wrote about Sathya Sai Baba's life in the book Sathyam Sivam Sundaram.",
     "entity_type": "person",
     "canonical_article_ids": "[\"c1e33c63-1e6c-44e0-9f2c-9e19a1e26ee4\", \"568cc82e-79d6-434a-8b98-37a5d6315143\", \"dca11d71-2b13-4990-85c6-db688d36498a\"]",
@@ -6933,7 +6933,7 @@
   },
   {
     "name": "Kausalya",
-    "aliases": "Kausalya the mother of Rama; Kausalya who fostered Sri Rama; Kausalya's son; Kausalya, the eldest queen; Mother Kausalya; Queen Kausalya; Rama's mother; Swami's mother; mother Kausalya; mother of Rama; princess of the Kosala kingdom",
+    "aliases": "Kausalya the mother of Rama; Kausalya who fostered Sri Rama; Kausalya's son; Kausalya, the eldest queen; Mother Kausalya; Queen Kausalya; mother Kausalya; mother of Rama; princess of the Kosala kingdom",
     "summary": "Kausalya is revered by Rama as his mother and is mentioned as a figure of respect in his life.",
     "entity_type": "person",
     "canonical_article_ids": "[\"5d62b820-24f4-4d16-8c8a-0855951e5433\", \"f13abefe-25e4-4ded-9b5b-7ac84366161c\", \"39bdfc46-5672-4c2f-8fdb-749c59f8efd3\"]",
@@ -6950,7 +6950,7 @@
   },
   {
     "name": "Kaushalya",
-    "aliases": "Mother Kaushalya; Queen Kaushalya; Rama's mother",
+    "aliases": "Mother Kaushalya; Queen Kaushalya",
     "summary": "Kaushalya is mentioned as the loving mother of Rama, whose care contributed to his divinity.",
     "entity_type": "person",
     "canonical_article_ids": "[\"1c8f27e0-60b2-4ad1-a127-7434fae78277\", \"72938ccf-8a0d-4ac5-b92a-93d743948674\", \"91592e19-7041-459d-ab57-a69f52884981\"]",
@@ -7082,7 +7082,7 @@
   },
   {
     "name": "Kousalya",
-    "aliases": "Rama's mother",
+    "aliases": "",
     "summary": "Kousalya is identified as the Satvika (balanced) Guna, one of the three queens married to Dasharatha.",
     "entity_type": "person",
     "canonical_article_ids": "[\"373d7e22-cda8-40ff-a1b0-f268b39d747f\", \"8043bfb4-ccb3-40b3-9d67-0171881d07de\"]",
@@ -7113,7 +7113,7 @@
   },
   {
     "name": "Krishna",
-    "aliases": "Aacharya of all Aacharyas; Aatma (soul); Aditya; Alankara Priyo Vishnu; Arjun; Arjuna; Arjuna Gita; Arjuna holding the Gandiva; Arjuna of the Mahabharata; Arjuna the Arms; Arjuna the King; Arjuna the Kshathriya; Arjuna the brave; Arjuna the devotee; Arjuna the disciple; Arjuna the naroththoma; Arjuna the narottama; Arjuna the prince; Arjuna the seeker; Arjuna the warrior; Arjuna's charioteer; Arjuna's delusion; Arjuna's teacher; Arjuna, the devotee; Arjuna, the devotee of Krishna; Arjuna, the eager inquirer; Arjuna, the warrior; Atma; Atma Rama; Avatars of Krishna; Avatars of Rama; Avatharic Person; Baba; Badri Narayana; Bhagavan; Bhagawan; Bhagawan Baba; Bhagawan Krishna; Bhagawan Sri Sathya Sai Baba; Bharata Aditya; Boy Krishna; Brother; Brother Krishna; Butter-thief; Chaitanya; Chaitanya Maha Prabhu; Chaitanya Mahaprabhu; Chaithanya; Chinmaya-murti; Cosmic Consciousness; Cowherd Boy; Cowherd Boy Krishna; Cowherd Krishna; Cowherd-Krishna; Damodara; Deva; Dhamodhara; Dhananjaya; Dhananjayaha; Divine Boy; Divine Child; Divine Father; Divine Krishna; Divine Name of Rama; Divine Principle; Divine love personified; Divine personality Rama; Divine presence; Divinity; Emperor of the Universe; Fair Child of Brindavan; Gauranga; Geethacharya; Giridhar; Giridhara Gopala; Giridhari; Gitacharya; God Incarnate; God Krishna; God Narayana; God Rama; God incarnate; Gopaala; Gopal; Gopala; Gopala Krishna; Gopanna; Gopeevallabha; Gopijanavallabhaya; Gopikas' beloved; Gopivallabha; Gouranga; Govardana mountain lifter; Govind; Govinda; Govinda Maharaj; Govindaya; Govindha; Gudakesa; Gudakesha; Hari; He who delights in decoration; Hrishikesha; Jagadrakshaka; Jagannatha; Jaya krishna; Kavi; Keshava; Kiriti; Krishna (divinity in human form); Krishna Avatar; Krishna Chaitanya; Krishna Charioteer; Krishna Himself; Krishna Paramatma; Krishna Principle; Krishna River; Krishna Thathwa; Krishna as the Lord; Krishna bhakta; Krishna declared; Krishna idol; Krishna in Bhagawadgeeta; Krishna in the Geeta; Krishna in the Gita; Krishna of the Gita; Krishna of the Mahabharata; Krishna of the Pandavas; Krishna of the Yadava clan; Krishna river; Krishna the Companion; Krishna the Comrade; Krishna the Cowherd Boy; Krishna the Friend; Krishna the God; Krishna the Heart; Krishna the Kinsman; Krishna the Lord; Krishna the Loved One; Krishna the Lover; Krishna the Purushoththama; Krishna the Purushottama; Krishna the Teacher; Krishna the Yogeshvara; Krishna the avataric Person; Krishna the charioteer; Krishna the divine; Krishna the flute player; Krishna the incarnation; Krishna the son of Nanda; Krishna the teacher; Krishna to Arjuna; Krishna who slew Narakasura; Krishna's leelas; Krishna's mother; Krishna's name; Krishna, Swami's son; Krishna-bhaktha; Krishna-consciousness; Krishna-dhanam; Krishna-thrishna; Krishnaavataar; Krishnaavatar; Krishnachandra; Krishnadeva Raya; Krishnah; Krisna; Krsna; Kuru nandhana; Kuru-nandana; Life-Consciousness; Lord Krishna; Lord Madhava; Lord Narayana; Lord Ram; Lord Rama; Lord Ramachandra; Lord Sri Krishna; Lord Vasudeva; Lord Vishnu; Lord of Madhura; Lord of Mathura; Lord of Yoga; Lord of yoga; Lotus-eyed Lord; Madhava; Madhuradhipate; Madhusudana; Master of the Three Worlds; Mathura; Meghashyama; Nagasayi; Name of Rama; Nanda-kishora; Nandakumara; Nandanandana; Nara; Narayana; Narayana alias Ramdas; Narottama; Navaneetachora; O Krishna; O Lord; Oh Krishna; Oh! Krishna; Omnipresent; Pandava Prince Arjuna; Pandava brother; Pandavanam Dhananjayah; Pandavas' brother; Paramatma; Partha; Parthiva; Phalguna; Premadayee; Prince Arjuna; Prince Rama; Prince of Righteousness; Pure Consciousness; Purusha-Rama; Purushothama; Purushottama; Puttaparthi Chakravarti; Puttaparthi Sai Baba; Puttaparthi Sathya Sai; Raama; Radha's Lord; Radha's consort; Raghunatha; Ram; Rama; Rama Avatar; Rama Chandra; Rama Rajya; Rama Tattvam; Rama as an avatar; Rama as depicted in the Ramayana; Rama as dharma embodied; Rama bhakta; Rama in the Heart; Rama incarnation; Rama is virtue personified; Rama namam; Rama of Ayodhya; Rama principle; Rama the Blissful; Rama the Ideal; Rama the Lord; Rama the Prince; Rama the brother of Bharata; Rama the embodiment of dharma; Rama the husband of Sita; Rama the incarnation of Narayana; Rama the personification of Dharma; Rama the universal Atma; Rama's Name; Rama's name; Rama's other self; Rama's own sons; Rama's right hand; Rama's sandals; Rama, the Purusha; Rama, who has come in the form and with the name of Rama; Rama-bhaktha; Rama-naamam; Rama-nama; Rama-namam; Rama-principle; Ramachandra; Ramanam; Ramanama; Ramavataram; Ramdas; Ramo vigrahavaan Dharmaha; Ramudu; Sabyasachi; Sai; Sai Avatar; Sai Baba; Sai principle; Sai tattwam; Sairam; Samartha Ramdas; Sat-Chit-Anandamurti; Sathya; Sathya Sai; Sathya Sai Baba; Sethuvahana; Shirdi Baba; Shirdi Sai Baba; Shirdi sareeram; Shri Krishna; Shri Rama; Shyamasundara; Source of Bliss; Sri Krishna; Sri Narayana; Sri Rama; Sri Rama Chandra; Sri Ramachandra; Sri Sathya Sai; Sri Sathya Sai Baba; Srirama; Sun; Sun God; Supreme Lord; Supreme Lord Narayana; Supreme Lord Vishnu; Supreme Lord of all; Supreme Self (Paramatma); Supreme Spirit; Supreme in Vaishnavism; Surdas; Surdas the devotee; Surya; Suurdhas; Swami; Swami Arjuna; Swami Krishna; Swami's Birthday; Swami's Name; Swami's devotee; Swami's disciple; Swami's form in Dwapara-yuga; Swami's foster son; Swami's reference to Rama; That which pervades everywhere; The Sun; Toddler-Krishna; Vasudeva; Vasudeva upasana; Vasudeva, son of Shura; Vasudeva, son of Sura; Vishnu; Vishnu for protection; Vishnu the Preserver; Vishnu the Protector; Vishnu-tattvam; Wielder of the Bow; Word of Sai; Yashoda's son; Yogeshwara; You; any other form of Divinity; attachment to God; child Krishna; cowherd boy; devotee; divine incarnation of Krishna; divine name 'Rama'; divine name of Keshava; divine name of Rama; divine resident inside this mansion; divinity; embodiment of Dharma; figure of Krishna; foremost warrior; friend; gitacharya; greatest bowman; guardian deity of the Hindus; idol of Krishna; idol of Vishnu; idols of Vishnu; incarnation of God; infant Krishna; inner consciousness; name of Rama; natha; one of the twelve Adityas; present Chief Minister of Karnataka; ritual Fire of Yajna; sacred Krishna; sacred bull; son of Dasharatha; son of Kunti; son of Pandu; son of Prithvi; the Atmarama; the Avatar; the Birthday of Krishna; the Charming Lord; the Creator; the Divine Boy; the Divine Chaitanya; the Divine Child; the Divine Incarnation; the Divine within; the God that symbolizes the universal aspect of the Divine Principle; the Humanisation of the Universal; the Indweller; the Krishna in your heart; the Krishna-form; the Lord Narayana; the Lord as Krishna; the Lord who came down to the earth from Gokulam; the Lotus-eyed Lord; the Name and Form of Krishna; the Name of Krishna; the Name of Rama; the ONE; the Pandava; the Protector; the Sun; the Sun God; the Sun that can make the lotus in the heart bloom; the Supreme Being; the Supreme Guru; the Supreme Self; the Universal; the all-pervasive; the best among men; the best of gods; the black Lord; the blind saint; the blind singer; the bold individual; the boy Krishna; the calf; the charming idol of Krishna; the child Krishna; the child born on September 28, 1835; the child of Devaki; the cowherd boy; the deserving human; the disciple; the disciple of Hrishikesha; the divine child; the embodiment of Dharma; the embodiment of Love; the embodiment of Time; the embodiment of dharma; the embodiment of peace; the example of Krishna; the faint-hearted poltroon; the form of Vishnu; the gopalas' friend; the gopikas appealed to Krishna; the great hero; the great hero Arjuna; the hero; the holy child; the ideal man; the individual; the individual entity; the jiva; the king of Dwaraka; the kinsman of the hapless; the life story of Rama; the little boy; the master of nature; the name of Rama; the one who learned from Krishna; the one who taught Arjuna; the one with that appropriate name; the presiding deity of Karma; the prince of the Pandavas; the protector; the pupil; the renowned warrior; the right interrogator for Krishna; the sacred Name of Krishna; the son of Dasaratha; the son of Dasharatha; the story of Rama; the supreme Lord of the three worlds; the sweet fruit; the true aspirant; the wedding of Krishna; the young Baba; third Pandava brother; uncle Krishna; young child dancing as Krishna",
+    "aliases": "Aacharya of all Aacharyas; Aatma (soul); Aditya; Alankara Priyo Vishnu; Arjun; Arjuna; Arjuna Gita; Arjuna holding the Gandiva; Arjuna of the Mahabharata; Arjuna the Arms; Arjuna the King; Arjuna the Kshathriya; Arjuna the brave; Arjuna the devotee; Arjuna the disciple; Arjuna the naroththoma; Arjuna the narottama; Arjuna the prince; Arjuna the seeker; Arjuna the warrior; Arjuna's charioteer; Arjuna's delusion; Arjuna's teacher; Arjuna, the devotee; Arjuna, the devotee of Krishna; Arjuna, the eager inquirer; Arjuna, the warrior; Atma; Atma Rama; Avatars of Krishna; Avatars of Rama; Avatharic Person; Baba; Badri Narayana; Bhagawan; Bhagawan Baba; Bhagawan Krishna; Bhagawan Sri Sathya Sai Baba; Bharata Aditya; Boy Krishna; Brother Krishna; Butter-thief; Chaitanya; Chaitanya Maha Prabhu; Chaitanya Mahaprabhu; Chaithanya; Chinmaya-murti; Cowherd Boy; Cowherd Boy Krishna; Cowherd Krishna; Cowherd-Krishna; Damodara; Dhamodhara; Dhananjaya; Dhananjayaha; Divine Boy; Divine Child; Divine Father; Divine Krishna; Divine Name of Rama; Divine personality Rama; Divine presence; Emperor of the Universe; Fair Child of Brindavan; Gauranga; Geethacharya; Giridhar; Giridhara Gopala; Giridhari; God Krishna; God Rama; Gopaala; Gopal; Gopala; Gopala Krishna; Gopanna; Gopeevallabha; Gopijanavallabhaya; Gopikas' beloved; Gopivallabha; Gouranga; Govardana mountain lifter; Govind; Govinda; Govinda Maharaj; Govindaya; Govindha; Gudakesa; Gudakesha; Hari; He who delights in decoration; Jagadrakshaka; Jagannatha; Jaya krishna; Kavi; Keshava; Kiriti; Krishna (divinity in human form); Krishna Avatar; Krishna Chaitanya; Krishna Charioteer; Krishna Himself; Krishna Paramatma; Krishna Principle; Krishna River; Krishna Thathwa; Krishna as the Lord; Krishna bhakta; Krishna declared; Krishna idol; Krishna in Bhagawadgeeta; Krishna in the Geeta; Krishna in the Gita; Krishna of the Gita; Krishna of the Mahabharata; Krishna of the Pandavas; Krishna of the Yadava clan; Krishna river; Krishna the Companion; Krishna the Comrade; Krishna the Cowherd Boy; Krishna the Friend; Krishna the God; Krishna the Heart; Krishna the Kinsman; Krishna the Lord; Krishna the Loved One; Krishna the Lover; Krishna the Purushoththama; Krishna the Purushottama; Krishna the Teacher; Krishna the Yogeshvara; Krishna the avataric Person; Krishna the charioteer; Krishna the divine; Krishna the flute player; Krishna the incarnation; Krishna the son of Nanda; Krishna the teacher; Krishna to Arjuna; Krishna who slew Narakasura; Krishna's leelas; Krishna's name; Krishna, Swami's son; Krishna-bhaktha; Krishna-consciousness; Krishna-dhanam; Krishna-thrishna; Krishnaavataar; Krishnaavatar; Krishnachandra; Krishnadeva Raya; Krishnah; Krisna; Krsna; Kuru nandhana; Kuru-nandana; Life-Consciousness; Lord Krishna; Lord Madhava; Lord Narayana; Lord Ram; Lord Rama; Lord Ramachandra; Lord Sri Krishna; Lord Vasudeva; Lord Vishnu; Lord of Madhura; Lord of Mathura; Lord of Yoga; Lord of yoga; Lotus-eyed Lord; Madhava; Madhuradhipate; Madhusudana; Master of the Three Worlds; Mathura; Meghashyama; Nagasayi; Nanda-kishora; Nandakumara; Nandanandana; Nara; Narayana alias Ramdas; Narottama; Navaneetachora; O Krishna; O Lord; Oh Krishna; Oh! Krishna; Omnipresent; Pandava Prince Arjuna; Pandava brother; Pandavanam Dhananjayah; Pandavas' brother; Partha; Parthiva; Phalguna; Premadayee; Prince Arjuna; Prince Rama; Prince of Righteousness; Purusha-Rama; Purushothama; Purushottama; Puttaparthi Chakravarti; Puttaparthi Sai Baba; Puttaparthi Sathya Sai; Raama; Radha's Lord; Radha's consort; Raghunatha; Ram; Rama; Rama Avatar; Rama Chandra; Rama Rajya; Rama Tattvam; Rama as an avatar; Rama as depicted in the Ramayana; Rama as dharma embodied; Rama bhakta; Rama in the Heart; Rama incarnation; Rama is virtue personified; Rama namam; Rama of Ayodhya; Rama principle; Rama the Blissful; Rama the Ideal; Rama the Lord; Rama the Prince; Rama the brother of Bharata; Rama the embodiment of dharma; Rama the husband of Sita; Rama the incarnation of Narayana; Rama the personification of Dharma; Rama the universal Atma; Rama's own sons; Rama's sandals; Rama, the Purusha; Rama, who has come in the form and with the name of Rama; Rama-bhaktha; Rama-naamam; Rama-nama; Rama-namam; Rama-principle; Ramachandra; Ramanam; Ramanama; Ramavataram; Ramdas; Ramo vigrahavaan Dharmaha; Ramudu; Sabyasachi; Sai Avatar; Sai principle; Sai tattwam; Sairam; Samartha Ramdas; Sat-Chit-Anandamurti; Sathya Sai; Sathya Sai Baba; Sethuvahana; Shirdi Baba; Shirdi Sai Baba; Shirdi sareeram; Shri Krishna; Shri Rama; Shyamasundara; Source of Bliss; Sri Krishna; Sri Narayana; Sri Rama; Sri Rama Chandra; Sri Ramachandra; Sri Sathya Sai; Sri Sathya Sai Baba; Srirama; Sun; Supreme Lord Narayana; Supreme Lord Vishnu; Supreme Lord of all; Supreme Self (Paramatma); Supreme in Vaishnavism; Surdas; Surdas the devotee; Surya; Suurdhas; Swami Arjuna; Swami Krishna; Swami's Birthday; Swami's Name; Swami's disciple; Swami's form in Dwapara-yuga; Swami's foster son; Swami's reference to Rama; That which pervades everywhere; Toddler-Krishna; Vasudeva; Vasudeva upasana; Vasudeva, son of Shura; Vasudeva, son of Sura; Vishnu for protection; Vishnu the Preserver; Vishnu the Protector; Vishnu-tattvam; Wielder of the Bow; Word of Sai; Yashoda's son; Yogeshwara; You; any other form of Divinity; attachment to God; child Krishna; cowherd boy; divine incarnation of Krishna; divine name 'Rama'; divine name of Keshava; divine name of Rama; divine resident inside this mansion; embodiment of Dharma; figure of Krishna; foremost warrior; friend; greatest bowman; guardian deity of the Hindus; idol of Krishna; idol of Vishnu; idols of Vishnu; infant Krishna; natha; one of the twelve Adityas; present Chief Minister of Karnataka; ritual Fire of Yajna; sacred Krishna; sacred bull; son of Kunti; son of Pandu; son of Prithvi; the Atmarama; the Avatar; the Birthday of Krishna; the Charming Lord; the Divine Boy; the Divine Chaitanya; the Divine Child; the Divine Incarnation; the Divine within; the God that symbolizes the universal aspect of the Divine Principle; the Humanisation of the Universal; the Indweller; the Krishna in your heart; the Krishna-form; the Lord Narayana; the Lord as Krishna; the Lord who came down to the earth from Gokulam; the Lotus-eyed Lord; the Name and Form of Krishna; the Name of Krishna; the Name of Rama; the Pandava; the Protector; the Sun God; the Sun that can make the lotus in the heart bloom; the Supreme Being; the Supreme Guru; the Universal; the all-pervasive; the best among men; the best of gods; the black Lord; the blind saint; the blind singer; the bold individual; the boy Krishna; the calf; the charming idol of Krishna; the child Krishna; the child born on September 28, 1835; the child of Devaki; the cowherd boy; the deserving human; the disciple of Hrishikesha; the divine child; the embodiment of Love; the embodiment of Time; the embodiment of peace; the example of Krishna; the faint-hearted poltroon; the form of Vishnu; the gopalas' friend; the gopikas appealed to Krishna; the great hero; the great hero Arjuna; the hero; the holy child; the ideal man; the individual; the individual entity; the jiva; the king of Dwaraka; the kinsman of the hapless; the life story of Rama; the little boy; the master of nature; the name of Rama; the one who learned from Krishna; the one who taught Arjuna; the one with that appropriate name; the presiding deity of Karma; the prince of the Pandavas; the protector; the pupil; the renowned warrior; the right interrogator for Krishna; the sacred Name of Krishna; the son of Dasaratha; the son of Dasharatha; the story of Rama; the supreme Lord of the three worlds; the sweet fruit; the true aspirant; the wedding of Krishna; the young Baba; third Pandava brother; uncle Krishna; young child dancing as Krishna",
     "summary": "Krishna is described as breaking butter pots in Brindavan, symbolizing the liberation of souls from material attachments.",
     "entity_type": "person",
     "canonical_article_ids": "[\"02deb747-f1eb-4eda-8f6d-1f96dc4594ff\", \"06b7e07a-017f-4dcb-81a5-54c00d5cb7ee\", \"075030cd-9367-460e-8112-6545a54dbd24\"]",
@@ -7229,7 +7229,7 @@
   },
   {
     "name": "Krodha",
-    "aliases": "Anger; anger; hatred",
+    "aliases": "Anger; anger",
     "summary": "Krodha is one of the six inner enemies of man, representing anger.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"310a9e23-56d2-4887-91e3-3a031930656b\"]",
@@ -7277,7 +7277,7 @@
   },
   {
     "name": "Kshama",
-    "aliases": "Forgiveness; forbearance; forgiveness; fortitude; son; tolerance",
+    "aliases": "Forgiveness; forbearance; forgiveness; son",
     "summary": "Kshama is described as a vital necessity for acquiring divine love and is characterized by extreme patience and the capacity to forget and forgive.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3a44a4d5-26c4-4a6a-a5b7-1c9fb8dc5e5c\"]",
@@ -7437,7 +7437,7 @@
   },
   {
     "name": "Kunti",
-    "aliases": "Kunti Devi; Kunti, mother of the Pandavas; Mother Kunti; Queenmother Kunti; Swami's mother; mother Kunti; mother of Pandavas; mother of the Pandavas; the mother of the Pandavas",
+    "aliases": "Kunti Devi; Kunti, mother of the Pandavas; Mother Kunti; Queenmother Kunti; mother Kunti; mother of Pandavas; mother of the Pandavas; the mother of the Pandavas",
     "summary": "Kunti, the mother of Dharmaraja, expressed her concern and inquired about the whereabouts of Dhritarashtra and Gandhari.",
     "entity_type": "person",
     "canonical_article_ids": "[\"fe0238fa-50e5-433e-add3-9226424df971\", \"11d9e9e8-116d-4f15-9794-b9cd244fb6a0\", \"7ff73ed3-f1a9-49b7-b82d-cb6e400c2310\"]",
@@ -7468,7 +7468,7 @@
   },
   {
     "name": "Kusa",
-    "aliases": "the son of Sita",
+    "aliases": "",
     "summary": "Kusa is the other boy who, along with Lava, sought to propagate the epic Ramayana as per Valmiki's wish.",
     "entity_type": "person",
     "canonical_article_ids": "[\"abe22432-ed51-4e9c-b108-698254f11611\"]",
@@ -7498,7 +7498,7 @@
   },
   {
     "name": "Lakshmana",
-    "aliases": "Brother Lakshmana; Brother of Rama; Lakshman; Lakshmana Rama's brother; Lakshmana the Prince; Lakshmana the brother of Rama; Lakshmana the jiva; Lakshmana's name; Lakshmana, brother of Rama; Laxmana; Lord Lakshmana; Manas; Rama's brother; Rama's brother and devoted companion; Rama's other self; Rama's right hand; Sumitra's son; Swami's brother; Swami's brother-in-law; second virtue of Rama; the embodiment of manas; younger brother of Rama",
+    "aliases": "Brother Lakshmana; Lakshman; Lakshmana Rama's brother; Lakshmana the Prince; Lakshmana the brother of Rama; Lakshmana the jiva; Lakshmana's name; Lakshmana, brother of Rama; Laxmana; Lord Lakshmana; Manas; Rama's brother and devoted companion; Sumitra's son; Swami's brother-in-law; second virtue of Rama; the embodiment of manas",
     "summary": "Lakshmana is Rama's brother, whom Rama treated with affection and considered as close as his own kin.",
     "entity_type": "person",
     "canonical_article_ids": "[\"73b2b9f4-30c8-4df2-8619-1bbf4ea3fbb9\", \"b58785c2-eacd-4eb2-85f7-61861e3e83d1\", \"bfbbd4e7-d4dd-4bae-9765-c6d455234c29\"]",
@@ -7514,7 +7514,7 @@
   },
   {
     "name": "Lakshmi",
-    "aliases": "Consort of God Narayana; Consort of Vishnu; Dhanalakshmi; Divine Consort; Divine Consort of Narayana; Friday for Lakshmi; Goddess Lakshmi; Goddess of Prosperity; Goddess of Riches; Goddess of Wealth; Goddess of riches; Goddess of wealth; Mother Lakshmi; Tuesday for Lakshmi; goddess Lakshmi; goddess of prosperity; goddess of wealth; one of the goddesses worshipped during Navaratri; the Goddess of wealth",
+    "aliases": "Consort of God Narayana; Consort of Vishnu; Dhanalakshmi; Divine Consort; Divine Consort of Narayana; Friday for Lakshmi; Goddess Lakshmi; Goddess of Prosperity; Goddess of Riches; Goddess of riches; Mother Lakshmi; Tuesday for Lakshmi; goddess Lakshmi; goddess of prosperity; the Goddess of wealth",
     "summary": "Lakshmi advises Parvati against marrying Lord Shiva, questioning the compatibility of their union.",
     "entity_type": "person",
     "canonical_article_ids": "[\"e35efa01-a806-4d12-8897-e227a9c93dd5\", \"9f61efee-bef7-446e-ad3a-96c2881591fa\", \"88e54732-05f8-4d05-822d-980d98e57d70\"]",
@@ -7531,7 +7531,7 @@
   },
   {
     "name": "Lakshmi Devi",
-    "aliases": "Goddess of Wealth; goddess of wealth",
+    "aliases": "",
     "summary": "Lakshmi Devi is mentioned as one of the rewards obtained from the churning of the ocean of milk by the Asuras and Devas.",
     "entity_type": "person",
     "canonical_article_ids": "[\"80bfb954-5c02-434a-a91e-1ed0ed888aca\", \"fbb41aa5-1a84-44d8-aa9e-4fb3c9eb00f6\"]",
@@ -7625,7 +7625,7 @@
   },
   {
     "name": "Lava",
-    "aliases": "the son of Sita",
+    "aliases": "",
     "summary": "Lava is one of the twin sons of Sita and Rama, raised by Sage Valmeeki.",
     "entity_type": "person",
     "canonical_article_ids": "[\"862a8544-7d56-498c-8adc-104861291bce\"]",
@@ -7740,7 +7740,7 @@
   },
   {
     "name": "Lokaah Samastaah Sukhino Bhavantu",
-    "aliases": "Vedic prayer",
+    "aliases": "",
     "summary": "This phrase expresses the ideal of wishing happiness for all worlds, reflecting the noble heritage of Indians.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"fab91bcf-b9c1-4e82-aeb0-e6c42c5eaa90\", \"a8eecc52-f718-4d59-8bfd-edab9d0564cc\", \"5722d91b-2061-4b59-9356-7298db945abb\"]",
@@ -7791,7 +7791,7 @@
   },
   {
     "name": "Maaya",
-    "aliases": "Divine illusion; apparent deluding reality; illusion; mayaa",
+    "aliases": "mayaa",
     "summary": "Maaya is described as a fundamental ignorance that creates illusions, making one believe in false realities.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0f736acf-2c28-49b7-a313-79af34e68a56\"]",
@@ -7805,7 +7805,7 @@
   },
   {
     "name": "Mada",
-    "aliases": "aggressive conceit; pride",
+    "aliases": "aggressive conceit",
     "summary": "Mada is one of the six inner enemies of man, representing pride.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f8c962d7-6f67-4a97-9224-78f5ccba5070\", \"86969391-cf6e-492a-a12f-3f90011d0186\", \"ad3de9e8-050a-4385-ab9b-479577cf606b\"]",
@@ -8164,7 +8164,7 @@
   },
   {
     "name": "Mamakara",
-    "aliases": "My-ness; attachment; possessiveness",
+    "aliases": "My-ness; possessiveness",
     "summary": "Mamakara refers to attachment, which is also portrayed as a harmful trait in human beings.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"00e9d75d-7a65-4f5a-a9f4-98d2084ca3a6\"]",
@@ -8229,7 +8229,7 @@
   },
   {
     "name": "Manava",
-    "aliases": "Man; human; human being; man",
+    "aliases": "human; human being",
     "summary": "Manava represents humanity in the discourse, illustrating the relationship between man and God.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"6f92807e-4d6a-4d1e-b89d-a2632ffd9e9b\", \"bab9976b-9176-4240-b1bc-a29664f7f651\"]",
@@ -8560,7 +8560,7 @@
   },
   {
     "name": "Matsarya",
-    "aliases": "envy; jealousy",
+    "aliases": "envy",
     "summary": "Matsarya is one of the six inner enemies of man, representing envy.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f8c962d7-6f67-4a97-9224-78f5ccba5070\", \"434d96fd-21d6-4fe3-bf9f-6b0f3eeb4753\", \"f1ba832c-41f4-4787-b122-e07c1a934764\"]",
@@ -8609,7 +8609,7 @@
   },
   {
     "name": "maya",
-    "aliases": "Delusion; Illusion; Nartaki; apparent deluding reality; basic ignorance; deluding effect of ignorance; deluding power; deluding wiles of Nature; deludious force; delusion; divine illusion; illusion; illusory power; the primal illusion; veil of delusion; worldly illusion",
+    "aliases": "Nartaki; basic ignorance; deluding effect of ignorance; deluding power; deluding wiles of Nature; deludious force; illusory power; the primal illusion; veil of delusion; worldly illusion",
     "summary": "Maya refers to the illusion that entangles individuals in the objective world.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"68205feb-274a-4c53-a94d-abdf67fda44c\"]",
@@ -8704,7 +8704,7 @@
   },
   {
     "name": "mithya",
-    "aliases": "delusion; false",
+    "aliases": "false",
     "summary": "Mithya is another term for satasat, representing the characteristic of many things in the world that appear to change.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9aca246b-3f19-44a0-8b16-2a31be56f3d3\", \"62e18b1c-f901-4cb3-942d-40367b8e8770\", \"4d03610e-020c-4758-9779-9fafa4a74860\"]",
@@ -8721,7 +8721,7 @@
   },
   {
     "name": "Moha",
-    "aliases": "Illusion; attachment; delusion; fascination; infatuation",
+    "aliases": "fascination; infatuation",
     "summary": "Moha is one of the six inner enemies of man, representing fascination.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"6deea157-9358-48b0-945e-8e01d1e8de44\", \"e35efa01-a806-4d12-8897-e227a9c93dd5\", \"fc1bfea4-6fe5-43d6-b123-674e475d32b0\"]",
@@ -8738,7 +8738,7 @@
   },
   {
     "name": "Moksham",
-    "aliases": "Freedom; Liberation; Self-realisation; liberation",
+    "aliases": "",
     "summary": "Moksham is referred to as the ultimate goal or purpose of life.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"bb15b045-eab4-4304-94ca-3d3b906569e5\", \"fcc95d0c-7b3a-4b82-9579-6e755acd553d\"]",
@@ -8858,7 +8858,7 @@
   },
   {
     "name": "mukthi",
-    "aliases": "Liberation; liberation",
+    "aliases": "",
     "summary": "Mukthi is the ultimate result of devotion and skill, leading to spiritual liberation.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"62b0bf7a-f930-46c3-bf95-bc03fe2458ca\"]",
@@ -8873,7 +8873,7 @@
   },
   {
     "name": "Mukti",
-    "aliases": "Liberation; Self-realisation; liberation",
+    "aliases": "",
     "summary": "Mukti is the state of liberation that can only be attained by eliminating desires that bind the heart.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"6b38a0d5-f51a-4dc6-bd2f-ab60405866d1\"]",
@@ -9133,7 +9133,7 @@
   },
   {
     "name": "Nara",
-    "aliases": "Naara; man",
+    "aliases": "Naara",
     "summary": "In Sanskrit, 'Nara' refers to man, who is burdened by animal instincts from previous lives.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"8ecdd272-adab-4292-9d3d-a3423a16321f\", \"bc97aa6d-85c8-414a-82d0-1f965e7fd2cc\"]",
@@ -9148,7 +9148,7 @@
   },
   {
     "name": "Narada",
-    "aliases": "My Mind-projected Son; Naarda; Narada Muni; Narada the son of Saraswati; Sage Narada; kalahapriya; sage Narada; son of Brahma; son of a maid; the sage",
+    "aliases": "My Mind-projected Son; Naarda; Narada Muni; Narada the son of Saraswati; Sage Narada; kalahapriya; sage Narada; son of Brahma; son of a maid",
     "summary": "Narada, a great exponent of devotion, defined bhakti as the ceaseless flow of devotion arising from dwelling on the Lord\u2019s name.",
     "entity_type": "person",
     "canonical_article_ids": "[\"44d67eb7-9ada-4254-8f66-f08c3098436b\", \"544dfacd-a6db-4bda-86b1-18417d434933\", \"80873191-868c-4cc8-9026-0cdc26c2905d\"]",
@@ -9295,7 +9295,7 @@
   },
   {
     "name": "Neeraja",
-    "aliases": "bride of Gopa family; gopi; the bride",
+    "aliases": "bride of Gopa family; the bride",
     "summary": "Neeraja is a bride who defies her in-laws' warnings and becomes deeply devoted to Krishna, ultimately facing ostracism from her village.",
     "entity_type": "person",
     "canonical_article_ids": "[\"a887f886-e2ee-4977-8757-df745ff2e91c\", \"245e33e7-e822-48ab-8f69-a9e74f24326d\"]",
@@ -9362,7 +9362,7 @@
   },
   {
     "name": "Nine Point Code of Conduct",
-    "aliases": "Nidanavati; Nine Paths of Devotion; Nine Point Code; Nine-fold path of bhakti; Nine-point Code; code of conduct; nine paths of devotion",
+    "aliases": "Nidanavati; Nine Paths of Devotion; Nine Point Code; Nine-fold path of bhakti; Nine-point Code; nine paths of devotion",
     "summary": "The Nine Point Code of Conduct is a framework for living a life based on human values and principles.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"103500a7-d8f7-4214-bf4a-4252eca00794\"]",
@@ -9409,7 +9409,7 @@
   },
   {
     "name": "Nirvana",
-    "aliases": "liberation",
+    "aliases": "",
     "summary": "Nirvana is described as a state of being without air, symbolizing the absence of desire.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b04c7dd1-b483-4e23-9837-6aea9d8cc7ab\", \"7a1c16e2-ae34-482a-8785-dcffb6a9aee1\", \"e8c94180-ba4f-4a1c-bdec-097b60d61aaf\"]",
@@ -9460,7 +9460,7 @@
   },
   {
     "name": "Nishkama karma",
-    "aliases": "desireless action",
+    "aliases": "",
     "summary": "Nishkama karma demonstrates and promotes the love principle in the context of karma yoga.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a011decf-0d87-448a-8d9c-a31709a3126c\", \"593805d3-33dc-490e-8ee5-a12a205d0da0\", \"6813e132-f0f7-498b-b4af-e7d21b238105\"]",
@@ -9477,7 +9477,7 @@
   },
   {
     "name": "Nishkama-karma",
-    "aliases": "desireless action; desireless activity; selfless action",
+    "aliases": "desireless activity; selfless action",
     "summary": "Nishkama-karma is the practice of engaging in action without attachment to the results, dedicated to the Lord.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a011decf-0d87-448a-8d9c-a31709a3126c\", \"7046118f-d338-425c-9bcd-d42cd5044abd\", \"e560a180-7ca2-4a62-81b3-b73f9b5b6e9d\"]",
@@ -9494,7 +9494,7 @@
   },
   {
     "name": "Niskama-karma",
-    "aliases": "selfless service",
+    "aliases": "",
     "summary": "Niskama-karma refers to the practice of selfless action, which is emphasized as a means to avoid desire and sorrow.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"5f899860-2cc5-4f22-96a1-aab7d9b8713e\"]",
@@ -9559,7 +9559,7 @@
   },
   {
     "name": "Niyama",
-    "aliases": "Discipline",
+    "aliases": "",
     "summary": "Niyama consists of five practices: Soucham (purity), Tapas (austerity), Santhosham (contentment), Swadhyayam (study of scriptures), and Easwara Pranidhanam (offering to the Lord).",
     "entity_type": "concept",
     "canonical_article_ids": "[\"7a12035a-ee6c-491f-8d29-4ad0988bdb6c\"]",
@@ -9573,7 +9573,7 @@
   },
   {
     "name": "Nyaya",
-    "aliases": "Justice",
+    "aliases": "",
     "summary": "Nyaya refers to Justice, which is a fundamental aspect of Dharma.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f956c1cd-5fbc-4490-9652-672be22f79e4\"]",
@@ -9681,7 +9681,7 @@
   },
   {
     "name": "Padmapada",
-    "aliases": "Lotus-footed; Padmapada the disciple; the disciple",
+    "aliases": "Lotus-footed; Padmapada the disciple",
     "summary": "Padmapada was one of Sankara's chief pupils known for his deep reverence for his Guru and his miraculous crossing of a river to deliver his Guru's washed clothes.",
     "entity_type": "person",
     "canonical_article_ids": "[\"f35a7f21-fbc9-4485-b125-6197c2cbf3a7\"]",
@@ -9695,7 +9695,7 @@
   },
   {
     "name": "Pancha Bhutas",
-    "aliases": "five basic elements; five elements",
+    "aliases": "",
     "summary": "The pancha bhutas are the embodiment of selflessness, representing the fundamental elements of nature.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"ad3de9e8-050a-4385-ab9b-479577cf606b\", \"75d5d83c-24fc-4620-b739-8a73f0ec1466\", \"550f0fbf-f237-4aa9-a2bf-9f5495d532eb\"]",
@@ -9712,7 +9712,7 @@
   },
   {
     "name": "Pancha Koshas",
-    "aliases": "five sheaths; five sheaths of the Self",
+    "aliases": "five sheaths of the Self",
     "summary": "The Pancha Koshas refer to the five sheaths enveloping the pure Atma, which are the Annamaya Kosha, Pranamaya Kosha, Manomaya Kosha, Vijnanamaya Kosha, and Anandamaya Kosha.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"8c105eb6-3cb6-44bc-a573-e60ec0558a64\", \"0d461190-4227-46c9-9997-01733fadae6c\", \"e0237ea3-c93e-4e66-89ed-2cb0e01a1fd1\"]",
@@ -9746,7 +9746,7 @@
   },
   {
     "name": "Pancha-bhutas",
-    "aliases": "Five Elements; five basic elements; five elements",
+    "aliases": "",
     "summary": "The Pancha-bhutas refer to the five elements that pervade the universe and are present in every human being in a subtle form.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"ad3de9e8-050a-4385-ab9b-479577cf606b\", \"550f0fbf-f237-4aa9-a2bf-9f5495d532eb\", \"75d5d83c-24fc-4620-b739-8a73f0ec1466\"]",
@@ -9763,7 +9763,7 @@
   },
   {
     "name": "pancha-koshas",
-    "aliases": "five sheaths",
+    "aliases": "",
     "summary": "Pancha-koshas refers to the five sheaths that are included in the concept of Yama.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"8c105eb6-3cb6-44bc-a573-e60ec0558a64\", \"542dbe0d-d43c-42cd-b3db-d923c0354c7e\", \"0d461190-4227-46c9-9997-01733fadae6c\"]",
@@ -9918,7 +9918,7 @@
   },
   {
     "name": "Paramaatma",
-    "aliases": "Supreme soul; the Eternal Witness",
+    "aliases": "the Eternal Witness",
     "summary": "Paramaatma is described as the Sarvaantaryaami, the inner motivator of all, present and immanent in everything.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"cf47ac2a-8aa9-4be7-819a-2281013c4a98\"]",
@@ -9950,7 +9950,7 @@
   },
   {
     "name": "paramashanti",
-    "aliases": "supreme Peace",
+    "aliases": "",
     "summary": "Paramashanti refers to supreme peace that can be attained by a wise person.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3d0726c2-26a7-4bcf-a0be-d90eed6e6358\", \"4241aba4-9dd7-44e5-9ff8-3c2b2052320f\"]",
@@ -9966,7 +9966,7 @@
   },
   {
     "name": "Paramatman",
-    "aliases": "Supreme Absolute Self; Supreme Reality; Supreme Soul",
+    "aliases": "Supreme Absolute Self",
     "summary": "Paramatman refers to the Supreme Soul, of which all beings are considered sparks.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f1ccb1c3-b99b-44e4-9b41-57e3487edb54\", \"3a7fa983-3f3d-4ae4-adcd-8f91b8f4ba8d\", \"f878b38f-cce6-4723-bd6c-84ee58ed4c80\"]",
@@ -9983,7 +9983,7 @@
   },
   {
     "name": "Parameshti",
-    "aliases": "Supreme Self",
+    "aliases": "",
     "summary": "Parameshti refers to the ultimate reality or God, from whom creation (Srishti) originates.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"4c7426e7-d15c-4862-8855-755fd2b4fe6f\", \"6bd1a169-f4ad-4806-aa7a-21a108999e69\", \"b929883f-f00f-4ce5-880f-aa6db5f3ee34\"]",
@@ -10000,7 +10000,7 @@
   },
   {
     "name": "Parameswara",
-    "aliases": "Supreme Lord",
+    "aliases": "",
     "summary": "Parameswara represents Viswasa (faith) in the discourse.",
     "entity_type": "person",
     "canonical_article_ids": "[\"14f83a1f-3777-42bf-a995-be5571816a1f\"]",
@@ -10277,7 +10277,7 @@
   },
   {
     "name": "Pippalada",
-    "aliases": "Maharshi Pippalada; Sage Pippalada; the Guru",
+    "aliases": "Maharshi Pippalada; Sage Pippalada",
     "summary": "Pippalada is the competent Teacher to whom aspirants approach to learn the rare and precious teaching known as Brahmavidya.",
     "entity_type": "person",
     "canonical_article_ids": "[\"fe653069-0f1a-4687-9bf1-2207d2703ecd\", \"4a308ca5-1c92-4136-ae72-fda338fa2d6f\", \"48055a97-a694-4b26-9051-e7bb5c7f53e3\"]",
@@ -10462,7 +10462,7 @@
   },
   {
     "name": "Prahlada",
-    "aliases": "Hiranyakashipu's son; Mahabali's father; Prahlada Maharaja; Prahlada the grandfather of Bali; Prahlada, the child of Leelavati; Prahlada, the devotee of Hari; Prahlada, the great devotee; a person who is full of ananda; child devotee of Lord Vishnu; son of a rakshasa; the child Prahlada; the little boy Prahlada; the young lad",
+    "aliases": "Hiranyakashipu's son; Mahabali's father; Prahlada Maharaja; Prahlada the grandfather of Bali; Prahlada, the child of Leelavati; Prahlada, the devotee of Hari; Prahlada, the great devotee; a person who is full of ananda; child devotee of Lord Vishnu; son of a rakshasa; the child Prahlada; the little boy Prahlada",
     "summary": "Prahlada is mentioned as a great hero who maintained his devotion to the Lord despite facing severe torture.",
     "entity_type": "person",
     "canonical_article_ids": "[\"e200d686-9a98-4737-ad64-ca72cf6804a6\"]",
@@ -10493,7 +10493,7 @@
   },
   {
     "name": "Prajapati",
-    "aliases": "Cosmic Consciousness; Cosmic womb; Golden Womb; Hiranyagarbha; Hiranyagarbha Lingam; Jnana Bhaskara; Lord of Creation; Lord of creatures; Ruler of all beings born; The Golden Womb; golden womb; the Lord of Creatures; the lord of creatures",
+    "aliases": "Cosmic womb; Golden Womb; Hiranyagarbha; Hiranyagarbha Lingam; Jnana Bhaskara; Lord of Creation; Lord of creatures; Ruler of all beings born; The Golden Womb; golden womb; the Lord of Creatures; the lord of creatures",
     "summary": "Prajapati is mentioned as the deity ruling over the generative aspect.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"30741185-2610-42f9-8edb-ef1205352acd\"]",
@@ -10507,7 +10507,7 @@
   },
   {
     "name": "Prajna",
-    "aliases": "Constant Integrated Awareness; Knower; Prajna principle; deep sleep stage; radiation; the 'I' principle",
+    "aliases": "Knower; Prajna principle; deep sleep stage; radiation; the 'I' principle",
     "summary": "Prajna is the causal state associated with the sound 'MA' and is linked to deep sleep.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b976d9d7-b4b7-4ade-a2ab-bd1d77070c4b\"]",
@@ -10555,7 +10555,7 @@
   },
   {
     "name": "Prakriti",
-    "aliases": "objective world; outer nature; phenomenal world; the Mother; the objective world",
+    "aliases": "outer nature; phenomenal world; the Mother; the objective world",
     "summary": "Prakriti represents Nature and the Feminine Principle, serving as a stern teacher that guides individuals towards the Divine.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"868174bc-3d8b-4f65-aad7-d47d749ac4a8\", \"e8a41524-7b1b-4435-be8c-aa1b5af59bed\", \"b193092c-a684-4c7d-bc7d-668e9c58b8bd\"]",
@@ -10688,7 +10688,7 @@
   },
   {
     "name": "Prapatti",
-    "aliases": "Dedication; Total surrender; total surrender",
+    "aliases": "Dedication",
     "summary": "Prapatti refers to total surrender to God and is related to Self-realisation.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9d7bbd0d-97e5-4a8f-b3b2-1f7b615c1243\", \"fbbf6e58-9eef-49fd-a2a7-43e6f4efdeef\", \"05f27b5f-ef79-4737-9f42-11b70a033e3d\"]",
@@ -10722,7 +10722,7 @@
   },
   {
     "name": "Prasanthi",
-    "aliases": "Prasanthi Nilayam; Supreme Peace; equanimity; inner peace; supreme peace; tranquility",
+    "aliases": "Prasanthi Nilayam; tranquility",
     "summary": "Prasanthi refers to a state of tranquility that one can achieve through spiritual practice and surrender to the Divine.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9918fead-3f69-4307-a9cd-d5dad7a75bfc\", \"702e61d6-5e51-4562-b2b8-b029ee660df3\", \"3d947df3-8729-4123-8f77-674d9d6b9fa4\"]",
@@ -10802,7 +10802,7 @@
   },
   {
     "name": "Prasanthi Vidwan Mahasabha",
-    "aliases": "Society of Pandits",
+    "aliases": "",
     "summary": "The Prasanthi Vidwan Mahasabha is identified as an instrument for the revival of dharma.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"8873325b-f16a-4a22-abc1-d25cd8335053\", \"2e0905ce-1a51-4970-8cd8-e280e4939d60\", \"0d923f80-6982-4ac2-92e5-127ddfa42a77\"]",
@@ -10836,7 +10836,7 @@
   },
   {
     "name": "prashanti",
-    "aliases": "Supreme Peace",
+    "aliases": "",
     "summary": "Prashanti is the Supreme Peace that can be achieved through the unity of speech, mind, and intellect.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"afae2fcc-5407-4e0a-96b7-abf8c014a1bc\", \"ce59a5d1-6a2f-4145-b3ee-1e3ea8301cde\", \"3406ac06-063c-4d2e-864d-9c498bf2be89\"]",
@@ -10934,7 +10934,7 @@
   },
   {
     "name": "Prema",
-    "aliases": "Divine Love; Divine Prema; Love towards all beings; divine love; love for all beings; pure love; selfless Divine Love; undercurrent of Love; universal love",
+    "aliases": "Divine Love; Divine Prema; Love towards all beings; divine love; love for all beings; pure love; selfless Divine Love; undercurrent of Love",
     "summary": "Prema is referred to as the subtle form of the Moon in the heart.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0a5d5cf6-4d28-4120-910b-053ea9dece9d\", \"22b19d8d-4e71-487c-8047-25bdcb614d2f\", \"3d261c71-0f0c-4c6b-a15c-44348edd2032\"]",
@@ -10950,7 +10950,7 @@
   },
   {
     "name": "Premaswarupa",
-    "aliases": "Divine Love Personified; Embodiment of Divine Love",
+    "aliases": "Embodiment of Divine Love",
     "summary": "You can call Me Embodiment of Divine Love (Premaswarupa)! You will not be wrong!",
     "entity_type": "person",
     "canonical_article_ids": "[\"3823a36f-3ec1-4b88-8e8b-7473c4dc2a7b\", \"15ec0143-f236-40b6-8e52-7b94207d7c74\", \"c27d86a1-1132-4197-a0ea-79519ed2530c\"]",
@@ -10984,7 +10984,7 @@
   },
   {
     "name": "Puja",
-    "aliases": "ritual worship; ritualistic worship; worship",
+    "aliases": "ritual worship; ritualistic worship",
     "summary": "Puja is a ritual worship practice that teachers are encouraged to perform in reverence to Sai Rama.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"775e3166-bc62-45a4-977f-24c662948a43\", \"86d67cec-26c0-4620-8273-e7b436975149\", \"35c3fe9b-6969-45bd-b5eb-336b5ace14de\"]",
@@ -11225,7 +11225,7 @@
   },
   {
     "name": "Radha",
-    "aliases": "Gopi; Gopi Radha; Gopika; Krishna's consort; Radha Rani; Radha alone; Radha the devotee; Radha, beloved of Krishna; Radha-tattvam; gopika; great devotee of Lord Krishna; the Radha Principle",
+    "aliases": "Gopi Radha; Gopika; Krishna's consort; Radha Rani; Radha alone; Radha the devotee; Radha, beloved of Krishna; Radha-tattvam; gopika; great devotee of Lord Krishna; the Radha Principle",
     "summary": "Radha is interpreted by Ramanujacharya as signifying the continuous stream of worship of the Divine.",
     "entity_type": "person",
     "canonical_article_ids": "[\"6fd3f914-0591-47c4-8e1d-f451e14468a1\", \"b8849624-6df1-459c-ab97-af4933dec02e\"]",
@@ -11255,7 +11255,7 @@
   },
   {
     "name": "Raga",
-    "aliases": "Attachment; Passion; attachment; desire",
+    "aliases": "Passion",
     "summary": "Raga signifies attachment, which includes love for family and kin, but should be kept within limits.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f5fecf98-c32d-44e8-a4e7-66b15d197876\", \"55d6b49b-ad6b-47e9-ae98-38b382cc97cf\", \"550481e4-605c-4aa8-a07b-2add5adaf871\"]",
@@ -11388,7 +11388,7 @@
   },
   {
     "name": "Rakshasas",
-    "aliases": "demons",
+    "aliases": "",
     "summary": "Rakshasas are mentioned as the beings whose atrocities were complained about by the egotistic ascetics.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"47f82985-5293-44ed-9878-2482707f2fdb\", \"53b33272-88d1-4040-a89b-b6a862b8aebc\", \"9d7b18e8-2579-45de-9870-919131eba157\"]",
@@ -11435,7 +11435,7 @@
   },
   {
     "name": "Ramanama",
-    "aliases": "Rama\u2019s name; holy name of Rama; name of Rama",
+    "aliases": "holy name of Rama",
     "summary": "Remembrance of the name Ramanama is essential for crossing the sea of worldly life and achieving realization of the Lord.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"eb92833f-15bf-49bb-8e53-4f2aa839748f\", \"61f9ab5c-0ff3-465d-965d-a3e07901bd05\", \"00108cfe-cf09-4f62-bdac-ea2bfb50b0ca\"]",
@@ -11516,7 +11516,7 @@
   },
   {
     "name": "Ramayana",
-    "aliases": "Adyatma Ramayana; Raamaayana; Rama-ayana; Sita-Rama Ramayanam; Srimad Ramayana; The Ramayana; The Story of Sita; The killing of Ravana; Valmeeki Ramayana; Valmiki Ramayana; ancient Ramayana; author of the Ramayana; the Rama story; the epic of Rama; the sacred text",
+    "aliases": "Adyatma Ramayana; Raamaayana; Rama-ayana; Sita-Rama Ramayanam; Srimad Ramayana; The Ramayana; The Story of Sita; The killing of Ravana; Valmeeki Ramayana; Valmiki Ramayana; ancient Ramayana; the Rama story; the epic of Rama; the sacred text",
     "summary": "The Ramayana is referenced as one of the scriptures that describe the impersonal person known by many names.",
     "entity_type": "text",
     "canonical_article_ids": "[\"3a809b99-f891-4a97-b2c4-63cb9a9a952c\", \"4b616b21-57da-43cd-8c81-37ee04f3fcc6\", \"70d2bb41-8177-43f6-8bf0-6949717f8a8b\"]",
@@ -11581,7 +11581,7 @@
   },
   {
     "name": "Ravana",
-    "aliases": "King Ravana; Rakshasa King of Lanka; Ravana from the Ramayana; Ravana the Rakshasa; Ravana the Scholar; Ravana the demon; Ravana the demon ruler; Ravana the great devotee; Ravana the king; Ravana the powerful; Ravana the powerful king; Ravana the ruler; Ravana the son of Brahma; Ravana, the great scholar; Ravana, the husband of Sita; Ravana, the king of Lanka; Ravanan; Ruler of the Rakshasas; Ten-headed One; demon-king of Lanka; personification of kama and krodha; the bereaved father; the brave Ravana; the demon king; the egoistic person Ravana; the great demon; the king of Lanka; the rakshasa ruler; the villain",
+    "aliases": "King Ravana; Rakshasa King of Lanka; Ravana from the Ramayana; Ravana the Rakshasa; Ravana the Scholar; Ravana the demon; Ravana the demon ruler; Ravana the great devotee; Ravana the king; Ravana the powerful; Ravana the powerful king; Ravana the ruler; Ravana the son of Brahma; Ravana, the great scholar; Ravana, the husband of Sita; Ravana, the king of Lanka; Ravanan; Ten-headed One; demon-king of Lanka; personification of kama and krodha; the bereaved father; the brave Ravana; the demon king; the egoistic person Ravana; the great demon; the king of Lanka; the rakshasa ruler; the villain",
     "summary": "Ravana is depicted as the wicked king of Lanka, who abducted Sita.",
     "entity_type": "person",
     "canonical_article_ids": "[\"13f0af89-26c4-4ca2-b88e-ebafc7e7c13c\", \"621cdea4-487b-4e7f-9f80-206ecbde0bfa\", \"766369b3-b1d8-42e4-8fa2-5a19e8435514\"]",
@@ -11820,7 +11820,7 @@
   },
   {
     "name": "Saadhaka",
-    "aliases": "Spiritual aspirant; spiritual aspirant",
+    "aliases": "",
     "summary": "A Saadhaka is a spiritual aspirant who seeks to attain self-knowledge and the realization of the Atman.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"1df4cb82-0ddd-4867-a3e1-378290e9937f\", \"41b0f86b-7310-4b3d-af92-8d2065fdc31c\", \"0c21322f-2b16-455a-9382-d29196737b24\"]",
@@ -11837,7 +11837,7 @@
   },
   {
     "name": "saadhana",
-    "aliases": "spiritual discipline",
+    "aliases": "",
     "summary": "Saadhana refers to spiritual discipline, which is essential for personal growth and development in the context of being a Guru.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"fe8128ee-e29d-403d-8c27-7d96de8f5998\", \"cf47ac2a-8aa9-4be7-819a-2281013c4a98\"]",
@@ -11916,7 +11916,7 @@
   },
   {
     "name": "Sadhaka",
-    "aliases": "Spiritual aspirant; spiritual aspirant; spiritual practitioner",
+    "aliases": "spiritual practitioner",
     "summary": "A sadhaka is a spiritual practitioner who listens attentively to the stories of God's grace.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"89a69ff9-7682-47d7-96ed-1ed2038be2dd\", \"3f577147-d39e-4652-ad09-8a5cdf403b08\", \"5828080a-f9ec-496e-a020-8b8bfce6ed5a\"]",
@@ -11950,7 +11950,7 @@
   },
   {
     "name": "sadhana",
-    "aliases": "Asceticism; Penance; Spiritual discipline; Tapas; austerity; discipline; penance; sadhyam; spiritual discipline; spiritual effort; spiritual efforts; spiritual endeavour; spiritual exercise; spiritual practice",
+    "aliases": "Tapas; austerity; sadhyam; spiritual effort; spiritual efforts; spiritual endeavour; spiritual exercise; spiritual practice",
     "summary": "Sadhana refers to the spiritual effort required to achieve self-realization and is essential for true devotion.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3845d08f-9c45-4124-89cb-8e72a7e0275a\", \"47813d57-5691-4687-a9a1-050453c80585\", \"a88378d3-772b-4146-b4fc-57e67948a76d\"]",
@@ -12000,7 +12000,7 @@
   },
   {
     "name": "Sahana",
-    "aliases": "Patience; fortitude; tolerance",
+    "aliases": "Patience",
     "summary": "Sahana is mentioned as a quality to cultivate, representing fortitude.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"c62df849-7bce-4d4c-8590-8a4e80dd5d57\", \"30fa5337-a7a0-48a8-8d12-f5a50e0a16d6\", \"30784d3d-2026-42d4-b857-d763b0c9349e\"]",
@@ -12049,7 +12049,7 @@
   },
   {
     "name": "Sakkubai",
-    "aliases": "Swami's devotee",
+    "aliases": "",
     "summary": "Sakkubai is highlighted as an exemplary devotee who demonstrated forbearance and steadfast faith in Lord Panduranga despite facing suffering from her family.",
     "entity_type": "person",
     "canonical_article_ids": "[\"cfeea1cb-f184-4d08-b74d-e41e688a252a\"]",
@@ -12080,7 +12080,7 @@
   },
   {
     "name": "Sama Veda",
-    "aliases": "Sama; Sama Veda",
+    "aliases": "Sama Veda",
     "summary": "Samaveda is one of the four broad categories of the Vedas classified by Sage Vyasa.",
     "entity_type": "text",
     "canonical_article_ids": "[\"606a2bd7-34aa-45f7-9061-6ed84e301dad\", \"4d813665-dafa-4199-b714-5992cc5ab37d\", \"b0c757c2-ffb2-4f82-8557-fc1ba4fa1dea\"]",
@@ -12179,7 +12179,7 @@
   },
   {
     "name": "Sameeka",
-    "aliases": "the hermit; the sage",
+    "aliases": "the hermit",
     "summary": "Sameeka is the ascetic who is meditating when Parikshit arrives at his hermitage, and he becomes the victim of Parikshit's anger.",
     "entity_type": "person",
     "canonical_article_ids": "[\"6ec1145e-a020-4d45-bc7f-f91339e4dd15\"]",
@@ -12240,7 +12240,7 @@
   },
   {
     "name": "Samsar",
-    "aliases": "worldly life",
+    "aliases": "",
     "summary": "Samsar refers to worldly life, which can be navigated safely if one stops the leaks of desires and attachments.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b7dcc6fe-33ae-40c7-9aa1-96e76fff83bf\", \"c2c9da63-2260-4776-a8f6-3dba6eb85bea\", \"63f143d6-942c-4a74-a75e-1eb9255a358e\"]",
@@ -12257,7 +12257,7 @@
   },
   {
     "name": "samsara",
-    "aliases": "Wheel of birth and death; family; family life; objective world; worldliness; worldly attachment; worldly life",
+    "aliases": "Wheel of birth and death; family; family life; worldliness; worldly attachment",
     "summary": "Samsara is mentioned in the context of being blamed for man's bondage, which is actually due to attachments and desires.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b7dcc6fe-33ae-40c7-9aa1-96e76fff83bf\", \"c2c9da63-2260-4776-a8f6-3dba6eb85bea\", \"90d0627b-eb0f-421f-bcbc-c7fa8780f7e9\"]",
@@ -12336,7 +12336,7 @@
   },
   {
     "name": "samyama",
-    "aliases": "Self-control",
+    "aliases": "",
     "summary": "Samyama is the control of sensory organs and is essential for attaining spiritual insight.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f977d781-e251-4338-88a3-95662a3efc3e\", \"5568e28f-526e-4c00-83b9-1576cdb846e4\", \"60dde7cf-e543-4e3f-a884-642408c99546\"]",
@@ -12415,7 +12415,7 @@
   },
   {
     "name": "Sanatana Dharma",
-    "aliases": "Eternal Law; Eternal Religion; Eternal Universal Religion; Eternal Upholding Principle; Primal and eternal law; Sanatan Dharma; eternal Dharma; eternal dharma; eternal religion; eternal universal religion",
+    "aliases": "Eternal Law; Eternal Upholding Principle; Primal and eternal law; Sanatan Dharma; eternal Dharma; eternal dharma",
     "summary": "Sanatana Dharma is described as the ancient religion of India that emphasizes heart-culture and the cultivation of love and wisdom for social harmony.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"4c52dd8f-00da-431b-aeb4-b53b4712e905\", \"b6727966-3b9d-436b-9925-5c0be8fec7c9\"]",
@@ -12430,7 +12430,7 @@
   },
   {
     "name": "Sanatanadharma",
-    "aliases": "eternal religion; eternal, universal religion",
+    "aliases": "",
     "summary": "Sanatanadharma is referred to as the protective fence for emerging bhakti, encompassing its rules and regulations.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"14c05ef5-709a-489d-b451-851571fcbf4f\", \"d2eb548a-ad3c-42e0-8105-89ffbb2ce4d4\"]",
@@ -12463,7 +12463,7 @@
   },
   {
     "name": "Sanathana Dharma",
-    "aliases": "Eternal Religion; Eternal Universal Religion; Eternal vedic religion; Veda Dharma; ancient spiritual code; ancient, eternal, universal religion; eternal religion; perennial philosophy of life; the Ancient Code of Righteousness; the Eternal Religion; the eternal law; the eternal religion; veda dharma",
+    "aliases": "Eternal vedic religion; Veda Dharma; ancient spiritual code; ancient, eternal, universal religion; perennial philosophy of life; the Ancient Code of Righteousness; the Eternal Religion; the eternal law; the eternal religion; veda dharma",
     "summary": "Sanathana Dharma is referred to as the protective fence for emerging devotion, encompassing its rules and regulations.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0ee6faa3-eb7b-4845-8c04-fadefabcd5cd\", \"582422c7-d16a-44d4-b828-e25eb01fba4b\", \"7211d847-8b11-4e51-a0ab-56a6d9788f31\"]",
@@ -12561,7 +12561,7 @@
   },
   {
     "name": "Sankalpa",
-    "aliases": "Sankalpas; intentions; resolve; resolves; sankalpas; thoughts; will",
+    "aliases": "Sankalpas; intentions; resolve; resolves; sankalpas; thoughts",
     "summary": "Sankalpa is described as the will that drives the efforts of the Mahasabha.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b546d903-8526-4e26-89fe-7a7bee8b0948\", \"5db1fcb0-9b2a-4851-bce3-219e108c1c7d\", \"8b614908-6af4-4f3b-8fbe-69e15c19ee13\"]",
@@ -12659,7 +12659,7 @@
   },
   {
     "name": "Sanyasa",
-    "aliases": "Renunciate stage; Renunciation; asceticism; complete renunciation; life as an ascetic; renunciant; renunciant stage; renunciation; sannyasa",
+    "aliases": "Renunciate stage; complete renunciation; life as an ascetic; renunciant stage; sannyasa",
     "summary": "Sanyasa is the fourth Ashrama, representing the stage of life as an ascetic.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e07c79fe-6a82-49db-a498-9b973ef95ca8\"]",
@@ -12673,7 +12673,7 @@
   },
   {
     "name": "sanyasi",
-    "aliases": "renunciant",
+    "aliases": "",
     "summary": "The Sanyasi is said to be three feet away from God, as he must renounce all bodily attachments and material desires.",
     "entity_type": "person",
     "canonical_article_ids": "[\"707fe0c7-4505-4d16-b7a1-d5689c0cd051\", \"bd037d03-5ebc-4c56-a440-85db6c80e6c2\", \"78393750-65e5-42d3-bfe5-0e13789e3614\"]",
@@ -12690,7 +12690,7 @@
   },
   {
     "name": "sanyasin",
-    "aliases": "monk; renunciant",
+    "aliases": "monk",
     "summary": "A sanyasin, or monk, is mentioned in a story to illustrate the folly of hoarding wealth instead of using it for good.",
     "entity_type": "person",
     "canonical_article_ids": "[\"707fe0c7-4505-4d16-b7a1-d5689c0cd051\", \"35c3fe9b-6969-45bd-b5eb-336b5ace14de\", \"ce558636-38b3-44d4-ac79-9edc31f64ea8\"]",
@@ -12722,7 +12722,7 @@
   },
   {
     "name": "Saraswathi",
-    "aliases": "Goddess of Knowledge; Goddess of Learning and Liberation; Saraswati; Saraswati river; one of the goddesses worshipped during Navaratri; river Saraswathi; the Goddess of transformation through learning",
+    "aliases": "Goddess of Learning and Liberation; Saraswati; Saraswati river; river Saraswathi; the Goddess of transformation through learning",
     "summary": "The Saraswathi river symbolizes the continuous blood circulation in the human body.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"8ff134ab-1131-4c54-a9ec-8874038c80e6\", \"2ba24482-e5c8-4b8e-ba59-c5f38252c585\", \"d90dc527-cba2-4aaa-8b01-aad6fceae14f\"]",
@@ -12739,7 +12739,7 @@
   },
   {
     "name": "Saraswati",
-    "aliases": "Bhagawati; Bharati; Goddess Saraswati; Goddess of Knowledge; Goddess of Learning; Goddess of Speech; Goddess of knowledge; Goddess of speech; Hamsa-vahini; Kamaroopini; Pavaka; River Saraswati; Sarah; Supreme in knowledge; Swami's divine aspect; Vak Devata Swaroopini; Vak-devata; Varade; Veena Pani; goddess Saraswati; goddess of learning and intellect; goddess of learning and speech; river Saraswati; the Goddess of Learning; the Goddess of Liberation; the embodiment of all speech; the goddess Saraswati; the river Saraswati",
+    "aliases": "Bhagawati; Goddess Saraswati; Goddess of Learning; Goddess of Speech; Goddess of speech; Hamsa-vahini; Kamaroopini; Pavaka; River Saraswati; Sarah; Supreme in knowledge; Swami's divine aspect; Vak Devata Swaroopini; Vak-devata; Varade; Veena Pani; goddess Saraswati; goddess of learning and intellect; goddess of learning and speech; river Saraswati; the Goddess of Learning; the Goddess of Liberation; the embodiment of all speech; the goddess Saraswati; the river Saraswati",
     "summary": "Saraswati attempts to counsel Parvati against marrying Lord Shiva, citing societal norms.",
     "entity_type": "person",
     "canonical_article_ids": "[\"adc6105a-1163-42cf-b4c7-ebb4e3eaf794\", \"fba8939a-4024-4fe6-9d75-cde7010aa22c\", \"f41685b8-8ce7-4660-9a88-9c38ae2b1c2c\"]",
@@ -12857,7 +12857,7 @@
   },
   {
     "name": "Satchidananda",
-    "aliases": "Being-Awareness-Bliss; Existence-Knowledge-Bliss Absolute; existence, knowledge, bliss",
+    "aliases": "Existence-Knowledge-Bliss Absolute; existence, knowledge, bliss",
     "summary": "Satchidananda is described as the true nature of man, which is often obscured by ignorance.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"95b8ae0c-1d97-4d01-8342-8c8ec844f1df\", \"9bda8dc4-fa7c-4555-9731-b3b2950c6eab\", \"f3b279cf-568f-4611-848d-99a06afc453d\"]",
@@ -12891,7 +12891,7 @@
   },
   {
     "name": "Sat-Chit-Ananda",
-    "aliases": "Asthi-Bhathi-Priya; Being \u2013 Awareness - Bliss absolute; Being-Awareness-Bliss; Truth, Consciousness, and Bliss; being, awareness, bliss; existence-consciousness-bliss",
+    "aliases": "Asthi-Bhathi-Priya; Being \u2013 Awareness - Bliss absolute; Truth, Consciousness, and Bliss; being, awareness, bliss; existence-consciousness-bliss",
     "summary": "Sat-chit-ananda represents the true identity of man, encompassing being, awareness, and bliss.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3568edc0-ee5c-4b40-b899-73f4f05ec70e\", \"6b76ec53-d6e5-4207-8c72-f1b95b973ac3\"]",
@@ -12906,7 +12906,7 @@
   },
   {
     "name": "sath karma",
-    "aliases": "beneficial acts; good deeds",
+    "aliases": "beneficial acts",
     "summary": "Sath karma denotes the performance of good deeds as a means to cultivate virtue.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"310a9e23-56d2-4887-91e3-3a031930656b\"]",
@@ -12952,7 +12952,7 @@
   },
   {
     "name": "Sathsang",
-    "aliases": "Association; good company",
+    "aliases": "Association",
     "summary": "Sathsang refers to the spiritual association or gathering where devotees come together to study and practice spiritual teachings.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"0ee4a7ad-a7a0-44ce-a750-646b32b3c0c1\"]",
@@ -12967,7 +12967,7 @@
   },
   {
     "name": "sathsanga",
-    "aliases": "good company",
+    "aliases": "",
     "summary": "Sathsanga is described as the company of the pious, which is essential for spiritual growth.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"fb12c363-d2a7-492c-93ae-639dcdaeea42\", \"1e5649e6-b950-46d0-9660-e05496cbff9c\"]",
@@ -13017,7 +13017,7 @@
   },
   {
     "name": "Sathya Sai Seva Samiti",
-    "aliases": "Organisation; Sai Seva Samiti; Samiti",
+    "aliases": "Sai Seva Samiti; Samiti",
     "summary": "The Sathya Sai Seva Samiti of Tirutani is an organization involved in community service and development projects.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"5a611ec6-00d8-4ac3-ba1b-a4d66865b54f\", \"a940cee6-922a-464c-855a-510a5fb1e8e5\", \"5e71ff95-4306-48fa-a62a-b6a54c44ef78\"]",
@@ -13034,7 +13034,7 @@
   },
   {
     "name": "Sathyabama",
-    "aliases": "Satyabhama; Swami's consort",
+    "aliases": "Satyabhama",
     "summary": "Sathyabama was one of the queens who tried to help Krishna during his pretense of illness.",
     "entity_type": "person",
     "canonical_article_ids": "[\"8c80bc08-997b-4d9a-97e3-1012ab54b53b\", \"c8aba436-4dc7-4df0-b39d-e6a48393da84\"]",
@@ -13050,7 +13050,7 @@
   },
   {
     "name": "Sathyabhama",
-    "aliases": "Sathya; Sathyabhama the one of desire",
+    "aliases": "Sathyabhama the one of desire",
     "summary": "Sathyabhama is mentioned as the consort of Sri Krishna who played a crucial role in the defeat of the demon Narakasura.",
     "entity_type": "person",
     "canonical_article_ids": "[\"bbead593-cbe8-4f86-9ca5-1119d675d4ff\", \"be39fad7-23ac-45ab-b7de-4c9819f5d99e\", \"212ab4eb-3166-4222-8d2a-72a67eacca83\"]",
@@ -13101,7 +13101,7 @@
   },
   {
     "name": "Sathyam, Sivam, Sundaram",
-    "aliases": "Truth, Auspiciousness, Beauty; book on Swami's life",
+    "aliases": "book on Swami's life",
     "summary": "Sathyam Sivam Sundaram is a book written by Kasturi and Thirumalacharya that chronicles the life of Sathya Sai Baba.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f769ab4c-72d6-4bd3-8fa2-69e37128171d\"]",
@@ -13148,7 +13148,7 @@
   },
   {
     "name": "Sathyanarayanamurthy",
-    "aliases": "Jonnalagadda SathyaNarayanamurthy; Jonnalagadda Sathyanarayanamurthy; Swami's devotee",
+    "aliases": "Jonnalagadda SathyaNarayanamurthy; Jonnalagadda Sathyanarayanamurthy",
     "summary": "Sathyanarayanamurthy spoke on fine topics in a fine language, emphasizing the limitations of human expression in conveying the truth of God.",
     "entity_type": "person",
     "canonical_article_ids": "[\"fea17941-b1fc-464a-b18a-835d71ff930d\", \"c8c1e3df-f449-45bb-b2ac-c22c44924b78\", \"dd5f813c-dd91-4f00-a077-c02f2432ee77\"]",
@@ -13198,7 +13198,7 @@
   },
   {
     "name": "satkarma",
-    "aliases": "good action; good deeds",
+    "aliases": "good action",
     "summary": "Satkarma refers to beneficial activities that help in realizing the true nature of the Self.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"bb15b045-eab4-4304-94ca-3d3b906569e5\", \"78aade28-95e4-4c8b-91a8-ca1da31a204e\", \"d331355f-ff94-4e77-869a-57c40ed802d7\"]",
@@ -13232,7 +13232,7 @@
   },
   {
     "name": "Satsang",
-    "aliases": "company of Truth; company of good people; good company; living in Divinity",
+    "aliases": "company of Truth; company of good people; living in Divinity",
     "summary": "Satsang refers to good company, which is emphasized as essential for attaining detachment and liberation.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"f3861d91-f9ec-4fbb-bc5c-6b23ef758eef\"]",
@@ -13246,7 +13246,7 @@
   },
   {
     "name": "satsanga",
-    "aliases": "good company",
+    "aliases": "",
     "summary": "Satsanga refers to good company, which is essential for developing a pure mind.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"6deea157-9358-48b0-945e-8e01d1e8de44\", \"55bffd03-eb7a-4d18-bc8f-347bf47ca238\", \"f977d781-e251-4338-88a3-95662a3efc3e\"]",
@@ -13373,7 +13373,7 @@
   },
   {
     "name": "Satya",
-    "aliases": "Divine mother; Sathya; Sathyam; Satyam; Swami; Swarupa; Ultimate Truth; true mother",
+    "aliases": "Divine mother; Sathyam; Satyam; Swarupa; Ultimate Truth; true mother",
     "summary": "Satya is one of the five Sadgunas representing good qualities.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9c790b86-c4f5-4613-88c5-0f27d1d51fdc\", \"16324659-11ea-4891-b63f-2915afcf8b6b\", \"33883a75-2ab1-482d-90e5-4bfa032b779a\"]",
@@ -13437,7 +13437,7 @@
   },
   {
     "name": "Satyam, Shivam, Sundaram",
-    "aliases": "truth, auspiciousness, beauty",
+    "aliases": "",
     "summary": "Satyam, Shivam, Sundaram represents the embodiment of Truth, Goodness, and Beauty, associated with the Supreme Being.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"41461875-e349-4335-9bd9-7ce692409db0\", \"049145c0-8354-4273-a8d6-043fccee80f4\", \"231eb863-5c22-4af9-aff2-8258e2b4eae4\"]",
@@ -13485,7 +13485,7 @@
   },
   {
     "name": "Satyam vada, Dharmam chara",
-    "aliases": "Speak the truth; Walk on the path of righteousness; sacred texts; speak the truth and practice dharma",
+    "aliases": "Speak the truth; Walk on the path of righteousness; speak the truth and practice dharma",
     "summary": "This aphorism highlights the significance of truth and righteousness as fundamental principles in Indian ethics.",
     "entity_type": "text",
     "canonical_article_ids": "[\"1f51f34c-7ae8-4c7a-b8a8-89e9cf28903c\"]",
@@ -13499,7 +13499,7 @@
   },
   {
     "name": "Satyannasti paro dharma",
-    "aliases": "There is no Dharma greater than adherence to truth; there is no greater dharma than adherence to truth",
+    "aliases": "there is no greater dharma than adherence to truth",
     "summary": "This phrase emphasizes that adherence to truth is the highest duty of man.",
     "entity_type": "text",
     "canonical_article_ids": "[\"1f09b642-ac94-4df3-90af-e587fa65d55e\", \"6a9d64f3-360f-4bf7-8a4e-d225df36a224\", \"2a652c5f-a71d-4c13-9967-fdffe36ff198\"]",
@@ -13516,7 +13516,7 @@
   },
   {
     "name": "Satyannasti paro dharmah",
-    "aliases": "There is no dharma greater than adherence to truth",
+    "aliases": "",
     "summary": "Satyannasti paro dharmah translates to 'Truth alone is the basis for Dharma' and underscores the significance of truth in the context of Dharma.",
     "entity_type": "text",
     "canonical_article_ids": "[\"1f09b642-ac94-4df3-90af-e587fa65d55e\", \"2a652c5f-a71d-4c13-9967-fdffe36ff198\", \"26356871-dbf1-4bae-8ac9-5081eca73cc2\"]",
@@ -13581,7 +13581,7 @@
   },
   {
     "name": "Savitri",
-    "aliases": "Savitri who brought her dead husband back to life; epic poem written by Sri Aurobindo; great woman of chastity; the pious woman of Bharat",
+    "aliases": "Savitri who brought her dead husband back to life; epic poem written by Sri Aurobindo; great woman of chastity",
     "summary": "Savitri is referenced as a woman of character who overcame obstacles to bring her dead husband back to life.",
     "entity_type": "person",
     "canonical_article_ids": "[\"2bb172a7-a99c-48ef-8bfb-d3af0dda420a\", \"2b1f03b8-c224-4747-ae62-f46cf2ee4c01\", \"c4fdd9f1-4f07-4064-86b4-eb479093dcb6\"]",
@@ -13632,7 +13632,7 @@
   },
   {
     "name": "Seva",
-    "aliases": "Service; sacred sense of service; selfless service; service; voluntary service",
+    "aliases": "Service; sacred sense of service; service; voluntary service",
     "summary": "Seva is emphasized as a value that should be taught and practiced to create awareness and encourage helping others.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"2338b804-cc1a-4eb8-afaf-e3b8a450dd85\", \"a482a38e-b348-44c4-a1fb-6b652fb48e8c\", \"bf8c41c0-7a91-4932-b0fa-ce8ecc530e44\"]",
@@ -13699,7 +13699,7 @@
   },
   {
     "name": "shama",
-    "aliases": "self-control",
+    "aliases": "",
     "summary": "Shama denotes the control of senses of perception, which is essential for self-realization.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a482a38e-b348-44c4-a1fb-6b652fb48e8c\", \"803b8b9a-7f82-494f-a6dc-510c957880e4\", \"06c2423d-15fe-4f62-a1ac-b06e88f58432\"]",
@@ -13748,7 +13748,7 @@
   },
   {
     "name": "Shanti",
-    "aliases": "Inner Peace; calmness; equanimity; inner peace; sacred Shanti; santhi; shaanti; shanthi; wife",
+    "aliases": "calmness; sacred Shanti; santhi; shaanti; shanthi",
     "summary": "Shanti is one of the five Sadgunas representing good qualities.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"3b196f40-3f84-489c-a8b8-460d43718094\", \"3f577147-d39e-4652-ad09-8a5cdf403b08\", \"4979c673-7f2b-4d06-bee9-92bb1fc6ab84\"]",
@@ -13764,7 +13764,7 @@
   },
   {
     "name": "Sharanagati",
-    "aliases": "absolute Self-surrender; absolute surrender; surrender; total surrender",
+    "aliases": "absolute Self-surrender; absolute surrender; surrender",
     "summary": "Sharanagati, or absolute surrender, is emphasized as the path to true faith and submission to God's will.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"de60117f-18c3-4301-9c1b-7779e93ec98e\"]",
@@ -13841,7 +13841,7 @@
   },
   {
     "name": "Shatrughna",
-    "aliases": "Prince Shatrughna; Rama's brother; Shatrughna the brother of Rama; Shatrughna's name; brother of Bharata; the embodiment of shanti",
+    "aliases": "Prince Shatrughna; Shatrughna the brother of Rama; Shatrughna's name; brother of Bharata; the embodiment of shanti",
     "summary": "Shatrughna is one of Rama's brothers, included in the familial bond that Rama cherished.",
     "entity_type": "person",
     "canonical_article_ids": "[\"a9418761-55eb-4800-ba50-76399a2b2492\", \"ffe863ac-3f54-4190-be6f-e5cfce86f0e9\", \"2c9b3746-d2d2-4dbf-8cbc-430dde0b4396\"]",
@@ -13954,7 +13954,7 @@
   },
   {
     "name": "Shiva",
-    "aliases": "Adi Sankara; Adi Shankara; Adi Shankaracharya; All-knowing; Almighty God; Eashwara; Eshwara; Festival of Shiva; God Shiva; Ishvara; Ishwara; Jagadguru; Jagadguru Shankarachaarya; Kamari; Lingam; Lord Eashwara; Lord Shankara; Lord Shiva; Lord Siva; Lord of the Universe; Mahadeva; Maheshwara; Maheswara; Monday for Shiva; Mrithyunjaya; Mrityunjaya; Mukkanti; Parameshvara; Parameshwara; Pashupathi; Rudra; Sambashiva; Sambasiva; Sankara; Sankaracharya; Shambhu; Shankara; Shankaracharya; Shiv; Shiva Consciousness; Shiva Shakti atmaka swaroopam; Shiva for dissolution; Shiva idol; Shiva tandavam; Shiva the Auspicious; Shiva's Birthday; Shivaratri; Shivaya; Shri Shankaracharya; Siva; Siva God; Siva Sayi; Sri Shankaracharya; Subhankara; Supreme God; Supreme Lord; Supreme Reality; Supreme in Shaivism; Svayambhu; Trinetra; Vishweshwara; auspiciousness; bow of Shiva; father of the world; great philosopher-saint; idol of Shiva; idol of Siva; idols of Shiva; the Destroyer; the Eternal Bliss Divine; the God whose throat is blue; the Sovereign of the Gods; the creator; the deity Shiva; the destroyer; the greatest expounder of Advaita; the head of Shankaracharya; three-eyed Shiva; three-eyed Siva",
+    "aliases": "Adi Sankara; Adi Shankara; Adi Shankaracharya; All-knowing; Eashwara; Eshwara; Festival of Shiva; God Shiva; Jagadguru; Jagadguru Shankarachaarya; Kamari; Lingam; Lord Eashwara; Lord Shankara; Lord Shiva; Lord of the Universe; Mahadeva; Maheshwara; Maheswara; Monday for Shiva; Mrithyunjaya; Mrityunjaya; Mukkanti; Parameshvara; Parameshwara; Pashupathi; Rudra; Sambashiva; Sambasiva; Sankara; Sankaracharya; Shambhu; Shankaracharya; Shiv; Shiva Consciousness; Shiva Shakti atmaka swaroopam; Shiva for dissolution; Shiva idol; Shiva tandavam; Shiva the Auspicious; Shiva's Birthday; Shivaratri; Shivaya; Shri Shankaracharya; Siva; Siva God; Siva Sayi; Sri Shankaracharya; Subhankara; Supreme in Shaivism; Svayambhu; Trinetra; Vishweshwara; auspiciousness; bow of Shiva; father of the world; great philosopher-saint; idol of Shiva; idol of Siva; idols of Shiva; the Destroyer; the Eternal Bliss Divine; the God whose throat is blue; the deity Shiva; the destroyer; the greatest expounder of Advaita; the head of Shankaracharya; three-eyed Shiva; three-eyed Siva",
     "summary": "Shiva is referenced in relation to the bow that Rama broke during the event in Mithila.",
     "entity_type": "person",
     "canonical_article_ids": "[\"049145c0-8354-4273-a8d6-043fccee80f4\", \"04922026-ae1e-4358-b988-ee4665754866\", \"168ce229-f73a-40ba-b36f-d3d712a6f36f\"]",
@@ -14113,7 +14113,7 @@
   },
   {
     "name": "shuddha Satva",
-    "aliases": "Pure Consciousness; pure Satva",
+    "aliases": "pure Satva",
     "summary": "Shuddha Satva, or pure Satva, accounts for the human form and is derived from Akasha.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"39bdfc46-5672-4c2f-8fdb-749c59f8efd3\", \"f8e2f864-a206-4f35-a203-8a754269b3c2\", \"8830b2e0-c838-48ee-8ae1-d8d35e687ab4\"]",
@@ -14147,7 +14147,7 @@
   },
   {
     "name": "Shuka",
-    "aliases": "Maharshi Shuka; Master; Sri Shuka; great sage Shuka; son of Sage Vyasa; son of Vyasa-Bhagawan; the sage Shuka",
+    "aliases": "Maharshi Shuka; Sri Shuka; great sage Shuka; son of Sage Vyasa; son of Vyasa-Bhagawan; the sage Shuka",
     "summary": "Shuka is portrayed as a figure who renounces attachments and teaches his father Vyasa about the nature of divine existence.",
     "entity_type": "person",
     "canonical_article_ids": "[\"aadfd5ac-9f7d-4303-bce6-7ac2748d2fca\"]",
@@ -14177,7 +14177,7 @@
   },
   {
     "name": "Shukracharya",
-    "aliases": "Guru Shukracharya; Sage Shukracharya; Shukra; Venus; preceptor; the Guru",
+    "aliases": "Guru Shukracharya; Sage Shukracharya; Shukra; Venus",
     "summary": "Shukracharya is the preceptor of Mahabali who warns him about the true identity of Vamana.",
     "entity_type": "person",
     "canonical_article_ids": "[\"3886be29-6917-4fe5-9f5c-1254aca9c013\", \"17376d99-4cc0-4d6b-aba9-b97a088484d3\", \"310c3c96-f97f-4eb6-83a8-5bb98b705aa0\"]",
@@ -14244,7 +14244,7 @@
   },
   {
     "name": "Sita",
-    "aliases": "Bhoojata; Brahmajnanam; Devi; Durga; Goddess Durga; Goddess Parvati; Goddess Sita; Gowri; Janaka's daughter; Janaki; Lava and Kusa's mother; Lokamata; Maha Maya; Maya Sita; Mother; Mother Devi; Mother Durga; Mother Goddess; Mother Parvati; Mother Sita; Mother of Vinayaka; Parvati; Parvati Devi; Parvati-Devi; Rama's wife; Rama\u2019s consort; Revered Father-in-law's daughter; Seeta; Seetha; Sita Devi; Sita Kalyanam; Sita as Rama's spouse; Sita the child of the earth; Sita the consort of Rama; Sita the embodiment of Consciousness; Sita the wife of Rama; Sita who brought up Lava and Kusa; Sita who proved her chastity; Sita, wife of Rama; Son of Parvati; Subramanya's mother; Swami's consort; Swami's mother; Swami's reference to Sita; Vaidehi; Wife of Rama; chaste wife of Rama; consort of Lord Shiva; daughter of Earth; daughter of the Goddess of Earth; daughter of the earth; daughter of the monarch of the Himalayas; divine daughter of Mother Earth; goddess Devi; idol of Durga; mother Sita; mother of Ganapati; mother of Lava and Kusa; mother of the world; one of the goddesses worshipped during Navaratri; personification of Anubhavajnanam; personified nature; sacred cow; son of Parvati; the Goddess; the Lord's consort; the divine daughter of mother earth; the embodiment of all the dharmas; the most beautiful woman in the world; the mula prakriti; the paragon of chastity and virtue; the personification of Nature; the pious woman of Bharat; the tender Princess of Mithila; the wife of Rama; the wife of Shiva; wife of Ramachandra",
+    "aliases": "Bhoojata; Brahmajnanam; Devi; Durga; Goddess Durga; Goddess Parvati; Goddess Sita; Gowri; Janaka's daughter; Janaki; Lava and Kusa's mother; Lokamata; Maha Maya; Maya Sita; Mother Devi; Mother Durga; Mother Goddess; Mother Parvati; Mother Sita; Mother of Vinayaka; Parvati; Parvati Devi; Parvati-Devi; Rama's wife; Rama\u2019s consort; Revered Father-in-law's daughter; Seeta; Seetha; Sita Devi; Sita Kalyanam; Sita as Rama's spouse; Sita the child of the earth; Sita the consort of Rama; Sita the embodiment of Consciousness; Sita the wife of Rama; Sita who brought up Lava and Kusa; Sita who proved her chastity; Sita, wife of Rama; Son of Parvati; Subramanya's mother; Swami's reference to Sita; Vaidehi; Wife of Rama; chaste wife of Rama; consort of Lord Shiva; daughter of Earth; daughter of the Goddess of Earth; daughter of the earth; daughter of the monarch of the Himalayas; divine daughter of Mother Earth; goddess Devi; idol of Durga; mother Sita; mother of Ganapati; mother of Lava and Kusa; mother of the world; personification of Anubhavajnanam; personified nature; sacred cow; son of Parvati; the Lord's consort; the divine daughter of mother earth; the embodiment of all the dharmas; the most beautiful woman in the world; the mula prakriti; the paragon of chastity and virtue; the personification of Nature; the tender Princess of Mithila; the wife of Rama; the wife of Shiva; wife of Ramachandra",
     "summary": "Sita is portrayed as the devoted wife of Rama, accompanying him on his journey.",
     "entity_type": "person",
     "canonical_article_ids": "[\"14aeab5b-4dd1-4af0-935e-7bff73ff9488\", \"2642f0a3-0fe4-4d24-83e1-81cfe64e70e4\", \"34e98af7-0ade-481d-8c56-a5d68d3cc66b\"]",
@@ -14275,7 +14275,7 @@
   },
   {
     "name": "Siva-Sakthi",
-    "aliases": "Sai Baba",
+    "aliases": "",
     "summary": "Siva-Sakthi represents the unity of the divine masculine and feminine energies in spiritual practice.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"98fecbf5-ceca-4444-ae5c-0b7d598c783b\", \"fe357fbf-8318-4d67-b32c-b969175220f8\", \"ee1d15b9-4607-42c8-a157-65787e271dd3\"]",
@@ -14443,7 +14443,7 @@
   },
   {
     "name": "Sri Sathya Sai Institute of Higher Learning",
-    "aliases": "Institute; Institute of Higher Learning; SSSIHL; Sathya Sai Institute; Sathya Sai Institute of Higher Learning",
+    "aliases": "Institute; Institute of Higher Learning; SSSIHL; Sathya Sai Institute of Higher Learning",
     "summary": "The Atmatattvam concept has been introduced in the M.B.A. course at the Sri Sathya Sai Institute of Higher Learning.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"f5756835-2699-4b16-b071-ac7946eadb7a\", \"b86f038c-b420-4320-934e-5ab4d42f8b5a\", \"50198e98-ec48-400c-ab78-6ee0dd7de4aa\"]",
@@ -14460,7 +14460,7 @@
   },
   {
     "name": "Sri Sathya Sai Seva Organisation",
-    "aliases": "Andhra Pradesh Sathya Sai Organisations; Organisation; SSIO; SSO; Sai Centres; Sai Organisation; Sai Organisations; Sai Organization; Sai Organizations; Sai Seva Organisation; Sai Seva Organisations; Sai organisations; Sai organizations; Sathya Sai Baba's Organisation; Sathya Sai International Organisation; Sathya Sai International Organization; Sathya Sai Organisation; Sathya Sai Organisations; Sathya Sai Organization; Sathya Sai Organizations; Sathya Sai Seva Organisation; Sathya Sai Seva Organisations; Sathya Sai Seva Organization; Sri Sathya Sai Organisation; Sri Sathya Sai Organisations; Sri Sathya Sai Seva Organisations; the Organisation",
+    "aliases": "Andhra Pradesh Sathya Sai Organisations; SSIO; SSO; Sai Centres; Sai Organisation; Sai Organisations; Sai Organization; Sai Organizations; Sai Seva Organisation; Sai Seva Organisations; Sai organisations; Sai organizations; Sathya Sai Baba's Organisation; Sathya Sai International Organisation; Sathya Sai International Organization; Sathya Sai Organisation; Sathya Sai Organisations; Sathya Sai Organization; Sathya Sai Organizations; Sathya Sai Seva Organisation; Sathya Sai Seva Organisations; Sri Sathya Sai Organisation; Sri Sathya Sai Organisations; Sri Sathya Sai Seva Organisations; the Organisation",
     "summary": "The uniqueness of the Sri Sathya Sai Seva Organisation consists in the fact that it regards seva as a form of service to the Divinity that is in each being.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"3a11a263-31de-4971-9afc-fecb5a5557f2\", \"2098b829-e9e6-4713-bd26-81faa7711ca0\", \"4ce659c9-7d15-4a07-9a02-ed73a072f3a2\"]",
@@ -14476,7 +14476,7 @@
   },
   {
     "name": "Sri Sathya Sai Seva Organization",
-    "aliases": "Sathya Sai Seva Organization",
+    "aliases": "",
     "summary": "The Sri Sathya Sai Seva Organization is encouraged to actively participate in acts of service to society.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"7c772bf9-b9b5-4622-9b2c-331a5f3569c5\", \"cdd3e975-e30b-4803-a464-1c8732786c9d\"]",
@@ -14574,7 +14574,7 @@
   },
   {
     "name": "Srishti",
-    "aliases": "Creation; creation",
+    "aliases": "",
     "summary": "Srishti denotes creation, which is a limb of the greater concept of society (Samashti).",
     "entity_type": "concept",
     "canonical_article_ids": "[\"6f6c8578-7188-49fb-a916-472ba5d481df\", \"039cfad7-5e2a-4121-9d61-f97825964b2e\", \"5e8c78e5-c85c-48ef-b277-c511016b949f\"]",
@@ -14803,7 +14803,7 @@
   },
   {
     "name": "Sun",
-    "aliases": "Sun God",
+    "aliases": "",
     "summary": "Sunday is dedicated to the Sun, and some individuals fast on this day.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"ad7e4d7f-5f43-428e-851d-53b0a22ae15c\", \"1d946b13-89bd-4f25-865d-4ee5a017dee6\", \"67a79bf0-d869-4055-be53-6c43a9be7b65\"]",
@@ -14935,7 +14935,7 @@
   },
   {
     "name": "svarga",
-    "aliases": "Heaven",
+    "aliases": "",
     "summary": "Svarga is referred to as a divine concept representing Heaven.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"db6b906f-e15b-430b-8f3d-4245e3622538\", \"181c2a78-0531-4ef6-9bd8-90e8aa593174\", \"789ecae6-b1aa-43d5-803a-468cc30abfa0\"]",
@@ -14969,7 +14969,7 @@
   },
   {
     "name": "Swarajya",
-    "aliases": "Freedom",
+    "aliases": "",
     "summary": "Swarajya denotes political independence, which is contrasted with the spiritual freedom of Sva-rajya.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"fbbbe9ab-a6ec-441e-a80d-9e0878da0436\", \"3406ac06-063c-4d2e-864d-9c498bf2be89\", \"64785168-deb0-4e1d-9c6f-6fa80c160360\"]",
@@ -15129,7 +15129,7 @@
   },
   {
     "name": "tapa",
-    "aliases": "penance",
+    "aliases": "",
     "summary": "Tapa is mentioned as a form of sadhana that the devotee did not engage in, highlighting the value of serving the poor over ritualistic practices.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"00b0afaf-bfb3-42d4-9321-5a9ce1a3c815\"]",
@@ -15190,7 +15190,7 @@
   },
   {
     "name": "Tat Twam Asi",
-    "aliases": "Thou art That",
+    "aliases": "",
     "summary": "Tat Twam Asi is a Vedic dictum emphasizing the oneness of the individual with the Divine.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"9425331c-92e4-4af9-aeba-03f177053604\", \"a0ab4664-fafa-4d1a-b3f3-ea09e7150de3\"]",
@@ -15206,7 +15206,7 @@
   },
   {
     "name": "Tat-tvam-asi",
-    "aliases": "Mahavakya Tattvamasi; Tat Tvam Asi; Tattvamas; Tattwamasi; That Thou Art; That Thou art; That thou art; Thath-thwam-asi; Thou art That; You and I are the same",
+    "aliases": "Mahavakya Tattvamasi; Tat Tvam Asi; Tattvamas; Tattwamasi; That Thou Art; That Thou art; That thou art; Thath-thwam-asi; You and I are the same",
     "summary": "Tat-tvam-asi, meaning 'Thou art that', is mentioned in the context of Yashoda's lullaby, highlighting the divine nature of Krishna.",
     "entity_type": "text",
     "canonical_article_ids": "[\"f9eb1e4d-9762-413a-8c16-a9468113d273\"]",
@@ -15220,7 +15220,7 @@
   },
   {
     "name": "thapas",
-    "aliases": "penance; religious austerity; thapam",
+    "aliases": "religious austerity; thapam",
     "summary": "Thapas refers to austerity, which is also part of the spiritual practices encouraged.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"ec20f41e-05e8-4adf-bc29-f0a1d66735f3\", \"c97ca507-0420-4c99-b522-9a73a83aba58\", \"f420426e-3f33-4cc9-a07f-a542b0c65464\"]",
@@ -15284,7 +15284,7 @@
   },
   {
     "name": "Thyaga",
-    "aliases": "renunciation; self-sacrifice; spirit of sacrifice",
+    "aliases": "self-sacrifice",
     "summary": "Thyaga is referred to as renunciation, which the Rishis practiced to attain genuine Yoga and merge with the Divine.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"552daced-b150-43c5-9231-805271634403\", \"f1a58180-0a19-48ae-89bd-a7ecd7c0e1f2\", \"46292aa6-6dc4-4985-9bde-f06d92defa4d\"]",
@@ -15350,7 +15350,7 @@
   },
   {
     "name": "Titiksha",
-    "aliases": "equanimity",
+    "aliases": "",
     "summary": "Titiksha is the quality of cheerful forbearance and endurance, necessary for spiritual aspirants.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"c62df849-7bce-4d4c-8590-8a4e80dd5d57\", \"24a1bac7-0199-4e4f-bb21-1dd8e9890a00\", \"1d3ebd9d-23a9-429d-beb4-2b21a356db9a\"]",
@@ -15401,7 +15401,7 @@
   },
   {
     "name": "Trikarana Shuddhi",
-    "aliases": "purity in thought, word, and deed; purity of three tools; triple purity; triple purity of body, speech, and heart",
+    "aliases": "purity in thought, word, and deed; purity of three tools; triple purity of body, speech, and heart",
     "summary": "Trikarana Shuddhi refers to the purity of thoughts, words, and deeds, which is essential for practicing Ahimsa.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"4e064dca-0f06-4e63-bf6b-3526bb5f29c3\"]",
@@ -15415,7 +15415,7 @@
   },
   {
     "name": "Trikarana-shuddhi",
-    "aliases": "triple purity",
+    "aliases": "",
     "summary": "Tri-karana-shuddhi is prescribed as essential for tasting the ananda of the Universal Absolute, emphasizing the purity of thought, word, and deed.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"ea4510f8-8b6a-47f7-b555-f7c6cc836f15\", \"d1e534b7-c389-48f5-8fc3-302f1cd9c18d\", \"b2328cb5-f137-4916-9178-f5500ade29fb\"]",
@@ -15592,7 +15592,7 @@
   },
   {
     "name": "Tyaga",
-    "aliases": "Detachment; Spirit of sacrifice; renunciation; sacrifice",
+    "aliases": "",
     "summary": "Tyaga, or sacrifice, is presented as essential for achieving unity among men.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e9144165-e08f-4471-90d7-65542998e6b7\"]",
@@ -15782,7 +15782,7 @@
   },
   {
     "name": "upasana",
-    "aliases": "Worship; worship",
+    "aliases": "",
     "summary": "Upasana refers to ritual worship and is one of the three potencies associated with human existence.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0ead21bb-4fdc-4888-a39d-4a20ae9b472d\", \"e6986797-6d7e-4317-83f2-55f18218775c\", \"a2cf7641-0e53-4e91-8419-e3f9dc94d3cb\"]",
@@ -15946,7 +15946,7 @@
   },
   {
     "name": "Vaikuntha",
-    "aliases": "Heaven; dwelling place of God; house of the Lord",
+    "aliases": "dwelling place of God; house of the Lord",
     "summary": "Vaikuntha is described as the abode of Narayana, from where He rose to help the brahmin.",
     "entity_type": "place",
     "canonical_article_ids": "[\"059abd18-ad22-4fd6-91f7-55f0a8d0c997\", \"0e7091ff-0cdc-439b-bcc4-85d6c33b345f\", \"43c2e09e-2d76-4803-b7ab-d52a5bb0fd9f\"]",
@@ -15979,7 +15979,7 @@
   },
   {
     "name": "Vairagya",
-    "aliases": "Renunciation; detachment; non-attachment; renunciation",
+    "aliases": "",
     "summary": "Vairagya, or detachment, is emphasized as a necessary quality for spiritual aspirants to overcome desires and attachments.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"46292aa6-6dc4-4985-9bde-f06d92defa4d\"]",
@@ -15993,7 +15993,7 @@
   },
   {
     "name": "Vairagyam",
-    "aliases": "detachment; non-attachment; renunciation",
+    "aliases": "",
     "summary": "Vairagyam, or detachment, is described as the means to remove all the dirt from the heart.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"b35ebd02-a2fb-4cbf-8d23-fac653caffc9\", \"8450844c-027b-4c43-bc63-bfe603d16279\", \"0b0b2f82-ee67-4807-91a3-43eedf136510\"]",
@@ -16075,7 +16075,7 @@
   },
   {
     "name": "Valmiki",
-    "aliases": "Adi Kavi; Adikavi; Ratnakara; Sage Valmeeki; Sage Valmiki; Valmeeki; Wayside robber Ratnakara; author of the Ramayana; great sage; highway robber; sage Valmiki; the First Poet; the immortal poet; the sage who wrote the Ramayana",
+    "aliases": "Adi Kavi; Adikavi; Ratnakara; Sage Valmeeki; Sage Valmiki; Valmeeki; Wayside robber Ratnakara; great sage; highway robber; sage Valmiki; the First Poet; the immortal poet; the sage who wrote the Ramayana",
     "summary": "Valmiki is the author of the Ramayana, which he divided into six Kandas and used to convey humanistic ideals.",
     "entity_type": "person",
     "canonical_article_ids": "[\"d717d000-5743-4b2c-ad1b-efec4a82504c\", \"13602e03-e938-496e-8592-bcc92877513e\", \"809e0855-b7b4-4c33-b6d0-4c7dfdd1704a\"]",
@@ -16109,7 +16109,7 @@
   },
   {
     "name": "Vamana",
-    "aliases": "Brahmana lad; God Narayana; Lord Vamana; Vamana Avatar; Vamana the Brahmin ascetic; Vamanaavataram; Vamanamurti; child of Kashyapa and Aditi; the Short-statured; the dwarf avatar of Vishnu; young Brahmin student; young boy",
+    "aliases": "Brahmana lad; Lord Vamana; Vamana Avatar; Vamana the Brahmin ascetic; Vamanaavataram; Vamanamurti; child of Kashyapa and Aditi; the Short-statured; the dwarf avatar of Vishnu; young Brahmin student; young boy",
     "summary": "Vamana is the incarnation of God who taught Bali a lesson about humility and sacrifice.",
     "entity_type": "person",
     "canonical_article_ids": "[\"f21d875e-1163-424a-8c94-604cb913393d\", \"f669b03b-2c8d-4162-9cba-97b8bda69d14\"]",
@@ -16241,7 +16241,7 @@
   },
   {
     "name": "Vasanas",
-    "aliases": "desires; tendencies",
+    "aliases": "tendencies",
     "summary": "Vasanas refer to the tendencies caused by past deeds that one should keep their mind clean of to attach oneself to God.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"55d6b49b-ad6b-47e9-ae98-38b382cc97cf\", \"89f9c72c-ae30-4104-8c0f-9f626f3548fc\", \"1ca165a3-7f27-4bdc-abc4-8cff5ec1ac31\"]",
@@ -16274,7 +16274,7 @@
   },
   {
     "name": "Vashishta",
-    "aliases": "Brahmarishi; Family Guru Vashishta; Guru Vashishta; Master Vashishta; Preceptor Vashishta; Rajaguru; Royal Preceptor; Sage Vashishta; Vashishta Muni; family preceptor; sage Vashishta; the Guru; the first Rishi",
+    "aliases": "Family Guru Vashishta; Guru Vashishta; Master Vashishta; Preceptor Vashishta; Rajaguru; Royal Preceptor; Sage Vashishta; Vashishta Muni; family preceptor; sage Vashishta; the first Rishi",
     "summary": "Vashishta was the sage consulted by Dileepa for guidance on how to overcome his sorrow regarding the lack of children.",
     "entity_type": "person",
     "canonical_article_ids": "[\"d920f849-af67-425e-a7b7-42532c34e7e9\"]",
@@ -16390,7 +16390,7 @@
   },
   {
     "name": "Vedamata",
-    "aliases": "Mother Veda; Mother of the Vedas; heritage of spiritual treasure; mother who speaks with the voice of the Vedas",
+    "aliases": "Mother of the Vedas; heritage of spiritual treasure; mother who speaks with the voice of the Vedas",
     "summary": "Vedamata refers to the concept of India as the mother who embodies the wisdom of the Vedas.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"24050ab1-ea66-49bb-8c2a-5eac9735f1db\", \"d713479c-7532-475f-bada-15012d1a60dc\"]",
@@ -16437,7 +16437,7 @@
   },
   {
     "name": "Vedas",
-    "aliases": "Mother Veda; Shruti; Shrutis; Veda; Veda-pramanam; Vedic scripture; Vedic scriptures; Vedic texts; ancient revealed sacred scriptures; ancient scriptures of spiritual wisdom; divine scriptures; sacred ancient scriptures; sacred scriptures of Bharateeyas; sacred texts; sacred-revealed ancient scriptures; the Vedas; the four Vedas; the sacred scriptures; the vedas",
+    "aliases": "Shruti; Shrutis; Veda; Veda-pramanam; Vedic scripture; Vedic scriptures; Vedic texts; ancient revealed sacred scriptures; ancient scriptures of spiritual wisdom; divine scriptures; sacred ancient scriptures; sacred scriptures of Bharateeyas; sacred-revealed ancient scriptures; the Vedas; the four Vedas; the sacred scriptures; the vedas",
     "summary": "The Vedas are the foundational texts from which all branches of knowledge originate according to the discourse.",
     "entity_type": "text",
     "canonical_article_ids": "[\"8c4bcc16-1ce5-482a-9ecf-7469240c46be\", \"b99f9484-7a46-4de9-b731-4dbd9b8a57ae\", \"bdfb4947-83ba-43a3-ac94-08cc57cef178\"]",
@@ -16548,7 +16548,7 @@
   },
   {
     "name": "Vibhishana",
-    "aliases": "Ravana's brother; Ruler of the Rakshasas; Vibhishana Ravana's brother; Vibhishana the brother of Ravana; brother of Ravana; the betrayer of Lanka; the embodiment of satva guna",
+    "aliases": "Ravana's brother; Vibhishana Ravana's brother; Vibhishana the brother of Ravana; brother of Ravana; the betrayer of Lanka; the embodiment of satva guna",
     "summary": "Vibhishana is depicted as the personification of the Satvika quality among the demon chiefs.",
     "entity_type": "person",
     "canonical_article_ids": "[\"0d33d4a7-8d20-4ee6-b5a4-b52c367b8e2b\"]",
@@ -16579,7 +16579,7 @@
   },
   {
     "name": "Vichara",
-    "aliases": "Enquiry",
+    "aliases": "",
     "summary": "Vichara is the process of enquiry that leads to the understanding of the true nature of reality, ultimately dispelling maya.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"99a8a558-a50f-46f8-9d83-9dceebbf0c7a\", \"68205feb-274a-4c53-a94d-abdf67fda44c\", \"8763296b-efd7-498a-913a-875bc49c99fd\"]",
@@ -16596,7 +16596,7 @@
   },
   {
     "name": "Vicharana",
-    "aliases": "enquiry; inquiry",
+    "aliases": "inquiry",
     "summary": "Vicharana means prudence and discrimination between what is good and bad, which is necessary for understanding truth.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"803b8b9a-7f82-494f-a6dc-510c957880e4\", \"06c2423d-15fe-4f62-a1ac-b06e88f58432\", \"f1ba832c-41f4-4787-b122-e07c1a934764\"]",
@@ -16645,7 +16645,7 @@
   },
   {
     "name": "Vidwan Mahasabha",
-    "aliases": "Society of Pandits",
+    "aliases": "",
     "summary": "Vidwan Mahasabha is a society aimed at fostering a positive attitude in spiritual effort and establishing truth in the minds of people.",
     "entity_type": "org_term",
     "canonical_article_ids": "[\"3bb81226-e64a-4a9e-b232-31b5c50361a6\", \"0d0a9dc5-56aa-40a2-8388-d7686bde69b6\", \"64e1f818-7c72-427f-854e-5731db602790\"]",
@@ -16679,7 +16679,7 @@
   },
   {
     "name": "Vijnana",
-    "aliases": "Assimilated Knowledge; Highest Wisdom; science",
+    "aliases": "Assimilated Knowledge; science",
     "summary": "Vijnana is necessary for knowledge but should be combined with Prajnana (divine wisdom) for true understanding.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"a8e0c985-ded5-4446-bb91-fce1195f78a2\", \"3ce40330-3e0c-49c0-9738-c5ff1d902062\", \"963bd4cb-27aa-4eea-8554-79149bc54be5\"]",
@@ -16696,7 +16696,7 @@
   },
   {
     "name": "Vijnanamaya Kosa",
-    "aliases": "Intelligence; intelligence sheath; sheath of integrated awareness",
+    "aliases": "intelligence sheath; sheath of integrated awareness",
     "summary": "The Vijnanamaya Kosa is one of the five sheaths that constitute the human entity.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"0f2b210b-807e-4001-a290-2ac57ab9b77a\", \"963bd4cb-27aa-4eea-8554-79149bc54be5\", \"35209072-8c32-4fb7-8885-7f192c1ef418\"]",
@@ -16795,7 +16795,7 @@
   },
   {
     "name": "Vinayaka",
-    "aliases": "Buddhi Pradayaka; Ganapathi; Ganapati; Ganesha; Ganesha the Elephant-headed; Guardian of Wealth; Lambodara; Lord Ganapati; Lord Ganesha; Lord Vighneshwara; Lord Vinayaka; Lord of the Ganas; Lord of the ganas; Lord of the intellect and wisdom; Master of Masters; Primal Deity; Siddhi Vinayaka; Supreme in Ganapati worship; Vighneshwara; Vighneswara; Vigneshwara; Vinayak; Vinayaka Chaturthi; Vinayaka the deity; elder son of Lord Shiva",
+    "aliases": "Buddhi Pradayaka; Ganapathi; Ganesha the Elephant-headed; Guardian of Wealth; Lambodara; Lord Ganapati; Lord Ganesha; Lord Vighneshwara; Lord Vinayaka; Lord of the Ganas; Lord of the ganas; Lord of the intellect and wisdom; Master of Masters; Primal Deity; Siddhi Vinayaka; Supreme in Ganapati worship; Vighneswara; Vigneshwara; Vinayak; Vinayaka Chaturthi; Vinayaka the deity; elder son of Lord Shiva",
     "summary": "Vinayaka, also known as Ganapati or Lord Vighneshwara, is described as the master of intellect and wisdom, who blesses all endeavors and helps dispel darkness.",
     "entity_type": "person",
     "canonical_article_ids": "[\"3e556f96-86ec-4e47-bdf1-cc5de3ed1735\", \"80424def-1265-4413-b11b-54cff57775ae\", \"9bda8dc4-fa7c-4555-9731-b3b2950c6eab\"]",
@@ -16811,7 +16811,7 @@
   },
   {
     "name": "Vinayaka Chaturthi",
-    "aliases": "Ganapati; Ganesha; Ganesha Chaturthi; Ganesha Festival; Vighneshwara; Vinayaka",
+    "aliases": "Ganesha Chaturthi; Ganesha Festival; Vinayaka",
     "summary": "Vinayaka Chaturthi is a festival during which various offerings are made to Vinayaka, emphasizing health and the importance of offerings prepared in steam.",
     "entity_type": "festival",
     "canonical_article_ids": "[\"3e556f96-86ec-4e47-bdf1-cc5de3ed1735\", \"8384cddd-b0b8-47d3-a533-3b0fd98f474c\", \"bd674fe2-5f60-416e-891c-1b93678e1535\"]",
@@ -16827,7 +16827,7 @@
   },
   {
     "name": "Virakti",
-    "aliases": "detachment",
+    "aliases": "",
     "summary": "Virakti is described as detachment or lack of affection towards worldly objects, which can allow one to skip stages of Ashrama.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"e07c79fe-6a82-49db-a498-9b973ef95ca8\", \"ed89fd5e-54d5-4144-9f96-967dc8ef0523\", \"c37052fa-5f6f-4177-83a9-aff1f549cbe1\"]",
@@ -16974,7 +16974,7 @@
   },
   {
     "name": "Vishwamitra",
-    "aliases": "Brahmarishi; Sage Vishwamitra; the sage Vishwamitra",
+    "aliases": "Sage Vishwamitra; the sage Vishwamitra",
     "summary": "Vishwamitra is a sage who guided Rama and Lakshmana during their mission to protect the Yajna and later invited them to Mithila.",
     "entity_type": "person",
     "canonical_article_ids": "[\"bbead593-cbe8-4f86-9ca5-1119d675d4ff\", \"006b39e3-2633-46f5-96aa-c4c0dcd52cab\", \"b2cf477d-093d-4c13-9c05-789a1c713981\"]",
@@ -16991,7 +16991,7 @@
   },
   {
     "name": "Vishwaprema",
-    "aliases": "Universal Love; Universal love",
+    "aliases": "",
     "summary": "Vishwaprema is highlighted as a lesson conveyed by the lives of Saints Thyagaraja and Namadheva.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"2e2fd439-187a-46e0-a7cc-1906d6ece0c5\", \"370fa907-3709-4244-b4cf-0736a0b7f1a0\"]",
@@ -17007,7 +17007,7 @@
   },
   {
     "name": "Visva",
-    "aliases": "creation",
+    "aliases": "",
     "summary": "Visva is one of the three states associated with the sound 'AH' in the context of understanding the divine.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"7ee7050f-6e3a-4a6b-8176-19e346f48a5f\"]",
@@ -17022,7 +17022,7 @@
   },
   {
     "name": "Vivekam",
-    "aliases": "Discrimination",
+    "aliases": "",
     "summary": "Vivekam refers to the quality of discrimination that is essential for students on the spiritual path.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"638c7c0e-4c3d-40b3-a6cb-a66e743bda5c\", \"615dddac-a80d-4296-a759-48f9a9920836\", \"63b0623c-8cb2-46b6-b22c-c87e3f61e4af\"]",
@@ -17056,7 +17056,7 @@
   },
   {
     "name": "Vyasa",
-    "aliases": "Adi-guru; Adiguru; Lokaguru; Maharshi Vyasa; Sage Vyasa; Veda Vyasa; Veda-Vyasa; Vedavyasa; Vyaasa; Vyasa Poornima; Vyasa the great individual; Vyasa-Bhagawan; Vyaso Narayano Harih; author of Mahabharata; sage Vyasa; son of Sage Parashara; the author of Bhagavatam; the great sage Vyasa; the greatest of spiritual doctors; the person who grouped the Vedas; the sage; the sage Vyasa",
+    "aliases": "Adi-guru; Adiguru; Lokaguru; Maharshi Vyasa; Sage Vyasa; Veda Vyasa; Veda-Vyasa; Vedavyasa; Vyaasa; Vyasa Poornima; Vyasa the great individual; Vyasa-Bhagawan; Vyaso Narayano Harih; author of Mahabharata; sage Vyasa; son of Sage Parashara; the author of Bhagavatam; the great sage Vyasa; the greatest of spiritual doctors; the person who grouped the Vedas; the sage Vyasa",
     "summary": "Vyasa is depicted as a sage who experiences a mental transformation after his son Shuka renounces worldly attachments.",
     "entity_type": "person",
     "canonical_article_ids": "[\"04d328d0-a4d8-4861-8a5f-bb9b9446f53d\", \"544dfacd-a6db-4bda-86b1-18417d434933\", \"b64a5de8-d602-4df3-9a46-1bfe00774615\"]",
@@ -17072,7 +17072,7 @@
   },
   {
     "name": "Vyashti",
-    "aliases": "individual",
+    "aliases": "",
     "summary": "Vyashti refers to the individual, who is a limb of society (Samashti) and ultimately part of the creation (Srishti).",
     "entity_type": "concept",
     "canonical_article_ids": "[\"4c7426e7-d15c-4862-8855-755fd2b4fe6f\"]",
@@ -17119,7 +17119,7 @@
   },
   {
     "name": "Yajna",
-    "aliases": "Vedic Yajna; Vedic ritual of sacrifice; Yaga; Yagas; Yajnas; ceremonial sacrifice; ritual of sacrifice; sacrifice; sacrificial rite; sacrificial rituals; vedic ritual of sacrifice; yaga",
+    "aliases": "Vedic Yajna; Vedic ritual of sacrifice; Yaga; Yagas; Yajnas; ceremonial sacrifice; ritual of sacrifice; sacrificial rite; sacrificial rituals; vedic ritual of sacrifice; yaga",
     "summary": "Yajnas are holy sacrificial rituals, and all actions of man can be regarded as yajnas when performed as offerings to God.",
     "entity_type": "concept",
     "canonical_article_ids": "[\"1a86c840-0da2-4295-900b-b872a6316f4d\", \"434d96fd-21d6-4fe3-bf9f-6b0f3eeb4753\", \"642be627-bc56-49fa-b94d-5030a523a21e\"]",
@@ -17182,7 +17182,7 @@
   },
   {
     "name": "Yashoda",
-    "aliases": "Krishna's foster mother; Krishna's mother; Mother Yashoda; Swami's mother; Yashoda, Krishna's mother; Yashoda, Vasudeva's elder wife; mother Yashoda",
+    "aliases": "Krishna's foster mother; Mother Yashoda; Yashoda, Krishna's mother; Yashoda, Vasudeva's elder wife; mother Yashoda",
     "summary": "Yashoda is noted for following the footprints of Krishna to find him after he had hidden himself.",
     "entity_type": "person",
     "canonical_article_ids": "[\"6fd3f914-0591-47c4-8e1d-f451e14468a1\"]",
@@ -17196,7 +17196,7 @@
   },
   {
     "name": "Yasoda",
-    "aliases": "Krishna's mother; foster-mother of Krishna",
+    "aliases": "foster-mother of Krishna",
     "summary": "Yasoda is the mother of Krishna, who expressed concern over Krishna's playful stealing of butter from the gopikas.",
     "entity_type": "person",
     "canonical_article_ids": "[\"03de4301-ca1e-4492-a019-3afd1e813536\", \"c8aba436-4dc7-4df0-b39d-e6a48393da84\"]",

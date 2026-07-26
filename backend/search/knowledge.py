@@ -30,6 +30,11 @@ from .config import WEAVIATE_RETRY_ATTEMPTS
 # question as a "miss" and fall back to semantic search rather than force a guess.
 ENTITY_MATCH_MIN_SCORE = 0.5
 
+# Minimum share of the QUESTION's content words that the matched entity must
+# account for. Calibrated against the golden set's exact-discourse cases, which
+# name a discourse title containing an incidental concept word.
+ENTITY_MIN_QUERY_COVERAGE = 0.4
+
 # Words too generic to signal an entity match (so "teachings of the Gita" doesn't
 # match an entity purely on "teachings"/"the").
 _STOPWORDS = {
@@ -108,6 +113,24 @@ def lookup_entity(query, entities=None):
     entity_words = _content_words(name + " " + (props.get("aliases") or ""))
     query_words = _content_words((query or "") + " " + " ".join(entities or []))
     if not (entity_words & query_words):
+        return {"status": "miss", "entity": None, "results": []}
+
+    # Coverage guard: the matched entity must account for a real SHARE of the
+    # question, not just appear inside it. Bare overlap was enough when the KB
+    # held a handful of curated rows; with ~1,000 concept entities it is not.
+    #
+    # "the discourse titled Ahamkara Causes Ashanti" names a DISCOURSE, but
+    # contains the concept entity "Ahamkara" — one word out of four — so the
+    # structured route answered a title lookup with an essay on ego. A question
+    # genuinely about an entity is mostly that entity ("what is Ahamkara" -> 1.0);
+    # a title that happens to contain one scores far lower. Below the bar we fall
+    # through to semantic search, which is what finds discourses by title.
+    coverage = len(entity_words & query_words) / max(len(query_words), 1)
+    if coverage < ENTITY_MIN_QUERY_COVERAGE:
+        logging.info(
+            f"entity {name!r} matched {query!r} at coverage {coverage:.2f} "
+            f"< {ENTITY_MIN_QUERY_COVERAGE} -> falling through to semantic"
+        )
         return {"status": "miss", "entity": None, "results": []}
 
     in_corpus = bool(props.get("in_corpus"))
