@@ -35,6 +35,16 @@ load_dotenv()
 
 from search.config import openai_client, GRADE_MODEL  # noqa: E402
 
+import re as _re
+
+
+def norm_title(t):
+    """Compare titles ignoring case, punctuation and curly-quote variants — the
+    corpus mixes ' and \u2019 in titles, and a user retyping one shouldn't count
+    as a miss."""
+    return _re.sub(r"[^a-z0-9 ]", "", (t or "").lower()).strip()
+
+
 BASE_URL = "http://localhost:8000"
 GOLDEN_FILE = "golden_questions.json"
 OUT_FILE = "eval_results.json"
@@ -93,9 +103,32 @@ def main():
         # Abstention correctness: abstain-labeled must be empty; others must not be.
         abstained = not has_results
         abstain_ok = (abstained == (expect == "abstain"))
-        # Route match: structured-labeled must take the structured route.
-        route_ok = (trace.get("route") == "structured") if expect == "structured" else True
-        # Quote judged only for questions that should answer and did.
+
+        # Exact-discourse retrieval: when a user names a specific discourse, that
+        # discourse must come back FIRST. `exact_only` is the stronger form —
+        # it came back alone, with no near-misses padding the list. First is the
+        # gate; only is tracked because a single confident hit is the ideal
+        # outcome for a question that names its own answer.
+        exact_ok = exact_only = None
+        if expect == "exact":
+            want = norm_title(g.get("expect_title", ""))
+            got = norm_title(results[0]["title"]) if has_results else ""
+            exact_ok = bool(want) and got == want
+            exact_only = exact_ok and len(results) == 1
+        # Route match: structured-labeled must take the structured route;
+        # listing-labeled must take the listing route (ordered enumeration).
+        if expect == "structured":
+            route_ok = trace.get("route") == "structured"
+        elif expect == "listing":
+            route_ok = trace.get("route") == "listing"
+        else:
+            route_ok = True
+        # An exact-discourse question may be served by the listing route, the
+        # exact-phrase shortcut, or semantic search — the route is not the
+        # contract, landing on the right discourse is. So route_ok stays True.
+        # Quote judged only for questions that should answer and did. Listing
+        # results carry a chapter PREVIEW (opening sentences), not an answering
+        # quote, so they are deliberately not quote-judged.
         quote = results[0].get("best_sentence") if has_results else None
         quote_ok = judge_quote_answers(g["question"], quote) if (expect in ("answer", "structured") and has_results) else None
 
@@ -104,9 +137,13 @@ def main():
             "intent": trace.get("intent"), "route": trace.get("route"),
             "n": len(results), "quality": trace.get("quality"),
             "abstain_ok": abstain_ok, "route_ok": route_ok, "quote_ok": quote_ok,
+            "exact_ok": exact_ok, "exact_only": exact_only,
+            "expect_title": g.get("expect_title"),
+            "got_title": results[0]["title"] if has_results else None,
             "ms": ms, "reasons": [r["code"] for r in trace.get("reasons", [])],
         })
-        mark = "ok" if abstain_ok and route_ok and (quote_ok is not False) else "FLAG"
+        mark = "ok" if (abstain_ok and route_ok and quote_ok is not False
+                        and exact_ok is not False) else "FLAG"
         print(f"[{g['id']}] {mark:4} expect={expect:10} intent={str(rows[-1]['intent']):12} route={str(rows[-1]['route'])} n={len(results)} quote_ok={quote_ok} {ms}ms")
 
     ok = [r for r in rows if "error" not in r]
@@ -114,6 +151,9 @@ def main():
     quote_rate = sum(1 for r in answered if r["quote_ok"]) / len(answered) if answered else 0
     abstain_rate = sum(1 for r in ok if r["abstain_ok"]) / len(ok) if ok else 0
     route_rate = sum(1 for r in ok if r["route_ok"]) / len(ok) if ok else 0
+    exact_rows = [r for r in ok if r["exact_ok"] is not None]
+    exact_rate = sum(1 for r in exact_rows if r["exact_ok"]) / len(exact_rows) if exact_rows else 0
+    only_rate = sum(1 for r in exact_rows if r["exact_only"]) / len(exact_rows) if exact_rows else 0
     lat = sorted(r["ms"] for r in ok)
     p50 = lat[len(lat)//2] if lat else 0
     p90 = lat[int(len(lat)*0.9)] if lat else 0
@@ -122,10 +162,16 @@ def main():
     print(f"  quote_answers_rate:      {quote_rate:.0%}  ({sum(1 for r in answered if r['quote_ok'])}/{len(answered)})")
     print(f"  abstention_correctness:  {abstain_rate:.0%}  ({sum(1 for r in ok if r['abstain_ok'])}/{len(ok)})")
     print(f"  route_match:             {route_rate:.0%}")
+    if exact_rows:
+        print(f"  exact_discourse_first:   {exact_rate:.0%}  "
+              f"({sum(1 for r in exact_rows if r['exact_ok'])}/{len(exact_rows)})")
+        print(f"  exact_discourse_only:    {only_rate:.0%}  "
+              f"({sum(1 for r in exact_rows if r['exact_only'])}/{len(exact_rows)})")
     print(f"  latency p50/p90:         {p50}ms / {p90}ms")
 
     json.dump({"quote_rate": quote_rate, "abstain_rate": abstain_rate,
-               "route_rate": route_rate, "p50": p50, "p90": p90, "rows": rows},
+               "route_rate": route_rate, "exact_rate": exact_rate,
+               "only_rate": only_rate, "p50": p50, "p90": p90, "rows": rows},
               open(OUT_FILE, "w"), indent=2)
 
     if "--baseline" in sys.argv:
@@ -133,7 +179,11 @@ def main():
         print("\n=== VS BASELINE ===")
         print(f"  quote_rate:  {base['quote_rate']:.0%} -> {quote_rate:.0%}")
         print(f"  abstain:     {base['abstain_rate']:.0%} -> {abstain_rate:.0%}")
-        gate = quote_rate >= base["quote_rate"] and abstain_rate >= base["abstain_rate"]
+        if "exact_rate" in base:
+            print(f"  exact_first: {base['exact_rate']:.0%} -> {exact_rate:.0%}")
+        gate = (quote_rate >= base["quote_rate"]
+                and abstain_rate >= base["abstain_rate"]
+                and exact_rate >= base.get("exact_rate", 0))
         print(f"  REGRESSION GATE: {'PASS' if gate else 'FAIL — do not ship'}")
 
     print(f"\nSaved {OUT_FILE}")

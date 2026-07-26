@@ -2,8 +2,8 @@
   "quote_rate": 0.6153846153846154,
   "abstain_rate": 1.0,
   "route_rate": 1.0,
-  "p50": 4941,
-  "p90": 6308,
+  "p50": 7364,
+  "p90": 10352,
   "rows": [
     {
       "id": "g01",
@@ -15,8 +15,8 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
-      "ms": 5925,
+      "quote_ok": true,
+      "ms": 9002,
       "reasons": []
     },
     {
@@ -25,12 +25,12 @@
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 10,
+      "n": 5,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 2,
+      "ms": 7389,
       "reasons": []
     },
     {
@@ -44,7 +44,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 4941,
+      "ms": 10207,
       "reasons": []
     },
     {
@@ -58,7 +58,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 5744,
+      "ms": 6519,
       "reasons": []
     },
     {
@@ -72,7 +72,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 5853,
+      "ms": 10746,
       "reasons": []
     },
     {
@@ -81,12 +81,12 @@
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 10,
+      "n": 9,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 5266,
+      "ms": 9869,
       "reasons": []
     },
     {
@@ -100,7 +100,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 5743,
+      "ms": 11792,
       "reasons": []
     },
     {
@@ -109,12 +109,12 @@
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 10,
+      "n": 6,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
-      "ms": 4878,
+      "quote_ok": true,
+      "ms": 10044,
       "reasons": []
     },
     {
@@ -123,12 +123,12 @@
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 10,
+      "n": 9,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 6330,
+      "ms": 7079,
       "reasons": []
     },
     {
@@ -137,12 +137,12 @@
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 9,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 5704,
+      "ms": 7988,
       "reasons": []
     },
     {
@@ -156,7 +156,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 1901,
+      "ms": 1678,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
@@ -172,7 +172,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 2352,
+      "ms": 1836,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
@@ -188,7 +188,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 1654,
+      "ms": 1308,
       "reasons": []
     },
     {
@@ -202,21 +202,21 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 2604,
+      "ms": 1556,
       "reasons": []
     },
     {
       "id": "g15",
       "question": "What is Tripura Rahasyam?",
       "expect": "abstain",
-      "intent": "factual",
+      "intent": "named_text",
       "route": "structured",
       "n": 0,
       "quality": "none",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
-      "ms": 1291,
+      "ms": 1437,
       "reasons": [
         "KB_KNOWN_GAP"
       ]
@@ -232,7 +232,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
-      "ms": 851,
+      "ms": 715,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -248,7 +248,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
-      "ms": 905,
+      "ms": 815,
       "reasons": [
         "META_REQUEST"
       ]
@@ -264,7 +264,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 5744,
+      "ms": 7686,
       "reasons": []
     },
     {
@@ -278,7 +278,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 7455,
+      "ms": 7529,
       "reasons": [
         "COMPARISON_BOTH_SIDES"
       ]
@@ -287,14 +287,14 @@
       "id": "g20",
       "question": "teachings of the Gita",
       "expect": "answer",
-      "intent": "conceptual",
+      "intent": "named_text",
       "route": "semantic",
-      "n": 8,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 6308,
+      "ms": 7364,
       "reasons": []
     },
     {
@@ -308,7 +308,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 5261,
+      "ms": 6768,
       "reasons": []
     },
     {
@@ -317,12 +317,12 @@
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 10,
+      "n": 5,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 5813,
+      "ms": 6837,
       "reasons": []
     },
     {
@@ -336,7 +336,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": false,
-      "ms": 5800,
+      "ms": 8620,
       "reasons": []
     },
     {
@@ -345,12 +345,12 @@
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 10,
+      "n": 9,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 5675,
+      "ms": 6783,
       "reasons": []
     },
     {
@@ -364,7 +364,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 4593,
+      "ms": 10352,
       "reasons": []
     },
     {
@@ -378,7 +378,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 499,
+      "ms": 654,
       "reasons": []
     },
     {
@@ -392,7 +392,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
-      "ms": 1048,
+      "ms": 925,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -408,7 +408,7 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": true,
-      "ms": 4759,
+      "ms": 8412,
       "reasons": []
     },
     {
@@ -421,67 +421,23 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": true,
-      "ms": 5981,
+      "quote_ok": false,
+      "ms": 6829,
       "reasons": []
     },
     {
       "id": "g30",
       "question": "How should students practice devotion?",
       "expect": "answer",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
-      "n": 7,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": true,
-      "ms": 9374,
+      "quote_ok": false,
+      "ms": 9643,
       "reasons": []
-    },
-    {
-      "id": "g31",
-      "question": "return the first 5 chapters from Prema Vahini",
-      "expect": "listing",
-      "intent": "listing",
-      "route": "listing",
-      "n": 5,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": null,
-      "ms": 1324,
-      "reasons": []
-    },
-    {
-      "id": "g32",
-      "question": "list the chapters of Prema Vahini",
-      "expect": "listing",
-      "intent": "listing",
-      "route": "listing",
-      "n": 11,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": null,
-      "ms": 1222,
-      "reasons": []
-    },
-    {
-      "id": "g33",
-      "question": "first 5 chapters of Nonexistent Book",
-      "expect": "abstain",
-      "intent": "listing",
-      "route": "listing",
-      "n": 0,
-      "quality": "none",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": null,
-      "ms": 1111,
-      "reasons": [
-        "LISTING_NOT_FOUND"
-      ]
     }
   ]
 }
