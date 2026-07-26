@@ -81,7 +81,7 @@ Frontend ──► API Gateway ──► Elastic Beanstalk (Flask: app.py)
 
 **Caching.** Repeat questions short-circuit the whole pipeline (56% of real traffic is a repeat). Failures — service errors, failed listings — are never cached.
 
-Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `eval_router.py` (routing).
+Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `test_knowledge_guard.py` (Entity-route precision guards, network mocked). Note there is no router-only eval — routing is currently measured only through end-to-end outcomes.
 
 ### Auth
 

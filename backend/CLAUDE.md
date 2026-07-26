@@ -45,7 +45,9 @@ python eval_ragas.py --baseline eval_baseline.json  # PASS/FAIL vs the shipped c
 - `abstention_correctness` — abstain-labelled questions return nothing, others return something
 - `exact_discourse_first` / `_only` — naming a specific discourse returns **that** discourse first, ideally alone
 
-`eval_baseline.json` is the shipped configuration's run; regenerate it when you intentionally move a metric. Supporting scripts: `build_golden_set.py` (sample + LLM-draft labels), `promote_golden_set.py` (apply reviewed fixes, add exact-discourse cases), `replay_real_questions.py` (bulk replay over harvested traffic), `eval_router.py` / `test_router_unit.py` (routing only).
+`eval_baseline.json` is the shipped configuration's run; regenerate it when you intentionally move a metric. Supporting scripts: `build_golden_set.py` (sample + LLM-draft labels), `promote_golden_set.py` (apply reviewed fixes, add exact-discourse cases), `replay_real_questions.py` (bulk replay over harvested traffic), `test_knowledge_guard.py` (Entity-route guards, network mocked).
+
+**There is no isolated router eval.** `eval_ragas.py` measures end-to-end outcomes, so a misrouted question and a retrieval miss look identical in it. Every routing bug found so far surfaced by accident rather than by measurement — worth building if you touch `query_planning.py` often.
 
 Two model-choice traps the harness has already caught, both recorded in `config.py`:
 - **Reasoning models carry a latency floor.** gpt-5-mini measured ~2× slower on both planner and judge even at `reasoning_effort="minimal"`, and worse on every quality metric.
