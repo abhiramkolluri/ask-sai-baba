@@ -92,14 +92,30 @@ GRADE_MODEL = "gpt-4o-mini"   # cheap utility calls (eval judge, follow-up propo
 # a latency win rather than a regression, so treat it as required, not tuning.
 # Env-overridable so a bad model can be rolled back without a code deploy, and
 # so an A/B baseline can be captured against the same golden set.
-# MEASURED, 218-question golden set, clean runs:
-#   gpt-4o judge     : quote 62%, exact_first 62%, total p50 4,298ms
-#   gpt-5-mini judge : quote 52%, exact_first 55%, total p50 8,058ms
-# gpt-5-mini is a reasoning model and carries a multi-second floor even at
-# reasoning_effort="minimal" — ~2x slower on BOTH planner and judge, and worse on
-# quality. Defaults stay on the gpt-4o family; override to re-test.
+# Judge selected by measurement, not by list price. All four run against the same
+# 218-question golden set:
+#
+#   judge          quote  exact_first  p50      worst    >29s  $/1M in-out
+#   gpt-4.1        65%    62%          4,221ms  10.1s    0     $2 / $8    <- chosen
+#   gpt-4o         62%    62%          3,716ms   8.8s    0     $2.50 / $10
+#   gpt-4.1-mini   69%    55%          7,957ms  63.1s    3     $0.40 / $1.60
+#   gpt-5-mini     52%    55%          7,681ms    —      —     $0.25 / $2
+#
+# gpt-4.1 is better than gpt-4o on quote quality, equal on exact-discourse, and
+# 20% cheaper, for ~500ms of p50.
+#
+# gpt-4.1-mini grades quotes best of all but is UNSHIPPABLE here: 3 of 218 queries
+# blew past API Gateway's 29s integration timeout (worst 63s = 3 client retries x
+# the 20s bound), and exact-discourse fell to 55%. Those are failed requests in
+# production, not slow ones.
+#
+# gpt-5-mini is a reasoning model with a multi-second floor even at
+# reasoning_effort="minimal" — ~2x slower on BOTH planner and judge, worse on
+# every quality metric.
+#
+# Re-measure with eval_ragas.py --baseline before changing either of these.
 PLAN_MODEL = os.getenv("PLAN_MODEL", "gpt-4o-mini")
-JUDGE_MODEL = os.getenv("JUDGE_MODEL", "gpt-4o")
+JUDGE_MODEL = os.getenv("JUDGE_MODEL", "gpt-4.1")
 REASONING_EFFORT = os.getenv("REASONING_EFFORT", "minimal")
 # gpt-4o-family models reject `reasoning_effort` and require `temperature`
 # instead. Detected rather than configured so a rollback is a single env var.
