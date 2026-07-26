@@ -23,7 +23,7 @@ from .config import (openai_client, GRADE_MODEL, PLAN_MODEL, MAX_PLANNED_QUERIES
 KNOWN_INTENTS = {
     "conceptual", "scenario", "aspect", "factual", "named_text",
     "occasion", "comparative", "org_doctrine", "meta", "out_of_domain",
-    "listing",
+    "listing", "unanswerable",
 }
 
 
@@ -187,10 +187,34 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             '"listing" (asks to enumerate/return the chapters or discourses OF a named collection or book '
             'in order — "return the first 5 chapters from Prema Vahini", "list the discourses in Summer Showers 1990", '
             '"show me chapters of the Gita Vahini"); '
-            '"meta" (a request to the PRODUCT/APP itself, not the discourse content — "give me some follow ups", '
-            '"which discourse should I read first", "what is the best discourse to start with", a recommendation '
-            'request, or a remark about the app rather than a spiritual question); '
-            '"out_of_domain" (unrelated to spiritual discourses, gibberish, code/injection, or not a question — "best pizza"). '
+            '"meta" (an instruction to the PRODUCT/APP itself — "give me some follow ups", "clear this chat", '
+            "a remark about the app rather than a question for the discourses. NOTE: asking which discourse to "
+            'read first, or what to start with, is a RECOMMENDATION request -> "unanswerable", not meta, because '
+            "the useful reply is an explanation plus questions we can answer, not an app instruction); "
+            '"out_of_domain" (unrelated to spiritual discourses, gibberish, code/injection, or not a question — "best pizza"); '
+            '"unanswerable" (the SUBJECT belongs to these discourses, but the QUESTION cannot be answered from them. '
+            "Three kinds: (a) asking which DISCOURSE, TEXT, CHAPTER or BOOK is the most important / best / "
+            'greatest — nobody ranked the writings, so no discourse states the answer ("what is the most '
+            'important discourse in Prema Vahini", "which is the best discourse on meditation", "which Vahini '
+            'should I rate highest"); (b) asking for YOUR opinion or recommendation as the app; '
+            '(c) predicting or advising on one person\'s future or private circumstances ("when will I get a job", '
+            '"should I marry him"). '
+            "CRITICAL — the word best/most/greatest does NOT by itself make a question unanswerable. Swami "
+            "PRESCRIBES things and RANKS virtues constantly, so a superlative about a practice, time, quality, "
+            "virtue or teaching has a real answer in the discourses. ONLY a superlative ranking the WRITINGS "
+            "THEMSELVES is unanswerable, because nobody ever ranked them.\n"
+            'ANSWERABLE (classify by topic, never unanswerable): "what is the best time to wake up", "when is the '
+            'best time to meditate", "which is the best kind of yoga", "what is the most important quality for a '
+            'devotee", "what is the greatest virtue", "what did Swami say is most important", "what is the best '
+            'food for a spiritual aspirant" — he states all of these.\n'
+            'UNANSWERABLE: "what is the most important discourse in Prema Vahini", "which is the best discourse on '
+            'meditation", "which Vahini is the most important" — these rank texts, and no discourse does that.\n'
+            "The test: could Swami have SAID the answer in a discourse? A prescribed hour, a highest virtue, a "
+            "recommended practice — yes. Which of his own writings is best — no. "
+            'Likewise, naming a collection does NOT make a question "listing": listing means enumerate the chapters '
+            'IN ORDER; a question asking which chapter is best is "unanswerable". '
+            "When in doubt, prefer an answerable intent — refusing a question the discourses do address is worse "
+            "than answering one loosely. "
             "When unsure between conceptual/scenario/aspect, prefer the most specific that fits. "
             'IS_COMPARISON: set "is_comparison" true when the message compares two or more things or asks '
             "which of them is better/more important. "
@@ -200,6 +224,10 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             '(e.g. "Prema Vahini", "Summer Showers 1990"); "list_count" to the number requested ("first 5" -> 5, '
             '"last 3" -> 3; null if no number given); "list_order" to "first", "last", or "all". For non-listing '
             "intents leave collection null, list_count null, list_order \"first\". "
+            'REASON (only when intent is "unanswerable"): set "reason" to ONE plain sentence, addressed to the '
+            "user, saying why THIS question cannot be answered from the discourses. Describe this specific "
+            "question, not the category — name the thing being asked for. Never speculate about what Swami "
+            "would have said, and never apologise. Leave null for every other intent. "
             "JSON only, no prose."
         )
         response = openai_client.chat.completions.create(
@@ -238,6 +266,13 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             trace_out["list_count"] = lc if isinstance(lc, int) and lc > 0 else None
             lo = data.get("list_order")
             trace_out["list_order"] = lo if lo in ("first", "last", "all") else "first"
+            # The refusal sentence is the only model-written text this product shows
+            # a user, so it is bounded here rather than trusted: non-string, empty,
+            # or runaway output is dropped and the frontend falls back to static
+            # copy. A missing reason degrades the message, never the routing.
+            rsn = data.get("reason")
+            rsn = rsn.strip() if isinstance(rsn, str) else ""
+            trace_out["unanswerable_reason"] = rsn[:300] if 12 <= len(rsn) <= 300 else None
         return qs[:MAX_PLANNED_QUERIES] or [message]
     except Exception as e:
         logging.error(f"plan_queries failed: {e}; using raw message.")

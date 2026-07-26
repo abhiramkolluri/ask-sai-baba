@@ -178,17 +178,31 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
             trace["results"]["top_relevance"] = results[0].get("score", 0.0) if results else 0.0
             assess_quality(trace, results)
             value = (results, trace)
-            # NEVER cache a failure. An empty result from an honest abstention
-            # (out-of-domain, a known corpus gap) is deterministic and worth
-            # caching — but a service error, or a listing whose collection the
-            # planner failed to extract, is transient. Caching those freezes one
-            # bad roll of the dice into every future request for that question
-            # until the process restarts. Observed: a planner flake on "the first
-            # 5 chapters from Prema Vahini" was served from cache indefinitely.
-            cacheable = not (
-                trace.get("service_error")
-                or trace.get("quality") == "error"
+            # NEVER cache a failure, and treat "empty" as a failure unless the
+            # emptiness was a DELIBERATE routing decision.
+            #
+            # An earlier version excluded only service errors and failed
+            # listings. That left a hole: the router is not deterministic, and a
+            # flake can degrade a perfectly good question into a semantic search
+            # that finds nothing — which is neither of those cases, so it got
+            # cached and replayed forever. Measured on "return the first 5
+            # chapters from Prema Vahini": 6/6 correct with the cache off, but a
+            # single flaked run poisoned the entry and every later request
+            # returned nothing.
+            #
+            # So: cache anything that produced results, plus the abstentions we
+            # arrived at on purpose (out-of-domain, meta, a known corpus gap,
+            # a collection we genuinely could not find). Everything else is
+            # cheap to recompute and might have been a bad roll.
+            deliberate_abstention = (
+                trace.get("route") == "guidance"
+                or trace.get("kb_gap")
                 or (trace.get("listing") or {}).get("not_found")
+            )
+            cacheable = (
+                not trace.get("service_error")
+                and trace.get("quality") != "error"
+                and (bool(results) or deliberate_abstention)
             )
         if cacheable:
             cache.put(*cache_args, value)
@@ -247,9 +261,18 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # result + guidance rather than semanticizing them into spurious matches.
         # Other intents fall through to the semantic route here; the structured
         # knowledge route (factual/named_text/org_doctrine) is wired in Phase 2.
-        if ROUTER_V2_ENABLED and intent in ("meta", "out_of_domain"):
+        # "unanswerable" is checked HERE, before the listing dispatch below, and the
+        # order is the whole fix. "What is the most important discourse in Prema
+        # Vahini?" names a collection, so the listing route used to claim it and
+        # return chapter 1 as a confident answer to a ranking nobody ever wrote
+        # down. A judgment about a collection is not an enumeration of it.
+        if ROUTER_V2_ENABLED and intent in ("meta", "out_of_domain", "unanswerable"):
             if trace:
                 trace["route"] = "guidance"
+                # The router's own sentence about THIS question. None when it
+                # didn't produce a usable one; the frontend then falls back to
+                # static copy rather than showing nothing.
+                trace["unanswerable_reason"] = plan_meta.get("unanswerable_reason")
             return _finish([])
 
         # (c.1b) Listing route: "return the first 5 chapters from Prema Vahini" —
@@ -563,7 +586,8 @@ def _verify_followup(candidate: str):
         logging.error(f"_verify_followup failed for {candidate!r}: {e}")
         return (0.0, 0)
 
-def generate_followups(query: str, results: List[Dict[str, Any]], history=None) -> List[str]:
+def generate_followups(query: str, results: List[Dict[str, Any]], history=None,
+                       intent: str = None, unanswerable_reason: str = None) -> List[str]:
     """Generate verified follow-up questions for the answer just returned.
 
     Two stages:
@@ -578,12 +602,21 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None) 
           FOLLOWUP_MIN_RERANK_SCORE survive; survivors are ranked by the score they
           reach and the best FOLLOWUP_KEEP are returned.
 
+    REDIRECT MODE (`intent="unanswerable"`): there are no results to ground on,
+    because the question was one the discourses cannot answer — a ranking nobody
+    made, our own opinion, or a prediction about one person. Stage A instead
+    proposes questions NEAR the user's evident interest that the corpus can
+    answer. Stage B is unchanged and is the reason this is safe to offer:
+    suggesting a redirect that also fails would compound the original refusal,
+    and every candidate is already verified against real retrieval.
+
     Returns a list of question strings (possibly empty). Never raises — any failure
     returns [] so the UI degrades to showing no follow-ups.
     """
     if not query or not isinstance(query, str):
         return []
-    if not results:
+    redirect = intent == "unanswerable"
+    if not results and not redirect:
         # Nothing was retrieved for the answer -> nothing to ground or funnel from.
         return []
     history = history or []
@@ -607,29 +640,54 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None) 
             ground_lines.append(f'- "{title}" (relevance {score_str}): {quote}')
         ground_block = "Discourses retrieved for the current question:\n" + "\n".join(ground_lines)
 
-        system = (
-            "You generate follow-up questions for a search tool over English-translated "
-            "spiritual discourses by Sathya Sai Baba. The user just asked a question and was "
-            "shown the discourses below, each with the quote that answered it and a relevance "
-            f"score from 0 to 1. Propose {FOLLOWUP_CANDIDATES} STANDALONE follow-up questions as "
-            'JSON: {"candidates":["..."]}. Rules: '
-            "(1) Each question must advance the user's apparent goal and read naturally on its own "
-            "(resolve any references to earlier turns). "
-            "(2) Phrase each so the corpus can directly answer it — concrete spiritual concepts, "
-            "practices, or teachings, not vague or meta questions. "
-            "(3) Funnel toward relevance: if the shown relevance scores are low (the results are "
-            "only tangentially related), propose NARROWER questions that target the specific "
-            "subject matter the strongest quotes hint at, to reach discourses that answer more "
-            "directly. If the scores are already high, propose questions that go DEEPER or explore "
-            "closely adjacent teachings. "
-            "(4) Make the questions distinct from each other and from the original question. "
-            "JSON only, no prose."
-        )
-        user_content = (
-            hist_block
-            + "Original question: " + query + "\n\n"
-            + ground_block
-        )
+        if redirect:
+            # No discourses were retrieved — by design. Tell the model what was
+            # asked and why it could not be answered, and ask it to move sideways
+            # to something the corpus does address, keeping whatever subject the
+            # person actually cares about ("most important discourse in Prema
+            # Vahini" -> what Prema Vahini teaches about divine love).
+            system = (
+                "A user asked a search tool over English-translated spiritual discourses by "
+                "Sathya Sai Baba a question it CANNOT answer. Your job is to offer questions it "
+                "CAN answer, staying as close as possible to what the person actually wants.\n\n"
+                f"Why the original could not be answered: {unanswerable_reason or 'It asks for a judgment, opinion, or prediction that no discourse states.'}\n\n"
+                f'Propose {FOLLOWUP_CANDIDATES} STANDALONE questions as JSON: {{"candidates":["..."]}}. Rules: '
+                "(1) KEEP THE SUBJECT. If they named a text, collection, person or topic, keep it — "
+                "someone asking which Prema Vahini chapter is best still wants Prema Vahini. "
+                "(2) Replace the unanswerable part. A ranking becomes a question about what the "
+                "discourses actually teach; a request for your opinion becomes a question about what "
+                "Swami said; a prediction about someone's life becomes a question about the teaching "
+                "that bears on it (\"when will I get a job\" -> what Swami says about work and duty). "
+                "(3) Every question must be answerable from recorded discourses — concrete teachings, "
+                "practices or concepts. Never ask the tool to rank, choose, recommend, or predict. "
+                "(4) Make them distinct from each other. "
+                "JSON only, no prose."
+            )
+            user_content = hist_block + "The question they asked: " + query
+        else:
+            system = (
+                "You generate follow-up questions for a search tool over English-translated "
+                "spiritual discourses by Sathya Sai Baba. The user just asked a question and was "
+                "shown the discourses below, each with the quote that answered it and a relevance "
+                f"score from 0 to 1. Propose {FOLLOWUP_CANDIDATES} STANDALONE follow-up questions as "
+                'JSON: {"candidates":["..."]}. Rules: '
+                "(1) Each question must advance the user's apparent goal and read naturally on its own "
+                "(resolve any references to earlier turns). "
+                "(2) Phrase each so the corpus can directly answer it — concrete spiritual concepts, "
+                "practices, or teachings, not vague or meta questions. "
+                "(3) Funnel toward relevance: if the shown relevance scores are low (the results are "
+                "only tangentially related), propose NARROWER questions that target the specific "
+                "subject matter the strongest quotes hint at, to reach discourses that answer more "
+                "directly. If the scores are already high, propose questions that go DEEPER or explore "
+                "closely adjacent teachings. "
+                "(4) Make the questions distinct from each other and from the original question. "
+                "JSON only, no prose."
+            )
+            user_content = (
+                hist_block
+                + "Original question: " + query + "\n\n"
+                + ground_block
+            )
         response = openai_client.chat.completions.create(
             model=GRADE_MODEL,
             messages=[

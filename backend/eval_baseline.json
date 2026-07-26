@@ -1,11 +1,11 @@
 {
-  "quote_rate": 0.6458333333333334,
-  "abstain_rate": 0.9357798165137615,
-  "route_rate": 0.9311926605504587,
-  "exact_rate": 0.625,
+  "quote_rate": 0.6912751677852349,
+  "abstain_rate": 0.9521739130434783,
+  "route_rate": 0.9304347826086956,
+  "exact_rate": 0.675,
   "only_rate": 0.425,
-  "p50": 4221,
-  "p90": 6443,
+  "p50": 4008,
+  "p90": 5994,
   "rows": [
     {
       "id": "q001",
@@ -22,7 +22,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Brahmacharya",
-      "ms": 6244,
+      "ms": 6883,
       "reasons": []
     },
     {
@@ -31,7 +31,7 @@
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 6,
+      "n": 7,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -40,7 +40,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Face The Challenge Of Krodhana",
-      "ms": 4784,
+      "ms": 4609,
       "reasons": []
     },
     {
@@ -58,7 +58,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "None Can Escape From The Consequences Of One\u2019s Actions",
-      "ms": 4773,
+      "ms": 5173,
       "reasons": []
     },
     {
@@ -76,7 +76,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Discrimination and detachment",
-      "ms": 7458,
+      "ms": 4531,
       "reasons": []
     },
     {
@@ -94,7 +94,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Commentary On The Message",
-      "ms": 4925,
+      "ms": 4701,
       "reasons": []
     },
     {
@@ -112,7 +112,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Satya and Dharma: Bases of Life",
-      "ms": 4586,
+      "ms": 5994,
       "reasons": []
     },
     {
@@ -130,7 +130,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Students and Saadhana",
-      "ms": 5604,
+      "ms": 6067,
       "reasons": []
     },
     {
@@ -148,7 +148,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Essence of Meditation is Fixing the Mind on One-point",
-      "ms": 5216,
+      "ms": 6086,
       "reasons": []
     },
     {
@@ -166,7 +166,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Do Not Waste Natural Resources",
-      "ms": 4000,
+      "ms": 3984,
       "reasons": []
     },
     {
@@ -184,7 +184,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Way of the Wise",
-      "ms": 7062,
+      "ms": 6561,
       "reasons": []
     },
     {
@@ -202,7 +202,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Easwaramma- Embodiment Of Love And Sacrifice",
-      "ms": 1966,
+      "ms": 2052,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
@@ -222,7 +222,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Lord of Puttaparthi Will Protect You",
-      "ms": 2267,
+      "ms": 2221,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
@@ -242,7 +242,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Nine Point Code of Conduct",
-      "ms": 1746,
+      "ms": 6419,
       "reasons": []
     },
     {
@@ -250,24 +250,24 @@
       "question": "What are the guiding principles of Balvikas?",
       "expect": "structured",
       "intent": "org_doctrine",
-      "route": "structured",
-      "n": 3,
+      "route": "semantic",
+      "n": 6,
       "quality": "strong",
       "abstain_ok": true,
-      "route_ok": true,
+      "route_ok": false,
       "quote_ok": false,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Educare Is Human Values",
-      "ms": 2454,
+      "got_title": "New Version Of Gurus",
+      "ms": 6329,
       "reasons": []
     },
     {
       "id": "q015",
       "question": "What is Tripura Rahasyam?",
       "expect": "abstain",
-      "intent": "factual",
+      "intent": "named_text",
       "route": "structured",
       "n": 0,
       "quality": "none",
@@ -278,7 +278,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 1443,
+      "ms": 1685,
       "reasons": [
         "KB_KNOWN_GAP"
       ]
@@ -298,7 +298,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 1498,
+      "ms": 845,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -318,7 +318,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 994,
+      "ms": 1001,
       "reasons": [
         "META_REQUEST"
       ]
@@ -329,7 +329,7 @@
       "expect": "answer",
       "intent": "occasion",
       "route": "semantic",
-      "n": 6,
+      "n": 3,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -338,7 +338,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Achieve nil balance",
-      "ms": 3250,
+      "ms": 3631,
       "reasons": []
     },
     {
@@ -351,12 +351,12 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
+      "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
       "got_title": "Self-Knowledge",
-      "ms": 3494,
+      "ms": 4510,
       "reasons": [
         "COMPARISON_BOTH_SIDES"
       ]
@@ -371,12 +371,12 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": true,
+      "quote_ok": false,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Dedicate All Actions To God",
-      "ms": 5258,
+      "got_title": "Yanthram & Manthram",
+      "ms": 4340,
       "reasons": []
     },
     {
@@ -385,7 +385,7 @@
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 6,
+      "n": 7,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -394,7 +394,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Peace of Mind and Ideal Life",
-      "ms": 4054,
+      "ms": 3624,
       "reasons": []
     },
     {
@@ -403,7 +403,7 @@
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 5,
+      "n": 8,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -411,8 +411,8 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Alms and Qualms",
-      "ms": 3792,
+      "got_title": "Make Your Mind The Master Of Your Desires",
+      "ms": 6266,
       "reasons": []
     },
     {
@@ -430,7 +430,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Aids to Meditation - Sincerity, Purity and Humility",
-      "ms": 4257,
+      "ms": 3918,
       "reasons": []
     },
     {
@@ -448,7 +448,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Character Is The Crest Jewel Of Education",
-      "ms": 4501,
+      "ms": 3826,
       "reasons": []
     },
     {
@@ -466,7 +466,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Practice of Meditation",
-      "ms": 3817,
+      "ms": 3664,
       "reasons": []
     },
     {
@@ -484,7 +484,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Love all: Serve all",
-      "ms": 456,
+      "ms": 499,
       "reasons": []
     },
     {
@@ -502,7 +502,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 1009,
+      "ms": 934,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -521,8 +521,8 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Foster Love: Eschew Hatred",
-      "ms": 4080,
+      "got_title": "God Is Your Only Goal",
+      "ms": 5318,
       "reasons": []
     },
     {
@@ -535,12 +535,12 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
+      "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Concept Of Spiritual Education",
-      "ms": 4755,
+      "ms": 4522,
       "reasons": []
     },
     {
@@ -558,7 +558,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Five D's",
-      "ms": 4467,
+      "ms": 4134,
       "reasons": []
     },
     {
@@ -576,7 +576,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 1326,
+      "ms": 1285,
       "reasons": []
     },
     {
@@ -594,7 +594,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 1230,
+      "ms": 1113,
       "reasons": []
     },
     {
@@ -612,7 +612,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 950,
+      "ms": 1005,
       "reasons": [
         "LISTING_NOT_FOUND"
       ]
@@ -632,7 +632,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 787,
+      "ms": 722,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -652,7 +652,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 783,
+      "ms": 847,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -672,7 +672,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 887,
+      "ms": 767,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -692,7 +692,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 2656,
+      "ms": 895,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -712,7 +712,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 799,
+      "ms": 801,
       "reasons": [
         "NO_MATCHES"
       ]
@@ -732,7 +732,7 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 821,
+      "ms": 921,
       "reasons": [
         "META_REQUEST"
       ]
@@ -741,9 +741,9 @@
       "id": "q040",
       "question": "When did Sai Baba say the best time to wake up?",
       "expect": "structured",
-      "intent": "factual",
+      "intent": "aspect",
       "route": "semantic",
-      "n": 6,
+      "n": 8,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": false,
@@ -752,33 +752,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Trail Of Wings",
-      "ms": 4422,
-      "reasons": [
-        "FACTUAL_QUESTION"
-      ]
+      "ms": 3296,
+      "reasons": []
     },
     {
       "id": "q041",
-      "question": "Who was Swami's mother?",
-      "expect": "structured",
-      "intent": "factual",
-      "route": "structured",
-      "n": 1,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": true,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "Easwaramma- Embodiment Of Love And Sacrifice",
-      "ms": 9,
-      "reasons": [
-        "FACTUAL_QUESTION"
-      ]
-    },
-    {
-      "id": "q042",
       "question": "where was sathya sai baba born",
       "expect": "structured",
       "intent": "factual",
@@ -792,18 +770,18 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Siva Sakti",
-      "ms": 5977,
+      "ms": 4056,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q043",
+      "id": "q042",
       "question": "when was Swami born",
       "expect": "structured",
       "intent": "factual",
       "route": "semantic",
-      "n": 3,
+      "n": 4,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": false,
@@ -812,67 +790,49 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Revelations About The Sai Avatar",
-      "ms": 3742,
+      "ms": 3915,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q044",
+      "id": "q043",
       "question": "What are the guiding principles of SSE",
       "expect": "structured",
       "intent": "org_doctrine",
-      "route": "structured",
-      "n": 3,
+      "route": "semantic",
+      "n": 6,
       "quality": "strong",
       "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": false,
+      "route_ok": false,
+      "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Educare Is Human Values",
-      "ms": 2134,
+      "got_title": "Seva Is The Highest Sadhana",
+      "ms": 4885,
+      "reasons": []
+    },
+    {
+      "id": "q044",
+      "question": "What are the guiding principles of Balvikas",
+      "expect": "structured",
+      "intent": "org_doctrine",
+      "route": "semantic",
+      "n": 6,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": false,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Gurus Not Teachers",
+      "ms": 5683,
       "reasons": []
     },
     {
       "id": "q045",
-      "question": "Nine Point Code of Conduct",
-      "expect": "structured",
-      "intent": "org_doctrine",
-      "route": "structured",
-      "n": 1,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": false,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "Nine Point Code of Conduct",
-      "ms": 3,
-      "reasons": []
-    },
-    {
-      "id": "q046",
-      "question": "What are the guiding principles of Balvikas",
-      "expect": "structured",
-      "intent": "org_doctrine",
-      "route": "structured",
-      "n": 3,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": false,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "Educare Is Human Values",
-      "ms": 2529,
-      "reasons": []
-    },
-    {
-      "id": "q047",
       "question": "\"Heroes, not Zeros\"",
       "expect": "answer",
       "intent": null,
@@ -886,11 +846,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Be Heroes, Not Zeros",
-      "ms": 518,
+      "ms": 487,
       "reasons": []
     },
     {
-      "id": "q048",
+      "id": "q046",
       "question": "retrieve the discourse on \"Love and Truth\"",
       "expect": "answer",
       "intent": null,
@@ -904,11 +864,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Bend Before Love And Truth",
-      "ms": 589,
+      "ms": 577,
       "reasons": []
     },
     {
-      "id": "q049",
+      "id": "q047",
       "question": "What does the Gita say about duty?",
       "expect": "answer",
       "intent": "conceptual",
@@ -922,11 +882,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Dharma and Indian Spirituality",
-      "ms": 5192,
+      "ms": 5546,
       "reasons": []
     },
     {
-      "id": "q050",
+      "id": "q048",
       "question": "What about for children?",
       "expect": "answer",
       "intent": "aspect",
@@ -940,11 +900,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Prahladas for the Present Age",
-      "ms": 6443,
+      "ms": 5191,
       "reasons": []
     },
     {
-      "id": "q051",
+      "id": "q049",
       "question": "Can you elaborate on that?",
       "expect": "answer",
       "intent": "aspect",
@@ -958,11 +918,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Selfless Service \u2013 The Purpose of Vidya",
-      "ms": 3931,
+      "ms": 3725,
       "reasons": []
     },
     {
-      "id": "q052",
+      "id": "q050",
       "question": "How",
       "expect": "abstain",
       "intent": "out_of_domain",
@@ -976,70 +936,14 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 802,
+      "ms": 876,
       "reasons": [
         "NO_MATCHES"
       ]
     },
     {
-      "id": "q053",
+      "id": "q051",
       "question": "How do you have meaninful connect6ions with people",
-      "expect": "answer",
-      "intent": "aspect",
-      "route": "semantic",
-      "n": 10,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": true,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "The True Nature Of Friendship",
-      "ms": 4285,
-      "reasons": []
-    },
-    {
-      "id": "q054",
-      "question": "What does Sai Baba say about detachment vs perseverance?",
-      "expect": "answer",
-      "intent": "comparative",
-      "route": "semantic",
-      "n": 10,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": true,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "Attachment to the Self Is True Love",
-      "ms": 4538,
-      "reasons": [
-        "COMPARISON_BOTH_SIDES"
-      ]
-    },
-    {
-      "id": "q055",
-      "question": "return the first 5 chapters from Prema Vahini",
-      "expect": "listing",
-      "intent": "listing",
-      "route": "listing",
-      "n": 5,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": null,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 9,
-      "reasons": []
-    },
-    {
-      "id": "q056",
-      "question": "How do you find life\u2019s purpose?",
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
@@ -1051,12 +955,50 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Faith in God Removes All Fears",
-      "ms": 4136,
+      "got_title": "The True Nature Of Friendship",
+      "ms": 4655,
       "reasons": []
     },
     {
-      "id": "q057",
+      "id": "q052",
+      "question": "What does Sai Baba say about detachment vs perseverance?",
+      "expect": "answer",
+      "intent": "comparative",
+      "route": "semantic",
+      "n": 10,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": false,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Work with Discrimination, Worship with Awareness",
+      "ms": 5179,
+      "reasons": [
+        "COMPARISON_BOTH_SIDES"
+      ]
+    },
+    {
+      "id": "q053",
+      "question": "How do you find life\u2019s purpose?",
+      "expect": "answer",
+      "intent": "aspect",
+      "route": "semantic",
+      "n": 10,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Faith in God Removes All Fears",
+      "ms": 4251,
+      "reasons": []
+    },
+    {
+      "id": "q054",
       "question": "How do I sing Bhajans, do service, learn prayers, meditate, and do yoga?",
       "expect": "answer",
       "intent": "aspect",
@@ -1070,11 +1012,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Purify the World by Sankirtana",
-      "ms": 8650,
-      "reasons": []
+      "ms": 9644,
+      "reasons": [
+        "RERANK_DEGRADED"
+      ]
     },
     {
-      "id": "q058",
+      "id": "q055",
       "question": "how do i remove SIN?",
       "expect": "answer",
       "intent": "aspect",
@@ -1088,11 +1032,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "A Righteous Emperor and Virtuous Subjects",
-      "ms": 5716,
+      "ms": 6138,
       "reasons": []
     },
     {
-      "id": "q059",
+      "id": "q056",
       "question": "how to sing bhajans",
       "expect": "answer",
       "intent": "aspect",
@@ -1106,11 +1050,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Purify the World by Sankirtana",
-      "ms": 5606,
+      "ms": 5402,
       "reasons": []
     },
     {
-      "id": "q060",
+      "id": "q057",
       "question": "how do i meditate?",
       "expect": "answer",
       "intent": "aspect",
@@ -1124,11 +1068,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Splendour of Meditation and its Practice",
-      "ms": 6834,
+      "ms": 7502,
       "reasons": []
     },
     {
-      "id": "q061",
+      "id": "q058",
       "question": "how do i remove hatered?",
       "expect": "answer",
       "intent": "aspect",
@@ -1141,12 +1085,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Techniques for Mind Control",
-      "ms": 4948,
+      "got_title": "Youth is Characterized by Sterling Virtues",
+      "ms": 4145,
       "reasons": []
     },
     {
-      "id": "q062",
+      "id": "q059",
       "question": "how do i sing?",
       "expect": "answer",
       "intent": "aspect",
@@ -1160,11 +1104,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Glorify the Lord's Name",
-      "ms": 5819,
+      "ms": 4702,
       "reasons": []
     },
     {
-      "id": "q063",
+      "id": "q060",
       "question": "How to overcome fear and develop courage?",
       "expect": "answer",
       "intent": "aspect",
@@ -1178,11 +1122,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Character Is The Crest Jewel Of Education",
-      "ms": 3664,
+      "ms": 4870,
       "reasons": []
     },
     {
-      "id": "q064",
+      "id": "q061",
       "question": "how to pray",
       "expect": "answer",
       "intent": "aspect",
@@ -1196,11 +1140,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Divine Proximity Is The Source Of True Happiness",
-      "ms": 4631,
+      "ms": 4754,
       "reasons": []
     },
     {
-      "id": "q065",
+      "id": "q062",
       "question": "how do i pray",
       "expect": "answer",
       "intent": "aspect",
@@ -1214,11 +1158,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Divine Proximity Is The Source Of True Happiness",
-      "ms": 4764,
+      "ms": 4362,
       "reasons": []
     },
     {
-      "id": "q066",
+      "id": "q063",
       "question": "How to develop spiritual awareness?",
       "expect": "answer",
       "intent": "aspect",
@@ -1231,12 +1175,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Ascent To The Divine",
-      "ms": 6070,
+      "got_title": "Develop Love For God And Experience Unity",
+      "ms": 5261,
       "reasons": []
     },
     {
-      "id": "q067",
+      "id": "q064",
       "question": "how to use compass mongodb client?",
       "expect": "abstain",
       "intent": "out_of_domain",
@@ -1250,13 +1194,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 1031,
+      "ms": 992,
       "reasons": [
         "NO_MATCHES"
       ]
     },
     {
-      "id": "q068",
+      "id": "q065",
       "question": "How to develop patience in difficult times?",
       "expect": "answer",
       "intent": "aspect",
@@ -1270,11 +1214,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Kshama, The Grandest And Noblest Virtue",
-      "ms": 4506,
+      "ms": 3827,
       "reasons": []
     },
     {
-      "id": "q069",
+      "id": "q066",
       "question": "how do I sing Bhajans?",
       "expect": "answer",
       "intent": "aspect",
@@ -1288,11 +1232,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Purify the World by Sankirtana",
-      "ms": 4305,
+      "ms": 4785,
       "reasons": []
     },
     {
-      "id": "q070",
+      "id": "q067",
       "question": "how do i meditate",
       "expect": "answer",
       "intent": "aspect",
@@ -1306,11 +1250,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Splendour of Meditation and its Practice",
-      "ms": 7044,
+      "ms": 7888,
       "reasons": []
     },
     {
-      "id": "q071",
+      "id": "q068",
       "question": "how do i pray?",
       "expect": "answer",
       "intent": "aspect",
@@ -1324,14 +1268,14 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Divine Proximity Is The Source Of True Happiness",
-      "ms": 4253,
+      "ms": 5796,
       "reasons": []
     },
     {
-      "id": "q072",
+      "id": "q069",
       "question": "How can I develop patience in difficult situations?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "scenario",
       "route": "semantic",
       "n": 9,
       "quality": "strong",
@@ -1342,14 +1286,14 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Kshama, The Grandest And Noblest Virtue",
-      "ms": 4433,
+      "ms": 4617,
       "reasons": []
     },
     {
-      "id": "q073",
+      "id": "q070",
       "question": "How can I develop more compassion?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "conceptual",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -1360,11 +1304,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Ceiling On Desires",
-      "ms": 3611,
+      "ms": 4484,
       "reasons": []
     },
     {
-      "id": "q074",
+      "id": "q071",
       "question": "how should I remember my dreams?",
       "expect": "abstain",
       "intent": "aspect",
@@ -1378,16 +1322,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 3112,
+      "ms": 2970,
       "reasons": [
         "ALL_REJECTED_BY_GRADER"
       ]
     },
     {
-      "id": "q075",
+      "id": "q072",
       "question": "How do I rid myself a laziness?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "scenario",
       "route": "semantic",
       "n": 8,
       "quality": "strong",
@@ -1397,30 +1341,32 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Transmute Every Minute",
-      "ms": 3282,
+      "got_title": "Seek Educare Instead Of Just Education",
+      "ms": 3076,
       "reasons": []
     },
     {
-      "id": "q076",
+      "id": "q073",
       "question": "how do i hate?",
       "expect": "abstain",
-      "intent": "aspect",
-      "route": "semantic",
-      "n": 1,
-      "quality": "partial",
-      "abstain_ok": false,
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Light the Lamp of Wisdom",
-      "ms": 2805,
-      "reasons": []
+      "got_title": null,
+      "ms": 976,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
     },
     {
-      "id": "q077",
+      "id": "q074",
       "question": "how to develop self confidence?",
       "expect": "answer",
       "intent": "aspect",
@@ -1434,11 +1380,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Krishna and Balarama as Students",
-      "ms": 3920,
+      "ms": 3856,
       "reasons": []
     },
     {
-      "id": "q078",
+      "id": "q075",
       "question": "How do I make myself believe that swami is taking care of everything and everything happens for a reason especially when embarrassing things happen",
       "expect": "answer",
       "intent": "aspect",
@@ -1451,12 +1397,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Love is Truth; Truth is Love. Live in Love.",
-      "ms": 5108,
+      "got_title": "Seek God Within",
+      "ms": 3713,
       "reasons": []
     },
     {
-      "id": "q079",
+      "id": "q076",
       "question": "how does sathya sai baba define dharma",
       "expect": "answer",
       "intent": "conceptual",
@@ -1469,12 +1415,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Sathya and Dharma Are Natural Attributes of Man",
-      "ms": 4156,
+      "got_title": "Always Be Happy And Peaceful",
+      "ms": 4086,
       "reasons": []
     },
     {
-      "id": "q080",
+      "id": "q077",
       "question": "How to avoid the company of people who tend to eat more non-vegetarian food?",
       "expect": "answer",
       "intent": "scenario",
@@ -1488,11 +1434,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Vinayaka \u2013 The Master Of Siddhi And Buddhi",
-      "ms": 4045,
+      "ms": 3754,
       "reasons": []
     },
     {
-      "id": "q081",
+      "id": "q078",
       "question": "how can you not have expectation on others",
       "expect": "answer",
       "intent": "aspect",
@@ -1506,14 +1452,14 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Birth of Sri Krishna",
-      "ms": 4878,
+      "ms": 3917,
       "reasons": []
     },
     {
-      "id": "q082",
+      "id": "q079",
       "question": "How do I cut out the temptation to snack?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "scenario",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -1524,11 +1470,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Direct Your Mind Towards God",
-      "ms": 4865,
+      "ms": 3951,
       "reasons": []
     },
     {
-      "id": "q083",
+      "id": "q080",
       "question": "How should we play the game of life?",
       "expect": "answer",
       "intent": "conceptual",
@@ -1542,16 +1488,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Develop Permanent Relationship With God",
-      "ms": 9520,
+      "ms": 5522,
       "reasons": []
     },
     {
-      "id": "q084",
+      "id": "q081",
       "question": "how do I stop bad habits?",
       "expect": "answer",
       "intent": "aspect",
       "route": "semantic",
-      "n": 9,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -1560,11 +1506,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Health Is Wealth",
-      "ms": 5553,
+      "ms": 4564,
       "reasons": []
     },
     {
-      "id": "q085",
+      "id": "q082",
       "question": "How to explain to others what the Sai organization is and what it\u2019s about",
       "expect": "answer",
       "intent": "conceptual",
@@ -1578,11 +1524,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Faults And Failures",
-      "ms": 4922,
+      "ms": 4025,
       "reasons": []
     },
     {
-      "id": "q086",
+      "id": "q083",
       "question": "how does eating meat negatively or positively impact one's spiritual journey?",
       "expect": "answer",
       "intent": "aspect",
@@ -1596,11 +1542,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Avatar And The Devotees",
-      "ms": 5123,
+      "ms": 3866,
       "reasons": []
     },
     {
-      "id": "q087",
+      "id": "q084",
       "question": "How do I manage my time",
       "expect": "answer",
       "intent": "aspect",
@@ -1613,12 +1559,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Let Everyone Do His Duty",
-      "ms": 4780,
+      "got_title": "Ceiling On Desires",
+      "ms": 4398,
       "reasons": []
     },
     {
-      "id": "q088",
+      "id": "q085",
       "question": "How can we recognize and appreciate the divine guidance in our daily achievements and small wins?",
       "expect": "answer",
       "intent": "aspect",
@@ -1627,16 +1573,16 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
+      "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Chant The Name Of God And Experience Divinity",
-      "ms": 5163,
+      "got_title": "Strive To Sanctify Your Lives",
+      "ms": 4191,
       "reasons": []
     },
     {
-      "id": "q089",
+      "id": "q086",
       "question": "how to get over addiction",
       "expect": "answer",
       "intent": "aspect",
@@ -1650,11 +1596,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Diminish desires",
-      "ms": 5441,
+      "ms": 5262,
       "reasons": []
     },
     {
-      "id": "q090",
+      "id": "q087",
       "question": "how do I eat berries?",
       "expect": "abstain",
       "intent": "out_of_domain",
@@ -1668,13 +1614,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 1075,
+      "ms": 1107,
       "reasons": [
         "NO_MATCHES"
       ]
     },
     {
-      "id": "q091",
+      "id": "q088",
       "question": "How do you have meaningful connections with people in your life?",
       "expect": "answer",
       "intent": "aspect",
@@ -1688,11 +1634,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The True Nature Of Friendship",
-      "ms": 4799,
+      "ms": 4132,
       "reasons": []
     },
     {
-      "id": "q092",
+      "id": "q089",
       "question": "How do I stop worrying about something?",
       "expect": "answer",
       "intent": "aspect",
@@ -1706,11 +1652,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Truth Is God And Service Is Yoga",
-      "ms": 5295,
+      "ms": 4256,
       "reasons": []
     },
     {
-      "id": "q093",
+      "id": "q090",
       "question": "How to have faith and confidence",
       "expect": "answer",
       "intent": "conceptual",
@@ -1724,11 +1670,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Krishna and Balarama as Students",
-      "ms": 6708,
+      "ms": 4147,
       "reasons": []
     },
     {
-      "id": "q094",
+      "id": "q091",
       "question": "how do I not let bad energy into my life?",
       "expect": "answer",
       "intent": "aspect",
@@ -1742,11 +1688,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Vinayaka \u2013 The Master Of Siddhi And Buddhi",
-      "ms": 4304,
+      "ms": 4770,
       "reasons": []
     },
     {
-      "id": "q095",
+      "id": "q092",
       "question": "how can I practice spirituality in daily life?",
       "expect": "answer",
       "intent": "aspect",
@@ -1760,11 +1706,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Forget the Non-Self and Contemplate on the Self",
-      "ms": 4359,
+      "ms": 4147,
       "reasons": []
     },
     {
-      "id": "q096",
+      "id": "q093",
       "question": "Should we love all",
       "expect": "answer",
       "intent": "conceptual",
@@ -1778,11 +1724,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "God Will Help You If You Help Others",
-      "ms": 4318,
+      "ms": 3678,
       "reasons": []
     },
     {
-      "id": "q097",
+      "id": "q094",
       "question": "test question",
       "expect": "abstain",
       "intent": "out_of_domain",
@@ -1796,18 +1742,18 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 937,
+      "ms": 970,
       "reasons": [
         "NO_MATCHES"
       ]
     },
     {
-      "id": "q098",
+      "id": "q095",
       "question": "Aradhana day",
       "expect": "structured",
       "intent": "occasion",
       "route": "semantic",
-      "n": 7,
+      "n": 6,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": false,
@@ -1816,11 +1762,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Colour on canvas",
-      "ms": 4796,
+      "ms": 4141,
       "reasons": []
     },
     {
-      "id": "q099",
+      "id": "q096",
       "question": "what breath should be inhale?",
       "expect": "abstain",
       "intent": "conceptual",
@@ -1834,11 +1780,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Vinayaka Principle Is All-Pervasive",
-      "ms": 3855,
+      "ms": 4096,
       "reasons": []
     },
     {
-      "id": "q100",
+      "id": "q097",
       "question": "queryy { __typename }",
       "expect": "abstain",
       "intent": "out_of_domain",
@@ -1852,13 +1798,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 878,
+      "ms": 1383,
       "reasons": [
         "NO_MATCHES"
       ]
     },
     {
-      "id": "q101",
+      "id": "q098",
       "question": "what did swamy talk about sin",
       "expect": "answer",
       "intent": "conceptual",
@@ -1872,11 +1818,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Nature of Brahman",
-      "ms": 4627,
+      "ms": 4516,
       "reasons": []
     },
     {
-      "id": "q102",
+      "id": "q099",
       "question": "If nothing works, what should I do",
       "expect": "answer",
       "intent": "scenario",
@@ -1890,11 +1836,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The wheels: outer and inner",
-      "ms": 6869,
+      "ms": 4441,
       "reasons": []
     },
     {
-      "id": "q103",
+      "id": "q100",
       "question": "What does Sathya Sai baba say about truth?",
       "expect": "answer",
       "intent": "conceptual",
@@ -1908,11 +1854,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Destiny and Divine Grace",
-      "ms": 5501,
+      "ms": 7457,
       "reasons": []
     },
     {
-      "id": "q104",
+      "id": "q101",
       "question": "what did swamy talk about festivals",
       "expect": "answer",
       "intent": "conceptual",
@@ -1926,11 +1872,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Day of Dedication",
-      "ms": 7500,
+      "ms": 4467,
       "reasons": []
     },
     {
-      "id": "q105",
+      "id": "q102",
       "question": "give it to God",
       "expect": "abstain",
       "intent": "conceptual",
@@ -1944,16 +1890,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Develop Permanent Relationship With God",
-      "ms": 4535,
+      "ms": 4150,
       "reasons": []
     },
     {
-      "id": "q106",
+      "id": "q103",
       "question": "Can you tell me more about Sathya Sai Baba?",
       "expect": "answer",
       "intent": "factual",
       "route": "semantic",
-      "n": 8,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -1962,13 +1908,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Worship In The Mind",
-      "ms": 7526,
+      "ms": 6411,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q107",
+      "id": "q104",
       "question": "Karma with relation to good luck and bad luck",
       "expect": "answer",
       "intent": "aspect",
@@ -1982,16 +1928,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Avatar as Guru",
-      "ms": 4860,
+      "ms": 6283,
       "reasons": []
     },
     {
-      "id": "q108",
+      "id": "q105",
       "question": "significance of aum",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "conceptual",
       "route": "semantic",
-      "n": 9,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2000,16 +1946,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Aum\u2014The Name Of God",
-      "ms": 6732,
+      "ms": 6544,
       "reasons": []
     },
     {
-      "id": "q109",
+      "id": "q106",
       "question": "Which yoga is the best kind of yoga?",
       "expect": "answer",
-      "intent": "comparative",
+      "intent": "aspect",
       "route": "semantic",
-      "n": 7,
+      "n": 6,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2018,13 +1964,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Ashtanga Yoga (Eightfold Disciplines): Yama, Niyama, Asana",
-      "ms": 4376,
+      "ms": 4071,
       "reasons": [
         "COMPARISON_BOTH_SIDES"
       ]
     },
     {
-      "id": "q110",
+      "id": "q107",
       "question": "Examples of dharma",
       "expect": "answer",
       "intent": "conceptual",
@@ -2038,11 +1984,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Path of Dharma Leads to Victory",
-      "ms": 4662,
+      "ms": 5981,
       "reasons": []
     },
     {
-      "id": "q111",
+      "id": "q108",
       "question": "dharma righteousness duty",
       "expect": "answer",
       "intent": "conceptual",
@@ -2056,16 +2002,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Quest For Peace",
-      "ms": 5403,
+      "ms": 4313,
       "reasons": []
     },
     {
-      "id": "q112",
+      "id": "q109",
       "question": "Can you elaborate on how prayer and meditation yield the same spiritual fruits?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "comparative",
       "route": "semantic",
-      "n": 4,
+      "n": 3,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2074,29 +2020,33 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Lamps lit from the same flame",
-      "ms": 5390,
-      "reasons": []
+      "ms": 3585,
+      "reasons": [
+        "COMPARISON_BOTH_SIDES"
+      ]
     },
     {
-      "id": "q113",
+      "id": "q110",
       "question": "what Indian political party would Swami align with based on his teachings?",
       "expect": "abstain",
-      "intent": "conceptual",
-      "route": "semantic",
-      "n": 5,
-      "quality": "strong",
-      "abstain_ok": false,
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Love Is The Royal Road To Reach God",
-      "ms": 3376,
-      "reasons": []
+      "got_title": null,
+      "ms": 928,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
     },
     {
-      "id": "q114",
+      "id": "q111",
       "question": "Clothing while singing bhajans",
       "expect": "answer",
       "intent": "conceptual",
@@ -2110,16 +2060,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Do Not Waste Natural Resources",
-      "ms": 2874,
+      "ms": 2859,
       "reasons": []
     },
     {
-      "id": "q115",
+      "id": "q112",
       "question": "what does Sathya Sai Baba say about rudram chanting",
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 4,
+      "n": 6,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2128,11 +2078,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Ati Rudra Maha Yajna Fosters The Divine Nature Of Humans",
-      "ms": 4026,
+      "ms": 4419,
       "reasons": []
     },
     {
-      "id": "q116",
+      "id": "q113",
       "question": "life is a journey quote",
       "expect": "abstain",
       "intent": "conceptual",
@@ -2145,15 +2095,15 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Direct Your Mind Towards God",
-      "ms": 3667,
+      "got_title": "The Quest For Peace",
+      "ms": 3619,
       "reasons": []
     },
     {
-      "id": "q117",
+      "id": "q114",
       "question": "Bad habits creep up, how do i stop them?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "scenario",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -2163,12 +2113,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 4916,
+      "got_title": "The Wise Raitu",
+      "ms": 3954,
       "reasons": []
     },
     {
-      "id": "q118",
+      "id": "q115",
       "question": "whats the 5th Code of Conduct in 9 point Code of Conduct",
       "expect": "structured",
       "intent": "listing",
@@ -2182,11 +2132,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Nine Point Code of Conduct",
-      "ms": 2912,
+      "ms": 1370,
       "reasons": []
     },
     {
-      "id": "q119",
+      "id": "q116",
       "question": "What does Sai Baba say about stopping bad habits and learning new habits?",
       "expect": "answer",
       "intent": "aspect",
@@ -2200,11 +2150,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 5143,
+      "ms": 4388,
       "reasons": []
     },
     {
-      "id": "q120",
+      "id": "q117",
       "question": "What does Sai Baba say about festivals?",
       "expect": "answer",
       "intent": "conceptual",
@@ -2218,11 +2168,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Spark And The Source",
-      "ms": 5301,
+      "ms": 4982,
       "reasons": []
     },
     {
-      "id": "q121",
+      "id": "q118",
       "question": "What does Swami say about stopping bad habits and learning good ones?",
       "expect": "answer",
       "intent": "aspect",
@@ -2236,11 +2186,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Health Is Wealth",
-      "ms": 4468,
+      "ms": 3897,
       "reasons": []
     },
     {
-      "id": "q122",
+      "id": "q119",
       "question": "what did sai baba talk about festivals",
       "expect": "answer",
       "intent": "conceptual",
@@ -2254,47 +2204,49 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Spark And The Source",
-      "ms": 3939,
+      "ms": 4626,
       "reasons": []
     },
     {
-      "id": "q123",
+      "id": "q120",
       "question": "What does swami say",
       "expect": "abstain",
-      "intent": "conceptual",
-      "route": "semantic",
-      "n": 9,
-      "quality": "strong",
-      "abstain_ok": false,
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "God Is Pure Bliss",
-      "ms": 5043,
-      "reasons": []
+      "got_title": null,
+      "ms": 993,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
     },
     {
-      "id": "q124",
+      "id": "q121",
       "question": "what did swami say about being vegetarian",
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 10,
+      "n": 9,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
+      "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Humility Is the Hallmark of Education",
-      "ms": 3965,
+      "got_title": "Keep Spirituality As First Goal",
+      "ms": 6024,
       "reasons": []
     },
     {
-      "id": "q125",
+      "id": "q122",
       "question": "what does sai baba say about being vegetarian",
       "expect": "answer",
       "intent": "conceptual",
@@ -2308,11 +2260,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Keep Spirituality As First Goal",
-      "ms": 5462,
+      "ms": 4872,
       "reasons": []
     },
     {
-      "id": "q126",
+      "id": "q123",
       "question": "what did swami talk about sin",
       "expect": "answer",
       "intent": "conceptual",
@@ -2321,16 +2273,16 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
+      "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "The Nature of Brahman",
-      "ms": 4786,
+      "got_title": "The Essence of Education",
+      "ms": 4274,
       "reasons": []
     },
     {
-      "id": "q127",
+      "id": "q124",
       "question": "What does Sai Baba say about eating eggs?",
       "expect": "answer",
       "intent": "conceptual",
@@ -2344,16 +2296,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Keep Spirituality As First Goal",
-      "ms": 3214,
+      "ms": 2901,
       "reasons": []
     },
     {
-      "id": "q128",
+      "id": "q125",
       "question": "what does Sai Baba say about exercise?",
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 10,
+      "n": 9,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2362,16 +2314,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Proximity To God Is Real Wealth",
-      "ms": 4152,
+      "ms": 4008,
       "reasons": []
     },
     {
-      "id": "q129",
+      "id": "q126",
       "question": "What did Swami say about impressing others?",
       "expect": "answer",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
-      "n": 5,
+      "n": 8,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2379,15 +2331,15 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Opening Discourse",
-      "ms": 3362,
+      "got_title": "Thirst and Quest",
+      "ms": 3851,
       "reasons": []
     },
     {
-      "id": "q130",
+      "id": "q127",
       "question": "what does swami aay about talking vehind other\u2019s backs",
       "expect": "answer",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -2398,16 +2350,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Develop Love for God",
-      "ms": 3982,
+      "ms": 4312,
       "reasons": []
     },
     {
-      "id": "q131",
+      "id": "q128",
       "question": "What does baba say about porn",
       "expect": "abstain",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 4,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": false,
       "route_ok": true,
@@ -2415,12 +2367,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Buddha\u2019s Gospel Of The Good Life",
-      "ms": 3101,
+      "got_title": "Blessed Is The Person Who Has Shuddhi, Shanti, And Perseverance",
+      "ms": 4382,
       "reasons": []
     },
     {
-      "id": "q132",
+      "id": "q129",
       "question": "What does Swami say about Kumbh Mela?",
       "expect": "answer",
       "intent": "aspect",
@@ -2434,52 +2386,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": null,
-      "ms": 3380,
+      "ms": 3485,
       "reasons": [
         "ALL_REJECTED_BY_GRADER"
       ]
     },
     {
-      "id": "q133",
+      "id": "q130",
       "question": "What does Sai baba say about marriage?",
       "expect": "answer",
       "intent": "conceptual",
-      "route": "semantic",
-      "n": 6,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": true,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "Step By Step",
-      "ms": 3690,
-      "reasons": []
-    },
-    {
-      "id": "q134",
-      "question": "what does Swami say about love?",
-      "expect": "answer",
-      "intent": "conceptual",
-      "route": "semantic",
-      "n": 9,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": true,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "God Will Help You If You Help Others",
-      "ms": 3927,
-      "reasons": []
-    },
-    {
-      "id": "q135",
-      "question": "What does Sai Baba say about the prayer to save the world and society ?",
-      "expect": "answer",
-      "intent": "aspect",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -2489,12 +2405,48 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Let Everyone Do His Duty",
-      "ms": 4221,
+      "got_title": "All Are One; Be Alike To Everyone",
+      "ms": 5293,
       "reasons": []
     },
     {
-      "id": "q136",
+      "id": "q131",
+      "question": "what does Swami say about love?",
+      "expect": "answer",
+      "intent": "conceptual",
+      "route": "semantic",
+      "n": 10,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Love Is God's Fragrance",
+      "ms": 4603,
+      "reasons": []
+    },
+    {
+      "id": "q132",
+      "question": "What does Sai Baba say about the prayer to save the world and society ?",
+      "expect": "answer",
+      "intent": "conceptual",
+      "route": "semantic",
+      "n": 8,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "The Glory of Chanting the Name of the Lord",
+      "ms": 3732,
+      "reasons": []
+    },
+    {
+      "id": "q133",
       "question": "what does Swami say about suicide",
       "expect": "answer",
       "intent": "conceptual",
@@ -2508,11 +2460,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Avatar as the Ideal",
-      "ms": 4080,
+      "ms": 4615,
       "reasons": []
     },
     {
-      "id": "q137",
+      "id": "q134",
       "question": "What did swami say about gnana",
       "expect": "answer",
       "intent": "conceptual",
@@ -2526,14 +2478,14 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Society Shines By The Human Quality Of Individuals",
-      "ms": 4748,
+      "ms": 5160,
       "reasons": []
     },
     {
-      "id": "q138",
+      "id": "q135",
       "question": "What did Sai Baba say on seeking attention?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "conceptual",
       "route": "semantic",
       "n": 8,
       "quality": "strong",
@@ -2543,12 +2495,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "How To Become Dear To The Lord",
-      "ms": 3991,
+      "got_title": "Health, Diet And Divinity",
+      "ms": 3613,
       "reasons": []
     },
     {
-      "id": "q139",
+      "id": "q136",
       "question": "In this ever changing world, how do I encourage my child to follow Sai Baba's values?",
       "expect": "answer",
       "intent": "scenario",
@@ -2562,11 +2514,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Nine Point Code of Conduct",
-      "ms": 4014,
+      "ms": 3743,
       "reasons": []
     },
     {
-      "id": "q140",
+      "id": "q137",
       "question": "Help me find some discourses to learn more about the value of Truth",
       "expect": "answer",
       "intent": "aspect",
@@ -2580,11 +2532,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Satya and Dharma: Bases of Life",
-      "ms": 3758,
+      "ms": 4236,
       "reasons": []
     },
     {
-      "id": "q141",
+      "id": "q138",
       "question": "My goal is to be more mindful in my daily life. Find discourses that can inspire me.",
       "expect": "answer",
       "intent": "conceptual",
@@ -2598,11 +2550,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The holiest task",
-      "ms": 4945,
+      "ms": 3899,
       "reasons": []
     },
     {
-      "id": "q142",
+      "id": "q139",
       "question": "I want to learn more about the importance of compassion through reading discourses.",
       "expect": "answer",
       "intent": "aspect",
@@ -2616,30 +2568,12 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Compassionate Heart Is The Temple Of God",
-      "ms": 5729,
+      "ms": 5265,
       "reasons": []
     },
     {
-      "id": "q143",
+      "id": "q140",
       "question": "I am struggling with work-life balance. I feel guilty when I spend time with my family because of pending work, and guilty at work because I miss my family. I want to fulfill both responsibilities but feel torn between them.\"",
-      "expect": "answer",
-      "intent": "scenario",
-      "route": "semantic",
-      "n": 9,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": false,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
-      "got_title": "Let Everyone Do His Duty",
-      "ms": 7116,
-      "reasons": []
-    },
-    {
-      "id": "q144",
-      "question": "what do i do if i feel pressure at work?",
       "expect": "answer",
       "intent": "scenario",
       "route": "semantic",
@@ -2651,12 +2585,30 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Unity Is Our Life Breath",
-      "ms": 6527,
+      "got_title": "Let Everyone Do His Duty",
+      "ms": 4987,
       "reasons": []
     },
     {
-      "id": "q145",
+      "id": "q141",
+      "question": "what do i do if i feel pressure at work?",
+      "expect": "answer",
+      "intent": "scenario",
+      "route": "semantic",
+      "n": 9,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": false,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Bhaktha Sakhaa Bhagavan!",
+      "ms": 4725,
+      "reasons": []
+    },
+    {
+      "id": "q142",
       "question": "what do I feel if i feel down",
       "expect": "abstain",
       "intent": "scenario",
@@ -2670,16 +2622,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Realise Atma Tattva By Constant Practice",
-      "ms": 4016,
+      "ms": 3540,
       "reasons": []
     },
     {
-      "id": "q146",
+      "id": "q143",
       "question": "Why my husband is cranky most of the time?",
       "expect": "abstain",
       "intent": "scenario",
       "route": "semantic",
-      "n": 8,
+      "n": 9,
       "quality": "strong",
       "abstain_ok": false,
       "route_ok": true,
@@ -2688,11 +2640,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Face The Challenge Of Krodhana",
-      "ms": 3563,
+      "ms": 3813,
       "reasons": []
     },
     {
-      "id": "q147",
+      "id": "q144",
       "question": "Are you struggling to make decisions?\nWhat do you need to decide ?",
       "expect": "abstain",
       "intent": "scenario",
@@ -2706,12 +2658,30 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Prema: A Link Between the Lord and the Devotee",
-      "ms": 4721,
+      "ms": 3922,
       "reasons": []
     },
     {
-      "id": "q148",
+      "id": "q145",
       "question": "I often struggle with my diet when it comes to eating vegetarian food, especially since there are no sources of protein. I want to become stronger and leaner, which are both noble pursuits. How do I go about my diet while following certain principles?",
+      "expect": "answer",
+      "intent": "scenario",
+      "route": "semantic",
+      "n": 9,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": false,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "The Moving Temple",
+      "ms": 5911,
+      "reasons": []
+    },
+    {
+      "id": "q146",
+      "question": "what should i  do with my life",
       "expect": "answer",
       "intent": "scenario",
       "route": "semantic",
@@ -2723,30 +2693,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Cultivate Saatvika Qualities Right From Childhood",
-      "ms": 4615,
-      "reasons": []
-    },
-    {
-      "id": "q149",
-      "question": "what should i  do with my life",
-      "expect": "answer",
-      "intent": "conceptual",
-      "route": "semantic",
-      "n": 10,
-      "quality": "strong",
-      "abstain_ok": true,
-      "route_ok": true,
-      "quote_ok": false,
-      "exact_ok": null,
-      "exact_only": null,
-      "expect_title": null,
       "got_title": "Faith in God Removes All Fears",
-      "ms": 4410,
+      "ms": 4853,
       "reasons": []
     },
     {
-      "id": "q150",
+      "id": "q147",
       "question": "I am feeling confused about life and girls. What should I do?",
       "expect": "abstain",
       "intent": "scenario",
@@ -2760,11 +2712,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Your Conscience Is Your Master And Guide",
-      "ms": 5032,
+      "ms": 4721,
       "reasons": []
     },
     {
-      "id": "q151",
+      "id": "q148",
       "question": "What is love?",
       "expect": "answer",
       "intent": "conceptual",
@@ -2777,12 +2729,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "The Noblest Quality Of Womanhood Is Compassion",
-      "ms": 4344,
+      "got_title": "The immoral Bhaktas",
+      "ms": 4496,
       "reasons": []
     },
     {
-      "id": "q152",
+      "id": "q149",
       "question": "What is the best way to meditate?",
       "expect": "answer",
       "intent": "aspect",
@@ -2795,17 +2747,17 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Light The Lamps Of Love",
-      "ms": 8900,
+      "got_title": "The Splendour of Meditation and its Practice",
+      "ms": 8110,
       "reasons": []
     },
     {
-      "id": "q153",
+      "id": "q150",
       "question": "What is the meaning of true happiness?",
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 10,
+      "n": 9,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2813,12 +2765,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Divine Proximity Is The Source Of True Happiness",
-      "ms": 3757,
+      "got_title": "Your True Nature Is Bliss \u2013 Realise It",
+      "ms": 4616,
       "reasons": []
     },
     {
-      "id": "q154",
+      "id": "q151",
       "question": "What is the purpose of life?",
       "expect": "answer",
       "intent": "conceptual",
@@ -2827,21 +2779,21 @@
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": false,
+      "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Education and Immortality",
-      "ms": 4157,
+      "got_title": "Faith in God Removes All Fears",
+      "ms": 4741,
       "reasons": []
     },
     {
-      "id": "q155",
+      "id": "q152",
       "question": "What is the purpose of rudraabhishekam?",
       "expect": "answer",
-      "intent": "aspect",
+      "intent": "conceptual",
       "route": "semantic",
-      "n": 5,
+      "n": 3,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2850,14 +2802,14 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Shiva In All",
-      "ms": 3796,
+      "ms": 4332,
       "reasons": []
     },
     {
-      "id": "q156",
+      "id": "q153",
       "question": "What is the best time to wake up in the morning?",
       "expect": "structured",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -2868,11 +2820,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Trail Of Wings",
-      "ms": 3483,
+      "ms": 5528,
       "reasons": []
     },
     {
-      "id": "q157",
+      "id": "q154",
       "question": "what is mind?",
       "expect": "answer",
       "intent": "conceptual",
@@ -2886,34 +2838,34 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Guru Within",
-      "ms": 4183,
+      "ms": 3933,
       "reasons": []
     },
     {
-      "id": "q158",
+      "id": "q155",
       "question": "What is swamis purpose",
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 5,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
-      "quote_ok": true,
+      "quote_ok": false,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Let Life Be Fruitful And Meaningful",
-      "ms": 8599,
+      "got_title": "The Mind Stuff",
+      "ms": 3276,
       "reasons": []
     },
     {
-      "id": "q159",
+      "id": "q156",
       "question": "what is self realisation",
       "expect": "answer",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 9,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -2922,11 +2874,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Treasure Spiritual Knowledge In Your Heart",
-      "ms": 5193,
+      "ms": 4598,
       "reasons": []
     },
     {
-      "id": "q160",
+      "id": "q157",
       "question": "When is self-realization?",
       "expect": "answer",
       "intent": "conceptual",
@@ -2940,16 +2892,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Earn God\u2019s Grace Through Prayer",
-      "ms": 4686,
+      "ms": 4625,
       "reasons": []
     },
     {
-      "id": "q161",
+      "id": "q158",
       "question": "When is the good time to wake up?",
       "expect": "structured",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
-      "n": 9,
+      "n": 8,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": false,
@@ -2958,11 +2910,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Trail Of Wings",
-      "ms": 3473,
+      "ms": 4042,
       "reasons": []
     },
     {
-      "id": "q162",
+      "id": "q159",
       "question": "when did sai baba say is the best time to wake up in the morning?",
       "expect": "structured",
       "intent": "aspect",
@@ -2976,47 +2928,49 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Trail Of Wings",
-      "ms": 4852,
+      "ms": 4321,
       "reasons": []
     },
     {
-      "id": "q163",
+      "id": "q160",
       "question": "When will i get job",
       "expect": "abstain",
-      "intent": "scenario",
-      "route": "semantic",
-      "n": 5,
-      "quality": "strong",
-      "abstain_ok": false,
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Unbroken Bliss",
-      "ms": 3441,
-      "reasons": []
+      "got_title": null,
+      "ms": 1026,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
     },
     {
-      "id": "q164",
+      "id": "q161",
       "question": "when is the right time to sleep",
       "expect": "structured",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
-      "n": 4,
-      "quality": "strong",
+      "n": 2,
+      "quality": "partial",
       "abstain_ok": true,
       "route_ok": false,
       "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Repose Faith In Your Conscience",
-      "ms": 3698,
+      "got_title": "Observance of Silence Develops Spiritual Energy",
+      "ms": 3412,
       "reasons": []
     },
     {
-      "id": "q165",
+      "id": "q162",
       "question": "when is the best time to meditate?",
       "expect": "structured",
       "intent": "aspect",
@@ -3030,16 +2984,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Practice of Meditation",
-      "ms": 4153,
+      "ms": 4021,
       "reasons": []
     },
     {
-      "id": "q166",
+      "id": "q163",
       "question": "when was jesus born",
       "expect": "abstain",
       "intent": "factual",
-      "route": "semantic",
-      "n": 4,
+      "route": "structured",
+      "n": 3,
       "quality": "strong",
       "abstain_ok": false,
       "route_ok": true,
@@ -3047,14 +3001,14 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "The way of Jesus",
-      "ms": 5925,
+      "got_title": "Isa",
+      "ms": 2102,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q167",
+      "id": "q164",
       "question": "when does sai baba say about eating meat?",
       "expect": "answer",
       "intent": "conceptual",
@@ -3068,16 +3022,16 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Avatar And The Devotees",
-      "ms": 5163,
+      "ms": 3697,
       "reasons": []
     },
     {
-      "id": "q168",
+      "id": "q165",
       "question": "who is sai baba",
       "expect": "structured",
       "intent": "factual",
       "route": "semantic",
-      "n": 6,
+      "n": 7,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": false,
@@ -3086,13 +3040,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Who Is Sathya Sai Baba?",
-      "ms": 6712,
+      "ms": 4090,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q169",
+      "id": "q166",
       "question": "who am i",
       "expect": "answer",
       "intent": "conceptual",
@@ -3106,11 +3060,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Never Forget God",
-      "ms": 5181,
+      "ms": 9376,
       "reasons": []
     },
     {
-      "id": "q170",
+      "id": "q167",
       "question": "who is swami",
       "expect": "structured",
       "intent": "factual",
@@ -3124,33 +3078,33 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Complete Surrender Confers Bliss",
-      "ms": 6524,
+      "ms": 4241,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q171",
+      "id": "q168",
       "question": "Who is brihaspathi",
       "expect": "structured",
       "intent": "factual",
-      "route": "semantic",
-      "n": 7,
+      "route": "structured",
+      "n": 3,
       "quality": "strong",
       "abstain_ok": true,
-      "route_ok": false,
-      "quote_ok": true,
+      "route_ok": true,
+      "quote_ok": false,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Inner Vision of Brahman with an Unwavering Mind",
-      "ms": 4485,
+      "got_title": "Inner Meaning for Every Story In Puranas",
+      "ms": 2219,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q172",
+      "id": "q169",
       "question": "Where do your thoughts tend to wander in the \nPast present and future ?",
       "expect": "answer",
       "intent": "conceptual",
@@ -3164,34 +3118,34 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Keep Your Focus On God Constantly",
-      "ms": 7375,
+      "ms": 3957,
       "reasons": []
     },
     {
-      "id": "q173",
+      "id": "q170",
       "question": "Who is Wolfe Messing?",
       "expect": "structured",
       "intent": "factual",
-      "route": "semantic",
+      "route": "structured",
       "n": 2,
-      "quality": "partial",
+      "quality": "strong",
       "abstain_ok": true,
-      "route_ok": false,
+      "route_ok": true,
       "quote_ok": true,
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
       "got_title": "Divine Leelas Reflect The Glory Of Avataras",
-      "ms": 4595,
+      "ms": 1942,
       "reasons": [
         "FACTUAL_QUESTION"
       ]
     },
     {
-      "id": "q174",
+      "id": "q171",
       "question": "why krishna",
       "expect": "answer",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -3202,11 +3156,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Become the Lord\u2019s Flute",
-      "ms": 10052,
+      "ms": 5934,
       "reasons": []
     },
     {
-      "id": "q175",
+      "id": "q172",
       "question": "Why is chanting Gayathri Manthra not enough",
       "expect": "answer",
       "intent": "aspect",
@@ -3220,14 +3174,14 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Sanctify Your Life By Chanting Gayatri Mantra",
-      "ms": 3708,
+      "ms": 3201,
       "reasons": []
     },
     {
-      "id": "q176",
+      "id": "q173",
       "question": "Why are some people lucky and others aren\u2019t?",
       "expect": "answer",
-      "intent": "conceptual",
+      "intent": "aspect",
       "route": "semantic",
       "n": 10,
       "quality": "strong",
@@ -3237,12 +3191,12 @@
       "exact_ok": null,
       "exact_only": null,
       "expect_title": null,
-      "got_title": "Worship A Picture As God But Not God As A Picture",
-      "ms": 4973,
+      "got_title": "The Avatar as Guru",
+      "ms": 4342,
       "reasons": []
     },
     {
-      "id": "q177",
+      "id": "q174",
       "question": "\"The Truth\"",
       "expect": "structured",
       "intent": null,
@@ -3256,11 +3210,11 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "The Truth",
-      "ms": 595,
+      "ms": 830,
       "reasons": []
     },
     {
-      "id": "q178",
+      "id": "q175",
       "question": "difference between conscience vs conscious",
       "expect": "answer",
       "intent": "comparative",
@@ -3274,13 +3228,13 @@
       "exact_only": null,
       "expect_title": null,
       "got_title": "Fill Your Heart With Noble Feelings",
-      "ms": 4407,
+      "ms": 5129,
       "reasons": [
         "COMPARISON_BOTH_SIDES"
       ]
     },
     {
-      "id": "q179",
+      "id": "q176",
       "question": "Noble Qualities Form the Path for the Aspirant",
       "expect": "exact",
       "intent": "conceptual",
@@ -3294,11 +3248,11 @@
       "exact_only": false,
       "expect_title": "Noble Qualities Form the Path for the Aspirant",
       "got_title": "The Quest for Happiness",
-      "ms": 6345,
+      "ms": 6187,
       "reasons": []
     },
     {
-      "id": "q180",
+      "id": "q177",
       "question": "\"Noble Qualities Form the Path for the Aspirant\"",
       "expect": "exact",
       "intent": null,
@@ -3312,11 +3266,11 @@
       "exact_only": true,
       "expect_title": "Noble Qualities Form the Path for the Aspirant",
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 588,
+      "ms": 730,
       "reasons": []
     },
     {
-      "id": "q181",
+      "id": "q178",
       "question": "the discourse titled Noble Qualities Form the Path for the Aspirant",
       "expect": "exact",
       "intent": "named_text",
@@ -3329,12 +3283,12 @@
       "exact_ok": false,
       "exact_only": false,
       "expect_title": "Noble Qualities Form the Path for the Aspirant",
-      "got_title": "Four Qualifications Needed for Self-Enquiry",
-      "ms": 6827,
+      "got_title": "The Quest for Happiness",
+      "ms": 6051,
       "reasons": []
     },
     {
-      "id": "q182",
+      "id": "q179",
       "question": "Prema Vahini Chapter 1",
       "expect": "exact",
       "intent": "listing",
@@ -3348,11 +3302,11 @@
       "exact_only": true,
       "expect_title": "Noble Qualities Form the Path for the Aspirant",
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 1340,
+      "ms": 1539,
       "reasons": []
     },
     {
-      "id": "q183",
+      "id": "q180",
       "question": "show me Chapter 1 of Prema Vahini",
       "expect": "exact",
       "intent": "listing",
@@ -3366,11 +3320,11 @@
       "exact_only": true,
       "expect_title": "Noble Qualities Form the Path for the Aspirant",
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 1415,
+      "ms": 1109,
       "reasons": []
     },
     {
-      "id": "q184",
+      "id": "q181",
       "question": "Ahamkara Causes Ashanti",
       "expect": "exact",
       "intent": "conceptual",
@@ -3384,11 +3338,11 @@
       "exact_only": false,
       "expect_title": "Ahamkara Causes Ashanti",
       "got_title": "Ahamkara Causes Ashanti",
-      "ms": 4681,
+      "ms": 6685,
       "reasons": []
     },
     {
-      "id": "q185",
+      "id": "q182",
       "question": "\"Ahamkara Causes Ashanti\"",
       "expect": "exact",
       "intent": null,
@@ -3402,17 +3356,17 @@
       "exact_only": true,
       "expect_title": "Ahamkara Causes Ashanti",
       "got_title": "Ahamkara Causes Ashanti",
-      "ms": 446,
+      "ms": 504,
       "reasons": []
     },
     {
-      "id": "q186",
+      "id": "q183",
       "question": "the discourse titled Ahamkara Causes Ashanti",
       "expect": "exact",
       "intent": "named_text",
       "route": "semantic",
-      "n": 2,
-      "quality": "partial",
+      "n": 4,
+      "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
@@ -3420,16 +3374,16 @@
       "exact_only": false,
       "expect_title": "Ahamkara Causes Ashanti",
       "got_title": "Ahamkara Causes Ashanti",
-      "ms": 8248,
+      "ms": 3981,
       "reasons": []
     },
     {
-      "id": "q187",
+      "id": "q184",
       "question": "Prema Vahini Chapter 2",
       "expect": "exact",
       "intent": "listing",
       "route": "listing",
-      "n": 1,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -3438,16 +3392,16 @@
       "exact_only": false,
       "expect_title": "Ahamkara Causes Ashanti",
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 1376,
+      "ms": 1205,
       "reasons": []
     },
     {
-      "id": "q188",
+      "id": "q185",
       "question": "show me Chapter 2 of Prema Vahini",
       "expect": "exact",
       "intent": "listing",
       "route": "listing",
-      "n": 1,
+      "n": 2,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -3456,16 +3410,16 @@
       "exact_only": false,
       "expect_title": "Ahamkara Causes Ashanti",
       "got_title": "Noble Qualities Form the Path for the Aspirant",
-      "ms": 1159,
+      "ms": 1154,
       "reasons": []
     },
     {
-      "id": "q189",
+      "id": "q186",
       "question": "Dharma is the Basis for the Existence of All Beings",
       "expect": "exact",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 9,
+      "n": 8,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -3474,11 +3428,11 @@
       "exact_only": false,
       "expect_title": "Dharma is the Basis for the Existence of All Beings",
       "got_title": "Dharma is the Basis for the Existence of All Beings",
-      "ms": 3918,
+      "ms": 3840,
       "reasons": []
     },
     {
-      "id": "q190",
+      "id": "q187",
       "question": "\"Dharma is the Basis for the Existence of All Beings\"",
       "expect": "exact",
       "intent": null,
@@ -3492,16 +3446,16 @@
       "exact_only": true,
       "expect_title": "Dharma is the Basis for the Existence of All Beings",
       "got_title": "Dharma is the Basis for the Existence of All Beings",
-      "ms": 477,
+      "ms": 451,
       "reasons": []
     },
     {
-      "id": "q191",
+      "id": "q188",
       "question": "the discourse titled Dharma is the Basis for the Existence of All Beings",
       "expect": "exact",
       "intent": "named_text",
       "route": "semantic",
-      "n": 9,
+      "n": 10,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -3510,11 +3464,11 @@
       "exact_only": false,
       "expect_title": "Dharma is the Basis for the Existence of All Beings",
       "got_title": "Dharma is the Basis for the Existence of All Beings",
-      "ms": 3860,
+      "ms": 4692,
       "reasons": []
     },
     {
-      "id": "q192",
+      "id": "q189",
       "question": "Dharma Vahini Chapter 1",
       "expect": "exact",
       "intent": "listing",
@@ -3528,11 +3482,11 @@
       "exact_only": true,
       "expect_title": "Dharma is the Basis for the Existence of All Beings",
       "got_title": "Dharma is the Basis for the Existence of All Beings",
-      "ms": 1448,
+      "ms": 1321,
       "reasons": []
     },
     {
-      "id": "q193",
+      "id": "q190",
       "question": "show me Chapter 1 of Dharma Vahini",
       "expect": "exact",
       "intent": "listing",
@@ -3546,11 +3500,11 @@
       "exact_only": true,
       "expect_title": "Dharma is the Basis for the Existence of All Beings",
       "got_title": "Dharma is the Basis for the Existence of All Beings",
-      "ms": 1277,
+      "ms": 1236,
       "reasons": []
     },
     {
-      "id": "q194",
+      "id": "q191",
       "question": "Atma Dharma is the Foundation for All Dharmas",
       "expect": "exact",
       "intent": "conceptual",
@@ -3564,11 +3518,11 @@
       "exact_only": false,
       "expect_title": "Atma Dharma is the Foundation for All Dharmas",
       "got_title": "Atma Dharma is the Foundation for All Dharmas",
-      "ms": 5214,
+      "ms": 3911,
       "reasons": []
     },
     {
-      "id": "q195",
+      "id": "q192",
       "question": "\"Atma Dharma is the Foundation for All Dharmas\"",
       "expect": "exact",
       "intent": null,
@@ -3582,11 +3536,11 @@
       "exact_only": true,
       "expect_title": "Atma Dharma is the Foundation for All Dharmas",
       "got_title": "Atma Dharma is the Foundation for All Dharmas",
-      "ms": 595,
+      "ms": 621,
       "reasons": []
     },
     {
-      "id": "q196",
+      "id": "q193",
       "question": "the discourse titled Atma Dharma is the Foundation for All Dharmas",
       "expect": "exact",
       "intent": "named_text",
@@ -3600,11 +3554,11 @@
       "exact_only": false,
       "expect_title": "Atma Dharma is the Foundation for All Dharmas",
       "got_title": "Atma Dharma is the Foundation for All Dharmas",
-      "ms": 5111,
+      "ms": 6341,
       "reasons": []
     },
     {
-      "id": "q197",
+      "id": "q194",
       "question": "Dharma Vahini Chapter 2",
       "expect": "exact",
       "intent": "listing",
@@ -3618,16 +3572,16 @@
       "exact_only": false,
       "expect_title": "Atma Dharma is the Foundation for All Dharmas",
       "got_title": "Dharma is the Basis for the Existence of All Beings",
-      "ms": 1526,
+      "ms": 1396,
       "reasons": []
     },
     {
-      "id": "q198",
+      "id": "q195",
       "question": "show me Chapter 2 of Dharma Vahini",
       "expect": "exact",
       "intent": "listing",
       "route": "listing",
-      "n": 1,
+      "n": 2,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -3636,16 +3590,16 @@
       "exact_only": false,
       "expect_title": "Atma Dharma is the Foundation for All Dharmas",
       "got_title": "Dharma is the Basis for the Existence of All Beings",
-      "ms": 1251,
+      "ms": 1341,
       "reasons": []
     },
     {
-      "id": "q199",
+      "id": "q196",
       "question": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
       "expect": "exact",
       "intent": "conceptual",
       "route": "semantic",
-      "n": 6,
+      "n": 7,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -3654,11 +3608,11 @@
       "exact_only": false,
       "expect_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
       "got_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
-      "ms": 4402,
+      "ms": 4707,
       "reasons": []
     },
     {
-      "id": "q200",
+      "id": "q197",
       "question": "\"Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity\"",
       "expect": "exact",
       "intent": null,
@@ -3672,29 +3626,29 @@
       "exact_only": true,
       "expect_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
       "got_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
-      "ms": 867,
+      "ms": 453,
       "reasons": []
     },
     {
-      "id": "q201",
+      "id": "q198",
       "question": "the discourse titled Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
       "expect": "exact",
       "intent": "named_text",
       "route": "semantic",
-      "n": 7,
+      "n": 5,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
-      "exact_ok": false,
+      "exact_ok": true,
       "exact_only": false,
       "expect_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
-      "got_title": "Equal-mindedness is the Hallmark of a Human Being",
-      "ms": 5039,
+      "got_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
+      "ms": 3973,
       "reasons": []
     },
     {
-      "id": "q202",
+      "id": "q199",
       "question": "Prasanthi Vahini Chapter 1",
       "expect": "exact",
       "intent": "listing",
@@ -3708,11 +3662,11 @@
       "exact_only": true,
       "expect_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
       "got_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
-      "ms": 1249,
+      "ms": 1514,
       "reasons": []
     },
     {
-      "id": "q203",
+      "id": "q200",
       "question": "show me Chapter 1 of Prasanthi Vahini",
       "expect": "exact",
       "intent": "listing",
@@ -3726,11 +3680,11 @@
       "exact_only": true,
       "expect_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
       "got_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
-      "ms": 1233,
+      "ms": 1329,
       "reasons": []
     },
     {
-      "id": "q204",
+      "id": "q201",
       "question": "Jnanam Born of Shanti is the True Jewel of Man",
       "expect": "exact",
       "intent": "conceptual",
@@ -3740,15 +3694,15 @@
       "abstain_ok": true,
       "route_ok": true,
       "quote_ok": null,
-      "exact_ok": false,
+      "exact_ok": true,
       "exact_only": false,
       "expect_title": "Jnanam Born of Shanti is the True Jewel of Man",
-      "got_title": "Acquire The Knowledge Of The Self",
-      "ms": 3406,
+      "got_title": "Jnanam Born of Shanti is the True Jewel of Man",
+      "ms": 5044,
       "reasons": []
     },
     {
-      "id": "q205",
+      "id": "q202",
       "question": "\"Jnanam Born of Shanti is the True Jewel of Man\"",
       "expect": "exact",
       "intent": null,
@@ -3762,11 +3716,11 @@
       "exact_only": true,
       "expect_title": "Jnanam Born of Shanti is the True Jewel of Man",
       "got_title": "Jnanam Born of Shanti is the True Jewel of Man",
-      "ms": 485,
+      "ms": 487,
       "reasons": []
     },
     {
-      "id": "q206",
+      "id": "q203",
       "question": "the discourse titled Jnanam Born of Shanti is the True Jewel of Man",
       "expect": "exact",
       "intent": "named_text",
@@ -3780,11 +3734,11 @@
       "exact_only": false,
       "expect_title": "Jnanam Born of Shanti is the True Jewel of Man",
       "got_title": "Jnanam Born of Shanti is the True Jewel of Man",
-      "ms": 5209,
+      "ms": 5125,
       "reasons": []
     },
     {
-      "id": "q207",
+      "id": "q204",
       "question": "Prasanthi Vahini Chapter 2",
       "expect": "exact",
       "intent": "listing",
@@ -3798,16 +3752,16 @@
       "exact_only": false,
       "expect_title": "Jnanam Born of Shanti is the True Jewel of Man",
       "got_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
-      "ms": 1316,
+      "ms": 1324,
       "reasons": []
     },
     {
-      "id": "q208",
+      "id": "q205",
       "question": "show me Chapter 2 of Prasanthi Vahini",
       "expect": "exact",
       "intent": "listing",
       "route": "listing",
-      "n": 2,
+      "n": 1,
       "quality": "strong",
       "abstain_ok": true,
       "route_ok": true,
@@ -3816,11 +3770,11 @@
       "exact_only": false,
       "expect_title": "Jnanam Born of Shanti is the True Jewel of Man",
       "got_title": "Prashanti is Maintaining the Constant Flow of Ananda Both in Adversity and in Prosperity",
-      "ms": 1213,
+      "ms": 1600,
       "reasons": []
     },
     {
-      "id": "q209",
+      "id": "q206",
       "question": "Service to Society Is Service to God",
       "expect": "exact",
       "intent": "conceptual",
@@ -3834,11 +3788,11 @@
       "exact_only": false,
       "expect_title": "Service to Society Is Service to God",
       "got_title": "Human Values And Service",
-      "ms": 3772,
+      "ms": 3827,
       "reasons": []
     },
     {
-      "id": "q210",
+      "id": "q207",
       "question": "\"Service to Society Is Service to God\"",
       "expect": "exact",
       "intent": null,
@@ -3852,11 +3806,11 @@
       "exact_only": true,
       "expect_title": "Service to Society Is Service to God",
       "got_title": "Service to Society Is Service to God",
-      "ms": 517,
+      "ms": 509,
       "reasons": []
     },
     {
-      "id": "q211",
+      "id": "q208",
       "question": "Revere and Respect the Elders",
       "expect": "exact",
       "intent": "conceptual",
@@ -3870,11 +3824,11 @@
       "exact_only": false,
       "expect_title": "Revere and Respect the Elders",
       "got_title": "Practice and Propagate Our Sacred Culture",
-      "ms": 3312,
+      "ms": 3917,
       "reasons": []
     },
     {
-      "id": "q212",
+      "id": "q209",
       "question": "\"Revere and Respect the Elders\"",
       "expect": "exact",
       "intent": null,
@@ -3888,11 +3842,11 @@
       "exact_only": true,
       "expect_title": "Revere and Respect the Elders",
       "got_title": "Revere and Respect the Elders",
-      "ms": 501,
+      "ms": 516,
       "reasons": []
     },
     {
-      "id": "q213",
+      "id": "q210",
       "question": "Give Up Ego And Attachment To Realise God",
       "expect": "exact",
       "intent": "conceptual",
@@ -3906,11 +3860,11 @@
       "exact_only": false,
       "expect_title": "Give Up Ego And Attachment To Realise God",
       "got_title": "Make Your Heart Pure To Install God In It",
-      "ms": 5241,
+      "ms": 5012,
       "reasons": []
     },
     {
-      "id": "q214",
+      "id": "q211",
       "question": "\"Give Up Ego And Attachment To Realise God\"",
       "expect": "exact",
       "intent": null,
@@ -3924,11 +3878,11 @@
       "exact_only": true,
       "expect_title": "Give Up Ego And Attachment To Realise God",
       "got_title": "Give Up Ego And Attachment To Realise God",
-      "ms": 520,
+      "ms": 497,
       "reasons": []
     },
     {
-      "id": "q215",
+      "id": "q212",
       "question": "Learning of Higher Values",
       "expect": "exact",
       "intent": "conceptual",
@@ -3942,11 +3896,11 @@
       "exact_only": false,
       "expect_title": "Learning of Higher Values",
       "got_title": "Educare Is Human Values",
-      "ms": 4415,
+      "ms": 3816,
       "reasons": []
     },
     {
-      "id": "q216",
+      "id": "q213",
       "question": "\"Learning of Higher Values\"",
       "expect": "exact",
       "intent": null,
@@ -3960,31 +3914,31 @@
       "exact_only": true,
       "expect_title": "Learning of Higher Values",
       "got_title": "Learning of Higher Values",
-      "ms": 435,
+      "ms": 451,
       "reasons": []
     },
     {
-      "id": "q217",
+      "id": "q214",
       "question": "New Horizons For The Sai Institute",
       "expect": "exact",
-      "intent": "factual",
-      "route": "semantic",
-      "n": 9,
-      "quality": "strong",
-      "abstain_ok": true,
+      "intent": "out_of_domain",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": false,
       "route_ok": true,
       "quote_ok": null,
       "exact_ok": false,
       "exact_only": false,
       "expect_title": "New Horizons For The Sai Institute",
-      "got_title": "The Unique University",
-      "ms": 5148,
+      "got_title": null,
+      "ms": 890,
       "reasons": [
-        "FACTUAL_QUESTION"
+        "NO_MATCHES"
       ]
     },
     {
-      "id": "q218",
+      "id": "q215",
       "question": "\"New Horizons For The Sai Institute\"",
       "expect": "exact",
       "intent": null,
@@ -3998,7 +3952,295 @@
       "exact_only": true,
       "expect_title": "New Horizons For The Sai Institute",
       "got_title": "New Horizons For The Sai Institute",
-      "ms": 634,
+      "ms": 506,
+      "reasons": []
+    },
+    {
+      "id": "q216",
+      "question": "What is the most important discourse from the Prema Vahini",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 2228,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q217",
+      "question": "which is the best discourse on meditation",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 1312,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q218",
+      "question": "what is Swami's greatest teaching",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 1078,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q219",
+      "question": "which Vahini is the most important",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 1295,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q220",
+      "question": "which discourse do you think I should read first",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 1167,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q221",
+      "question": "do you recommend meditation or bhajans",
+      "expect": "answer",
+      "intent": "comparative",
+      "route": "semantic",
+      "n": 6,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Sing The Sweet Name",
+      "ms": 3754,
+      "reasons": [
+        "COMPARISON_BOTH_SIDES"
+      ]
+    },
+    {
+      "id": "q222",
+      "question": "when will I get a job",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 1023,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q223",
+      "question": "should I marry the person I am seeing",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 818,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q224",
+      "question": "will my business succeed this year",
+      "expect": "abstain",
+      "intent": "unanswerable",
+      "route": "guidance",
+      "n": 0,
+      "quality": "none",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": null,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": null,
+      "ms": 817,
+      "reasons": [
+        "UNANSWERABLE"
+      ]
+    },
+    {
+      "id": "q225",
+      "question": "what did Swami say is most important",
+      "expect": "answer",
+      "intent": "aspect",
+      "route": "semantic",
+      "n": 8,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Love God Whole-heartedly",
+      "ms": 4318,
+      "reasons": []
+    },
+    {
+      "id": "q226",
+      "question": "what does Swami say about work and duty",
+      "expect": "answer",
+      "intent": "conceptual",
+      "route": "semantic",
+      "n": 10,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Love God Whole-heartedly",
+      "ms": 4507,
+      "reasons": []
+    },
+    {
+      "id": "q227",
+      "question": "what does Prema Vahini teach about love",
+      "expect": "answer",
+      "intent": "aspect",
+      "route": "semantic",
+      "n": 10,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Poorna minus poorna is poorna",
+      "ms": 5329,
+      "reasons": []
+    },
+    {
+      "id": "q228",
+      "question": "what does Swami say about choosing a life partner",
+      "expect": "answer",
+      "intent": "aspect",
+      "route": "semantic",
+      "n": 2,
+      "quality": "partial",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Choose Your God",
+      "ms": 3237,
+      "reasons": []
+    },
+    {
+      "id": "q229",
+      "question": "what is the most important quality for a devotee to cultivate",
+      "expect": "answer",
+      "intent": "aspect",
+      "route": "semantic",
+      "n": 9,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Let Unity Be The Undercurrent Everywhere",
+      "ms": 3965,
+      "reasons": []
+    },
+    {
+      "id": "q230",
+      "question": "what is the best food for a spiritual aspirant",
+      "expect": "answer",
+      "intent": "aspect",
+      "route": "semantic",
+      "n": 7,
+      "quality": "strong",
+      "abstain_ok": true,
+      "route_ok": true,
+      "quote_ok": true,
+      "exact_ok": null,
+      "exact_only": null,
+      "expect_title": null,
+      "got_title": "Miti and Gati",
+      "ms": 3582,
       "reasons": []
     }
   ]

@@ -88,6 +88,11 @@ def new_trace(query, history=None):
         "route": None,
         "is_comparison": False,
         "entities": [],
+        # The router's one-sentence explanation of why THIS question cannot be
+        # answered from the discourses. Only set for intent="unanswerable"; None
+        # when the router produced nothing usable, in which case the frontend
+        # falls back to static copy.
+        "unanswerable_reason": None,
         # Set by the structured route when a matched entity is a known corpus gap
         # (e.g. a named text the discourses don't cover) -> honest abstention.
         "kb_gap": False,
@@ -220,6 +225,18 @@ def assess_quality(trace, results):
     # Meta / out-of-domain questions were short-circuited before retrieval, so the
     # retrieval-miss heuristics below (MULTI_TOPIC_DILUTION, etc.) don't apply —
     # give them a single clean reason instead of a pile of irrelevant tips.
+    # Unanswerable: the subject is in this corpus's world but the question is not
+    # something any discourse answers (a ranking nobody made, our opinion, or a
+    # prediction about one person). One clean note carrying the router's own
+    # sentence — NOT a pile of refinement tips, because the question is not
+    # malformed and telling someone to rephrase it would be wrong.
+    if intent == "unanswerable":
+        trace["reasons"] = [{
+            "code": "UNANSWERABLE",
+            "data": {"reason": trace.get("unanswerable_reason")},
+        }]
+        return trace
+
     if intent == "meta":
         trace["reasons"] = [{"code": "META_REQUEST"}]
         return trace

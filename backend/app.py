@@ -709,7 +709,17 @@ def followups_endpoint():
             results = []
         if not query:
             return jsonify({'error': 'Query parameter is missing'}), 400
-        followups = generate_followups(query, results, history=history)
+        # Redirect mode: when /search refused the question as unanswerable there
+        # are no results to ground on, so the client passes the trace's intent and
+        # the reason it was given, and we suggest questions the corpus CAN answer.
+        # Body-only additions — no route change, so no API Gateway sync.
+        intent = request.json.get('intent')
+        unanswerable_reason = request.json.get('unanswerable_reason')
+        followups = generate_followups(
+            query, results, history=history,
+            intent=intent if isinstance(intent, str) else None,
+            unanswerable_reason=unanswerable_reason if isinstance(unanswerable_reason, str) else None,
+        )
         return jsonify({'followups': followups})
     else:
         return jsonify({'error': 'Request must contain JSON data'}), 400

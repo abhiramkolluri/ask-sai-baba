@@ -152,7 +152,10 @@ PASSAGE_COLLECTION = "Passage"
 # of requests. The frontend cache only covers a single session; this one spans
 # users. Keyed on the normalized question + context; invalidated by process
 # restart, which is also what a corpus re-index requires.
-SEMANTIC_CACHE_ENABLED = True
+# Env-overridable: an eval or A/B run needs the cache OFF, or the first result
+# for a question is replayed for every subsequent measurement and flakiness
+# becomes invisible.
+SEMANTIC_CACHE_ENABLED = os.getenv("SEMANTIC_CACHE_ENABLED", "1") not in ("0", "false", "False")
 SEMANTIC_CACHE_SIZE = 512
 
 # Listing route: how many chapters to return for "list the chapters of X" with no
