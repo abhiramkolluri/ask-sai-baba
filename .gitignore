@@ -32,3 +32,4 @@ Database Vectorizer\.env
 /backend/golden_questions_draft.json
 /backend/contextualize_progress.json
 /backend/eval_results_*.json
+/backend/entity_backup_*.json

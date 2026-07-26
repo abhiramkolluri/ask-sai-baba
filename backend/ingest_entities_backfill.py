@@ -24,8 +24,8 @@ additions that matter for a write of this size:
 """
 
 import argparse
-import glob
 import json
+import os
 import re
 import sys
 import time
@@ -39,6 +39,10 @@ from weaviate.classes.query import Filter  # noqa: E402
 
 REVIEW_FILE = "entities_review.json"
 BATCH_REPORT = "entity_ingest_report.json"
+# The collection as it stood before this script ever wrote to it. Committed, and
+# the authoritative definition of "hand-curated" — NOT "whatever is in the
+# collection now", which after one run includes this script's own inserts.
+CURATED_BASELINE = "entity_baseline_curated.json"
 
 # Properties the Entity collection actually stores. Review-only keys (_article_count,
 # _selected_by, ...) are stripped — they exist for human eyes, not for retrieval.
@@ -128,15 +132,17 @@ def main():
     # collection as it stood before this script ever wrote to it, so that is the
     # authoritative baseline. No backup => first run => everything present is
     # hand-curated.
-    backups = sorted(glob.glob("entity_backup_*.json"))
     if args.protected_from:
-        baseline = json.load(open(args.protected_from))
-        src = args.protected_from
-    elif backups:
-        baseline = json.load(open(backups[0]))
-        src = backups[0]
+        baseline, src = json.load(open(args.protected_from)), args.protected_from
+    elif os.path.exists(CURATED_BASELINE):
+        baseline, src = json.load(open(CURATED_BASELINE)), CURATED_BASELINE
     else:
+        # First ever run: whatever is here now is hand-curated by definition, and
+        # gets frozen as the baseline so later runs cannot mistake this script's
+        # own inserts for human work.
         baseline, src = current, "current collection (first run)"
+        json.dump(current, open(CURATED_BASELINE, "w"), indent=2)
+        print(f"  froze {len(current)} rows as the curated baseline -> {CURATED_BASELINE}")
     print(f"  hand-curated baseline: {len(baseline)} rows from {src}")
 
     protected = {}
