@@ -652,12 +652,18 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None,
                 "CAN answer, staying as close as possible to what the person actually wants.\n\n"
                 f"Why the original could not be answered: {unanswerable_reason or 'It asks for a judgment, opinion, or prediction that no discourse states.'}\n\n"
                 f'Propose {FOLLOWUP_CANDIDATES} STANDALONE questions as JSON: {{"candidates":["..."]}}. Rules: '
-                "(1) KEEP THE SUBJECT. If they named a text, collection, person or topic, keep it — "
-                "someone asking which Prema Vahini chapter is best still wants Prema Vahini. "
-                "(2) Replace the unanswerable part. A ranking becomes a question about what the "
-                "discourses actually teach; a request for your opinion becomes a question about what "
-                "Swami said; a prediction about someone's life becomes a question about the teaching "
-                "that bears on it (\"when will I get a job\" -> what Swami says about work and duty). "
+                "(1) THE FIRST CANDIDATE MUST BE A REWRITE OF THEIR OWN QUESTION, not a related "
+                "question. Keep their subject and what they were actually trying to find out, and "
+                "change ONLY the part that cannot be answered. It should read like the question they "
+                "would have asked if they had known what this tool can do. Examples: "
+                '"What is the most important discourse from the Prema Vahini" -> "What are the '
+                'central teachings of Prema Vahini?"; "should I marry the person I am seeing" -> '
+                '"What does Swami say about choosing a life partner?"; "when will I get a job" -> '
+                '"What does Swami say about work and duty?"; "which discourse should I read first" '
+                '-> "What does Swami say is the foundation of spiritual practice?". Do NOT drift to '
+                "a merely adjacent topic — someone asking which Prema Vahini chapter is best still "
+                "wants Prema Vahini, not divine love in general. "
+                "(2) The remaining candidates explore the same interest from other angles. "
                 "(3) Every question must be answerable from recorded discourses — concrete teachings, "
                 "practices or concepts. Never ask the tool to rank, choose, recommend, or predict. "
                 "(4) Make them distinct from each other. "
@@ -709,20 +715,31 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None,
             return []
 
         # --- Stage B: verify each candidate actually surfaces answering quotes. ---
-        verified = []  # (top_relevance, candidate)
+        verified = []  # (top_relevance, proposal_index, candidate)
         with ThreadPoolExecutor(max_workers=FOLLOWUP_MAX_WORKERS) as executor:
             future_to_candidate = {
-                executor.submit(_verify_followup, c): c for c in candidates
+                executor.submit(_verify_followup, c): (i, c)
+                for i, c in enumerate(candidates)
             }
             for future in as_completed(future_to_candidate):
-                candidate = future_to_candidate[future]
+                idx, candidate = future_to_candidate[future]
                 top_relevance, hits = future.result()
                 if hits >= FOLLOWUP_MIN_HITS:
-                    verified.append((top_relevance, candidate))
+                    verified.append((top_relevance, idx, candidate))
 
-        # Funnel: surface the follow-ups that reach the highest-relevance discourses.
-        verified.sort(key=lambda x: x[0], reverse=True)
-        return [c for _, c in verified[:FOLLOWUP_KEEP]]
+        if redirect:
+            # Rank by FAITHFULNESS first, then relevance. Stage A is told to make
+            # candidate 0 a rewrite of the user's own question, and sorting purely
+            # by score threw that away — a generic "what does Swami say about love"
+            # outscores "what does Swami say about choosing a life partner" while
+            # answering something the person did not ask. The rewrite still has to
+            # pass the same verification as any other candidate, so keeping it
+            # first cannot surface a question the corpus fails to answer.
+            verified.sort(key=lambda x: (x[1] != 0, -x[0]))
+        else:
+            # Funnel: surface the follow-ups reaching the highest-relevance discourses.
+            verified.sort(key=lambda x: x[0], reverse=True)
+        return [c for _, _, c in verified[:FOLLOWUP_KEEP]]
     except Exception as e:
         logging.error(f"generate_followups failed: {e}")
         return []
