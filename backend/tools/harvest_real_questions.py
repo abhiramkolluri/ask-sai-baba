@@ -19,6 +19,28 @@ NOT written to the output; only question text and history.
 Output: real_questions.json — [{id, source, question, history}]
 """
 
+import os as _os, sys as _sys
+# This script lives in a subdirectory but imports the backend's top-level
+# modules (search, weaviate_client, …), so put the backend root on sys.path
+# before those imports. Keeps the script runnable from anywhere.
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.dirname(_HERE)
+
+
+def _here(name):
+    """A committed fixture that lives beside this script."""
+    return _os.path.join(_HERE, name)
+
+
+def _artifact(name):
+    """A generated run output. Kept out of the source tree in artifacts/."""
+    d = _os.path.join(_ROOT, "artifacts")
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
+
 import json
 
 from dotenv import load_dotenv
@@ -27,7 +49,7 @@ load_dotenv()
 
 from weaviate_client import get_client  # noqa: E402  (needs env loaded first)
 
-OUT_FILE = "real_questions.json"
+OUT_FILE = _artifact("real_questions.json")
 USERQUERY_SAMPLE = 20
 
 # The 4 frontend sample questions (SampleQuestions.jsx) — clicked, not composed.

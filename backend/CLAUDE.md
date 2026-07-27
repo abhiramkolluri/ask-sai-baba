@@ -46,9 +46,9 @@ Required env (from `.env`): `WEAVIATE_URL`, `WEAVIATE_API_KEY`, `OPENAI_API_KEY`
 The `test_*.py` files are **integration scripts that hit a running server**, not pytest unit tests. They require a live backend (local or deployed):
 
 ```bash
-BASE_URL=http://localhost:8000 python test_endpoints.py   # configurable via env
-python test_backend.py                                    # has hardcoded EB/Gateway URLs
-python test_weaviate_connection.py                        # checks Weaviate connectivity
+BASE_URL=http://localhost:8000 python evals/test_endpoints.py   # configurable via env
+python evals/test_backend.py                                    # has hardcoded EB/Gateway URLs
+python evals/test_weaviate_connection.py                        # checks Weaviate connectivity
 ```
 
 ### Evaluating search changes — do not skip this
@@ -57,7 +57,7 @@ python test_weaviate_connection.py                        # checks Weaviate conn
 
 ```bash
 python app.py &                                     # harness needs a live server
-python eval_ragas.py --baseline eval_baseline.json  # PASS/FAIL vs the shipped config
+python evals/eval_ragas.py --baseline evals/eval_baseline.json  # PASS/FAIL vs the shipped config
 ```
 
 - `quote_answers_rate` — does the top quote actually answer the question (LLM-judged, so ±2-3 points is noise)
@@ -79,9 +79,9 @@ Corpus ingestion/backfill lives in `ingest_sss.py`, `ingest_vahinis.py`, `backfi
 `eval_ragas.py` measures end-to-end outcomes, so a misrouted question and a retrieval miss look identical in it. `eval_router.py` isolates the router: it calls `plan_queries` directly, so it needs **no server** and finishes in seconds.
 
 ```bash
-venv/bin/python eval_router.py              # 75 cases from real traffic + past bugs
-venv/bin/python eval_router.py --repeat 3   # + stability; use this one
-venv/bin/python eval_router.py --only unanswerable
+venv/bin/python evals/eval_router.py              # 75 cases from real traffic + past bugs
+venv/bin/python evals/eval_router.py --repeat 3   # + stability; use this one
+venv/bin/python evals/eval_router.py --only unanswerable
 ```
 
 **Always use `--repeat 3`.** A single pass hides the failures that matter: "the best time to wake up" (asked 145× in real traffic) passed 1×, then flipped to `unanswerable` on 2 of 3 runs. Instability is reported per *route*, not per intent — `conceptual`/`scenario`/`aspect` all dispatch to the same semantic path, so a flip among them changes nothing a user sees and would otherwise drown out the flips that do.
@@ -107,6 +107,41 @@ eb deploy <env>                 # asv-dev (staging) or asv-prod (production)
 `package_eb.sh` flattens `backend/` to the zip root (so `app.py` is at the archive root, which EB expects) and excludes venv/logs/.env. It warns if `app.py` is newer than `infra/openapi.json`.
 
 **Critical coupling: routes and the API Gateway must stay in sync.** Whenever you add, remove, or change a `@app.route` path, you must regenerate the OpenAPI spec and redeploy the gateway, or the new route will 404 through API Gateway even though EB serves it. `infra/generate_openapi.py` derives `infra/openapi.json` **and** `infra/openapi.yaml` from the Flask routes (never hand-edit either — regenerate); `sync_gateway.sh` diffs it against `openapi.json.prev`, runs CDK (`infra/cdk/`), then promotes the spec to `.prev`. Watch for sibling path-variable conflicts in API Gateway (e.g. `/chats/<user_email>` vs `/chats/<thread_id>` — same position, different names collide; recent commits normalized these).
+
+## Repository layout
+
+Only what the running app imports lives at the backend root. Everything else is
+dev tooling, grouped by what it does:
+
+```
+backend/
+  app.py                 Flask app — MUST stay at the root (EB expects it at the archive root)
+  weaviate_client.py     client + init_schema          } imported by app.py
+  chat.py  persistence.py  fine_tuning.py              } and/or search/
+  metadata_norm.py       date/metadata normalization — imported by search/listing.py
+  search/                the pipeline, one module per stage
+  infra/                 OpenAPI generation + CDK for the API Gateway
+  evals/                 eval_ragas, eval_router, eval_transliteration, test_* +
+                         their committed fixtures (golden_questions.json,
+                         router_cases.json, eval_baseline.json)
+  ingestion/             ingest_*, backfill_*, chunk_articles, reembed_corpus,
+                         contextualize_corpus + entity_baseline_curated.json
+  tools/                 harvest_*, build/promote_golden_set, replay_real_questions,
+                         analyze_real_replay, coverage_gaps, probe_traces
+  artifacts/             generated run outputs — GITIGNORED
+```
+
+Scripts under `evals/`, `ingestion/` and `tools/` put the backend root on
+`sys.path` themselves and resolve data files relative to their own location, so
+run them from anywhere: `python evals/eval_router.py`, not `cd evals && …`.
+Committed fixtures sit beside the script that reads them; generated output goes
+to `artifacts/` via the `_artifact()` helper, which is why the root no longer
+collects run debris.
+
+**Do not move the root modules into a package.** `app.py` must be at the archive
+root for EB, and `package_eb.sh` flattens `backend/` into the zip — moving
+`weaviate_client` or `metadata_norm` would break `search/*` imports and require
+a redeploy to verify.
 
 ## Architecture
 

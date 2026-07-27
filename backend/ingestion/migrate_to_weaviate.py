@@ -1,3 +1,10 @@
+
+import os as _os, sys as _sys
+# This script lives in a subdirectory but imports the backend's top-level
+# modules (search, weaviate_client, …), so put the backend root on sys.path
+# before those imports. Keeps the script runnable from anywhere.
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import os
 import json
 import datetime

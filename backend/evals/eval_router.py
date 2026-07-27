@@ -35,6 +35,28 @@ than the bug that motivated the refusal feature.
     venv/bin/python eval_router.py --only unanswerable
 """
 
+import os as _os, sys as _sys
+# This script lives in a subdirectory but imports the backend's top-level
+# modules (search, weaviate_client, …), so put the backend root on sys.path
+# before those imports. Keeps the script runnable from anywhere.
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.dirname(_HERE)
+
+
+def _here(name):
+    """A committed fixture that lives beside this script."""
+    return _os.path.join(_HERE, name)
+
+
+def _artifact(name):
+    """A generated run output. Kept out of the source tree in artifacts/."""
+    d = _os.path.join(_ROOT, "artifacts")
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
+
 import argparse
 import collections
 import json
@@ -47,7 +69,7 @@ load_dotenv()
 
 from search.query_planning import plan_queries  # noqa: E402
 
-CASES_FILE = "router_cases.json"
+CASES_FILE = _here("router_cases.json")
 
 # Intents that dispatch IDENTICALLY. pipeline.py branches on meta/out_of_domain/
 # unanswerable, on listing, and on factual/named_text/org_doctrine; everything
@@ -238,7 +260,7 @@ def main():
     json.dump({"accuracy": passed / total, "total": total, "passed": passed,
                "unstable": len(unstable),
                "failures": [{"q": c["q"], "detail": d} for c, _, d in failures]},
-              open("router_eval_results.json", "w"), indent=2)
+              open(_artifact("router_eval_results.json"), "w"), indent=2)
 
     print(f"\nSaved router_eval_results.json")
     return 1 if (failures or unstable) else 0

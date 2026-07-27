@@ -1,3 +1,19 @@
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.dirname(_HERE)
+
+
+def _here(name):
+    """A committed fixture that lives beside this script."""
+    return _os.path.join(_HERE, name)
+
+
+def _artifact(name):
+    """A generated run output. Kept out of the source tree in artifacts/."""
+    d = _os.path.join(_ROOT, "artifacts")
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+import os as _os, sys as _sys
 """Summarize the real-question replay (real_replay_results.json) for review.
 
 Prints the fixed-class scorecard inputs and groups flagged traces by flag so the
@@ -11,7 +27,7 @@ import json
 import statistics
 from collections import Counter
 
-d = json.load(open("real_replay_results.json"))
+d = json.load(open(_artifact("real_replay_results.json")))
 ok = {k: v for k, v in d.items() if "trace" in v}
 errors = {k: v for k, v in d.items() if "error" in v}
 

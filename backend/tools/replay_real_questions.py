@@ -1,3 +1,19 @@
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.dirname(_HERE)
+
+
+def _here(name):
+    """A committed fixture that lives beside this script."""
+    return _os.path.join(_HERE, name)
+
+
+def _artifact(name):
+    """A generated run output. Kept out of the source tree in artifacts/."""
+    d = _os.path.join(_ROOT, "artifacts")
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+import os as _os, sys as _sys
 """Replay harvested real user questions through /search and flag holes.
 
 Companion to harvest_real_questions.py (which writes real_questions.json) and
@@ -19,8 +35,8 @@ import time
 import urllib.request
 
 BASE_URL = "http://localhost:8000"
-IN_FILE = "real_questions.json"
-OUT_FILE = "real_replay_results.json"
+IN_FILE = _artifact("real_questions.json")
+OUT_FILE = _artifact("real_replay_results.json")
 
 # Cap the run: the first N harvested questions (~15s each). Covers effectively
 # the whole harvested set while leaving a small margin.

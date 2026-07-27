@@ -23,6 +23,28 @@ additions that matter for a write of this size:
     venv/bin/python ingest_entities_backfill.py --rollback entity_backup_<ts>.json
 """
 
+import os as _os, sys as _sys
+# This script lives in a subdirectory but imports the backend's top-level
+# modules (search, weaviate_client, …), so put the backend root on sys.path
+# before those imports. Keeps the script runnable from anywhere.
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.dirname(_HERE)
+
+
+def _here(name):
+    """A committed fixture that lives beside this script."""
+    return _os.path.join(_HERE, name)
+
+
+def _artifact(name):
+    """A generated run output. Kept out of the source tree in artifacts/."""
+    d = _os.path.join(_ROOT, "artifacts")
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
+
 import argparse
 import json
 import os
@@ -37,12 +59,12 @@ load_dotenv()
 from weaviate_client import get_client  # noqa: E402
 from weaviate.classes.query import Filter  # noqa: E402
 
-REVIEW_FILE = "entities_review.json"
-BATCH_REPORT = "entity_ingest_report.json"
+REVIEW_FILE = _artifact("entities_review.json")
+BATCH_REPORT = _artifact("entity_ingest_report.json")
 # The collection as it stood before this script ever wrote to it. Committed, and
 # the authoritative definition of "hand-curated" — NOT "whatever is in the
 # collection now", which after one run includes this script's own inserts.
-CURATED_BASELINE = "entity_baseline_curated.json"
+CURATED_BASELINE = _here("entity_baseline_curated.json")
 
 # Properties the Entity collection actually stores. Review-only keys (_article_count,
 # _selected_by, ...) are stripped — they exist for human eyes, not for retrieval.

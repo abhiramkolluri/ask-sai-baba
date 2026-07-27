@@ -102,7 +102,11 @@ if [[ ! -s "$OUT_ZIP" ]]; then
   exit 1
 fi
 
-unzip -l "$OUT_ZIP" | grep -qE "^\s*[0-9].*\s+app\.py$" || {
+# NB: matched with awk, not grep -E "\s". This check reported ERROR on two
+# perfectly valid bundles because \s is not portable across the greps found on
+# macOS — and an ERROR that is routinely wrong is worse than no check, because
+# it trains you to deploy through it.
+unzip -l "$OUT_ZIP" | awk '$NF == "app.py" { found=1 } END { exit !found }' || {
   echo "ERROR: zip does not contain app.py at the archive root." >&2
   exit 1
 }

@@ -34,3 +34,8 @@ Database Vectorizer\.env
 /backend/contextualize_progress.json
 /backend/eval_results_*.json
 /backend/entity_backup_*.json
+
+# Generated run outputs from the eval/ingestion/analysis tooling. These used to
+# accumulate loose in backend/ and were ignored one filename at a time; the
+# scripts now write everything here via _artifact().
+/backend/artifacts/

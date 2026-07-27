@@ -24,6 +24,28 @@ Resumable: partial extractions are checkpointed, so an interrupted run restarts
 where it stopped.
 """
 
+import os as _os, sys as _sys
+# This script lives in a subdirectory but imports the backend's top-level
+# modules (search, weaviate_client, …), so put the backend root on sys.path
+# before those imports. Keeps the script runnable from anywhere.
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.dirname(_HERE)
+
+
+def _here(name):
+    """A committed fixture that lives beside this script."""
+    return _os.path.join(_HERE, name)
+
+
+def _artifact(name):
+    """A generated run output. Kept out of the source tree in artifacts/."""
+    d = _os.path.join(_ROOT, "artifacts")
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
+
 import argparse
 import json
 import logging
@@ -41,9 +63,9 @@ from search.config import openai_client, GRADE_MODEL  # noqa: E402
 from search.retrieval import search_passages  # noqa: E402
 from search.ranking import rerank_passages  # noqa: E402
 
-OUT_FILE = "entities_review.json"
-CHECKPOINT = "entities_extract_checkpoint.json"
-REJECTED_FILE = "entities_rejected.json"
+OUT_FILE = _artifact("entities_review.json")
+CHECKPOINT = _artifact("entities_extract_checkpoint.json")
+REJECTED_FILE = _artifact("entities_rejected.json")
 MAX_WORKERS = 8
 # Entities cluster in the opening of a discourse (and in its title). Sending the
 # whole article would triple cost for very little extra recall.

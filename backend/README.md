@@ -151,9 +151,9 @@ eb deploy asv-prod       # production
 The `test_*.py` files are **integration scripts that hit a running server**, not pytest unit tests:
 
 ```bash
-BASE_URL=http://localhost:8000 python test_endpoints.py   # configurable via env
-python test_backend.py                                    # hardcoded EB/Gateway URLs
-python test_weaviate_connection.py                        # Weaviate connectivity
+BASE_URL=http://localhost:8000 python evals/test_endpoints.py   # configurable via env
+python evals/test_backend.py                                    # hardcoded EB/Gateway URLs
+python evals/test_weaviate_connection.py                        # Weaviate connectivity
 ```
 
 ### Evaluating search changes
@@ -163,7 +163,7 @@ Search quality is gated by a 218-question golden set sampled from real traffic a
 ```bash
 lsof -ti :8000 | xargs -r kill -9                   # kill by PORT — see the note below
 SEMANTIC_CACHE_ENABLED=0 python app.py &            # the harness needs a live server
-python eval_ragas.py --baseline eval_baseline.json  # prints a PASS/FAIL gate
+python evals/eval_ragas.py --baseline evals/eval_baseline.json  # prints a PASS/FAIL gate
 ```
 
 > **Two ways this harness will lie to you.** The server runs as `.../MacOS/Python app.py`, so `pkill -f "python app.py"` matches nothing — the old process keeps :8000, the replacement dies on "Address already in use", and the whole run measures *the code you replaced*. And with the cache on, a repeat run replays stored results. **A p50 in single-digit milliseconds means you measured the cache, not the pipeline** — check it before trusting a scorecard.

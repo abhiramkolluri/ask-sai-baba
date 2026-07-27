@@ -23,6 +23,28 @@ Labels are LLM-drafted and WILL contain mistakes. The two that matter most:
     it measures the gap rather than hiding it.
 """
 
+import os as _os, sys as _sys
+# This script lives in a subdirectory but imports the backend's top-level
+# modules (search, weaviate_client, …), so put the backend root on sys.path
+# before those imports. Keeps the script runnable from anywhere.
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.dirname(_HERE)
+
+
+def _here(name):
+    """A committed fixture that lives beside this script."""
+    return _os.path.join(_HERE, name)
+
+
+def _artifact(name):
+    """A generated run output. Kept out of the source tree in artifacts/."""
+    d = _os.path.join(_ROOT, "artifacts")
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
+
 import json
 import re
 import collections
@@ -35,8 +57,8 @@ load_dotenv()
 from weaviate_client import get_client  # noqa: E402
 from search.config import openai_client, GRADE_MODEL  # noqa: E402
 
-OUT_FILE = "golden_questions_draft.json"
-EXISTING_FILE = "golden_questions.json"
+OUT_FILE = _artifact("golden_questions_draft.json")
+EXISTING_FILE = _os.path.join(_ROOT, "evals", "golden_questions.json")
 TARGET_SAMPLED = 120
 BATCH = 12
 random.seed(20260725)  # reproducible draft

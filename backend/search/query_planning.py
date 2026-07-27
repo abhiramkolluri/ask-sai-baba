@@ -567,7 +567,12 @@ def _validate_filters(raw, catalog=None, message=""):
             if filters.pop(key, None):
                 logging.info(f"router: dropped {key} filter — the question asks what it MEANS")
 
-    if filters.get("book") == "Geeta Vahini" and not re.search(r"vahini", message or "", re.I):
+    # `message and` matters: with no message to inspect there is nothing to
+    # second-guess, and dropping the filter by default would discard a correctly
+    # extracted book. Caught by test_router_unit, which validates filters
+    # directly and passes no message.
+    if (message and filters.get("book") == "Geeta Vahini"
+            and not re.search(r"vahini", message, re.I)):
         logging.info("router: dropped Geeta Vahini book filter — no 'Vahini' in the message")
         for key in ("book", "chapter_start", "chapter_end", "volume"):
             filters.pop(key, None)
