@@ -385,6 +385,45 @@ paths:
         required: true
         schema:
           type: string
+  /collections:
+    get:
+      summary: Get Collections
+      description: "The corpus grouped for the Collections tab: Vahinis, Sathya Sai\
+        \ Speaks\n    by volume, year-based discourse series, and Chinna Katha \u2014\
+        \ each entry with\n    the identifiers (`book`, `volume`, `year`) the chapters\
+        \ endpoint takes.\n    Public, like /blog. Cached in-process (see search/collections_index.py)."
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+  /collections/chapters:
+    get:
+      summary: Get Collection Chapters
+      description: "Discourses in reading order, metadata only.\n\n    Query params\
+        \ (all optional): book (canonical or any casing), volume (int,\n    Sathya\
+        \ Sai Speaks), year (int, year-based series). Without book, the whole\n  \
+        \  corpus is returned as lean title rows \u2014 this powers the Collections\
+        \ search\n    bar client-side. Identifiers go in the query string \u2014 never\
+        \ path segments \u2014\n    so names with spaces/apostrophes survive the API\
+        \ Gateway proxy unmangled."
+      responses:
+        '400':
+          description: Bad Request
+        '500':
+          description: Server Error
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
   /blog/{id}:
     get:
       summary: Get Article

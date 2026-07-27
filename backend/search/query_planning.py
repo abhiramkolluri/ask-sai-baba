@@ -238,7 +238,11 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             '{"queries":["..."],"occasion":null,"intent":"conceptual","is_comparison":false,"entities":[],'
             '"filters":{"book":null,"volume":null,"chapter_start":null,"chapter_end":null,'
             '"year_start":null,"year_end":null,"location":null,"occasion":null},'
-            '"sort":null,"limit":null,"list_order":"first"}. Rules: '
+            # "reason" is declared here, not only described further down. It used
+            # to be prose-only and the model emitted it anyway; once the catalog
+            # block made this prompt much longer it silently stopped, and every
+            # refusal lost its explanation while still looking correct.
+            '"sort":null,"limit":null,"list_order":"first","reason":null}. Rules: '
             "(1) Resolve any references to earlier turns so each query stands alone. "
             "(2) Distill long or emotional scenarios down to the underlying spiritual "
             "concept(s) being asked about; drop names and incidental narrative detail. "
