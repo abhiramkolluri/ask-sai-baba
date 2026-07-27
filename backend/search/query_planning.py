@@ -77,6 +77,97 @@ def expand_short_query(query: str) -> str:
         return query
 
 
+# Words naming a WRITING. Refusal reason (a) — "nobody ranked the discourses" —
+# only holds if the question is actually about one, so these are what make that
+# reason true.
+_TEXT_WORDS = re.compile(
+    r"\b(discourse|discourses|vahini|vahinis|chapter|chapters|book|books|text|texts"
+    r"|writing|writings|scripture|scriptures|teaching|teachings|volume|sutra)\b",
+    re.I,
+)
+
+# Reason (c) — a prediction or ruling about ONE person's own life.
+_PERSONAL_FUTURE = re.compile(
+    r"\b(will i\b|will my\b|should i\b|shall i\b|am i going to\b|is it worth me\b"
+    r"|for me to\b|my future\b|my career\b|my marriage\b)",
+    re.I,
+)
+
+# Reason (b) — asking the app itself to pick, which no discourse can settle.
+_ASKS_OUR_OPINION = re.compile(
+    r"\b(do you think|in your opinion|what do you recommend|would you recommend"
+    r"|read first|start with|begin with)\b",
+    re.I,
+)
+
+
+# Syntax that belongs to code, not to a question about discourses: braces, dunder
+# names, statement terminators, tags, GraphQL/SQL shapes. No question a devotee
+# asks contains these, so matching one is decisive.
+_LOOKS_LIKE_CODE = re.compile(
+    r"[{}<>;]|__\w|\w__|\bselect\b.+\bfrom\b|\bdrop\s+table\b|</?\w+>", re.I
+)
+
+
+def _is_code_or_injection(message):
+    """True for input that is a code/query snippet rather than a question.
+
+    Deterministic on purpose. The router classifies these as out_of_domain most
+    of the time, but it is only ever a *tendency* — "queryy { __typename }"
+    started coming back `conceptual` after an unrelated edit elsewhere in the
+    same prompt, which sends a GraphQL probe into a semantic search instead of
+    the honest "this library holds discourses" reply. Cheap to settle in code.
+    """
+    return bool(_LOOKS_LIKE_CODE.search(message or ""))
+
+
+# The one thing the model over-reads. The guard below only engages when a
+# superlative is present, because that is the whole failure mode: a superlative
+# about a practice or virtue looks, to the router, like a superlative about a text.
+_SUPERLATIVE = re.compile(
+    r"\b(best|most|greatest|highest|finest|foremost|supreme|ideal|top|"
+    r"important|essential|primary)\b",
+    re.I,
+)
+
+
+def _refusal_is_warranted(message):
+    """True when "unanswerable" is defensible for this message.
+
+    WHY THIS IS CODE AND NOT PROMPT TEXT
+    The refusal boundary is the one place a routing error is actively harmful:
+    declining a question the discourses DO answer is worse than answering a
+    vague one loosely. It also proved to be the boundary the model holds least
+    reliably — "the best time to wake up" (asked 145x in real traffic) came back
+    unanswerable on 2 of 3 runs even while the prompt listed it verbatim as
+    answerable. Three prompt rewrites were measured against eval_router.py and
+    every one made it WORSE (2 failures -> 4 -> 5): the more prompt spent on this
+    intent, the more the model reached for it. So the rule moved into code.
+
+    This only ever DOWNGRADES a refusal to the normal semantic route; it can
+    never cause one. A false negative here costs a search we would have run
+    anyway, while a false positive costs a user their answer.
+
+    The superlative is not the signal — the OBJECT is. "which is the best kind of
+    yoga" is a question about a practice, which Swami ranks constantly; "which is
+    the best discourse on meditation" is a question about a text, which nobody
+    ranked. Same wording, opposite answerability.
+
+    SCOPE: only questions containing a superlative are second-guessed at all.
+    An earlier version overrode *every* refusal that did not match (a)-(c), which
+    silently broke the ones the router declines for unrelated but sound reasons —
+    the golden set caught "how do i hate?" and the bare fragment "What does swami
+    say" being pushed into a semantic search. Those have no superlative, so the
+    router's own verdict now stands.
+    """
+    m = message or ""
+    if not _SUPERLATIVE.search(m):
+        return True  # not the failure mode this guard exists for — do not interfere
+    return bool(_TEXT_WORDS.search(m)
+                or _PERSONAL_FUTURE.search(m)
+                or _ASKS_OUR_OPINION.search(m))
+
+
 # ===========================================================================
 # Adaptive multi-query planning (the live pipeline's entry stage)
 # ===========================================================================
@@ -224,10 +315,22 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             '(e.g. "Prema Vahini", "Summer Showers 1990"); "list_count" to the number requested ("first 5" -> 5, '
             '"last 3" -> 3; null if no number given); "list_order" to "first", "last", or "all". For non-listing '
             "intents leave collection null, list_count null, list_order \"first\". "
-            'REASON (only when intent is "unanswerable"): set "reason" to ONE plain sentence, addressed to the '
-            "user, saying why THIS question cannot be answered from the discourses. Describe this specific "
-            "question, not the category — name the thing being asked for. Never speculate about what Swami "
-            "would have said, and never apologise. Leave null for every other intent. "
+            # The only model-written prose the product shows a user, and it landed
+            # generic ("This question cannot be answered from the discourses") on
+            # exactly the questions where a person most needs a real explanation.
+            # Stating the rule did not move it; the worked contrast did.
+            #
+            # Kept to two examples on purpose — the first draft used three, and
+            # the extra length pushed a `named_text` question in the golden set
+            # over to `conceptual`. Every line here is paid for by the questions
+            # this prompt ALSO has to classify.
+            'REASON (only when intent is "unanswerable"): ONE plain sentence to the user naming the specific '
+            "thing THIS question asks for and why the discourses cannot supply it. Write it fresh — these are "
+            "the shape, not phrasing to copy. A question about the future is a prediction, not a decision. "
+            'GOOD: "The discourses are not ranked against one another, so none of them names a most important '
+            'chapter of Prema Vahini." / "No discourse foretells when an individual will find work." '
+            'BAD: "This question cannot be answered from the discourses." Never apologise, never speculate '
+            "about what Swami would have said. Leave null for every other intent. "
             "JSON only, no prose."
         )
         response = openai_client.chat.completions.create(
@@ -255,7 +358,16 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             # (the plain semantic route), which is always a safe fallback.
             intent = data.get("intent")
             intent = intent.strip().lower() if isinstance(intent, str) else ""
-            trace_out["intent"] = intent if intent in KNOWN_INTENTS else "conceptual"
+            intent = intent if intent in KNOWN_INTENTS else "conceptual"
+            if _is_code_or_injection(message):
+                intent = "out_of_domain"
+            if intent == "unanswerable" and not _refusal_is_warranted(message):
+                # See _refusal_is_warranted: three prompt rewrites could not hold
+                # this boundary, so it is enforced in code instead.
+                logging.info(f"router: downgraded unwarranted refusal of {message[:80]!r}")
+                intent = "conceptual"
+                data["reason"] = None
+            trace_out["intent"] = intent
             trace_out["is_comparison"] = bool(data.get("is_comparison"))
             ents = data.get("entities")
             trace_out["entities"] = [e.strip() for e in ents if isinstance(e, str) and e.strip()] if isinstance(ents, list) else []

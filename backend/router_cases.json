@@ -1,0 +1,251 @@
+[
+  {
+    "q": "What is the most important discourse from the Prema Vahini",
+    "intent": "unanswerable",
+    "note": "the original bug \u2014 listing captured it and returned chapter 1"
+  },
+  {
+    "q": "which is the best discourse on meditation",
+    "intent": "unanswerable"
+  },
+  {
+    "q": "which Vahini is the most important",
+    "intent": "unanswerable"
+  },
+  {
+    "q": "what is Swami's greatest teaching",
+    "intent": "unanswerable"
+  },
+  {
+    "q": "which discourse do you think I should read first",
+    "intent": "unanswerable",
+    "note": "was meta \u2014 user got told to press a button"
+  },
+  {
+    "q": "what is the best discourse to start with",
+    "intent": "unanswerable"
+  },
+  {
+    "q": "when will I get a job",
+    "intent": "unanswerable"
+  },
+  {
+    "q": "should I marry the person I am seeing",
+    "intent": "unanswerable"
+  },
+  {
+    "q": "will my business succeed this year",
+    "intent": "unanswerable"
+  },
+  {
+    "q": "what is the best time to wake up",
+    "not_intent": "unanswerable",
+    "note": "I broke this \u2014 a prescribed hour, Swami states it"
+  },
+  {
+    "q": "When did Sai Baba say the best time to wake up?",
+    "not_intent": "unanswerable",
+    "note": "asked 145x in real traffic"
+  },
+  {
+    "q": "when is the best time to meditate?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "Which yoga is the best kind of yoga?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what is the most important quality for a devotee to cultivate",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what is the greatest virtue",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what did Swami say is most important",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what is the best food for a spiritual aspirant",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "return the first 5 chapters from Prema Vahini",
+    "intent": "listing",
+    "collection": "Prema Vahini",
+    "list_count": 5
+  },
+  {
+    "q": "list the discourses in Summer Showers 1990",
+    "intent": "listing",
+    "collection": "Summer Showers 1990"
+  },
+  {
+    "q": "show me chapters of the Gita Vahini",
+    "intent": "listing",
+    "collection": "Geeta Vahini",
+    "note": "corpus spells it Geeta Vahini; listing resolves Gita/Geetha to it"
+  },
+  {
+    "q": "Prema Vahini Chapter 1",
+    "intent": "listing",
+    "collection": "Prema Vahini"
+  },
+  {
+    "q": "give me the last 3 chapters of Dharma Vahini",
+    "intent": "listing",
+    "collection": "Dharma Vahini",
+    "list_count": 3
+  },
+  {
+    "q": "give me some follow ups",
+    "intent": "meta",
+    "note": "must stay meta \u2014 an app instruction"
+  },
+  {
+    "q": "clear this chat",
+    "intent": "meta"
+  },
+  {
+    "q": "Who was Swami's mother?",
+    "intent": "factual"
+  },
+  {
+    "q": "where was sathya sai baba born",
+    "intent": "factual"
+  },
+  {
+    "q": "when was Swami born",
+    "intent": "factual"
+  },
+  {
+    "q": "who is Valmiki",
+    "intent": "factual"
+  },
+  {
+    "q": "Tripura Rahasyam",
+    "intent": "named_text"
+  },
+  {
+    "q": "where is this quote from: It is only in the depths of silence that the voice of God can be heard",
+    "intent": "named_text"
+  },
+  {
+    "q": "What are the guiding principles of SSE",
+    "intent": "org_doctrine"
+  },
+  {
+    "q": "Nine Point Code of Conduct",
+    "intent": "org_doctrine"
+  },
+  {
+    "q": "What are the guiding principles of Balvikas",
+    "intent": "org_doctrine"
+  },
+  {
+    "q": "how do I prepare french fries",
+    "intent": "out_of_domain"
+  },
+  {
+    "q": "how to use compass mongodb client?",
+    "intent": "out_of_domain"
+  },
+  {
+    "q": "xyz123",
+    "intent": "out_of_domain"
+  },
+  {
+    "q": "queryy { __typename }",
+    "intent": "out_of_domain"
+  },
+  {
+    "q": "hello",
+    "intent": "out_of_domain"
+  },
+  {
+    "q": "What does Sai Baba say about detachment vs perseverance?",
+    "intent": "comparative"
+  },
+  {
+    "q": "difference between conscience vs conscious",
+    "intent": "comparative"
+  },
+  {
+    "q": "what is tamasic food versus rajasic food",
+    "intent": "comparative"
+  },
+  {
+    "q": "What does Swami say about Kumbh Mela?",
+    "not_intent": "unanswerable",
+    "note": "topical, not a request for discourses given AT Kumbh Mela"
+  },
+  {
+    "q": "discourses given during Dasara",
+    "intent": "occasion"
+  },
+  {
+    "q": "how do I control my anger",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "how do I meditate?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what is faith",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what is the Atma?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what does swami say about reputation",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "How do you have meaninful connect6ions with people",
+    "not_intent": "unanswerable",
+    "note": "typo'd, verbatim from logs"
+  },
+  {
+    "q": "I am struggling with maintaining friendships in my life. How do I make sure I keep good company?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "how do I encourage my child to follow Sai Baba's values",
+    "not_intent": "unanswerable",
+    "note": "asked 97x"
+  },
+  {
+    "q": "how do i remove SIN?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what does Swami say about diet",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "how to sing bhajans",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "how do I overcome fear and develop courage?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what is the meaning of true happiness?",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "I am planning a study circle on why Meditation is important. Give me some discourses to help me plan my study circle.",
+    "not_intent": "unanswerable"
+  },
+  {
+    "q": "what does Prema Vahini teach about love",
+    "not_intent": "unanswerable",
+    "note": "names a collection but is NOT a listing"
+  }
+]

@@ -18,6 +18,25 @@ python app.py            # serves on :8000 (FLASK_RUN_PORT)
 python validate-env.py   # check required env vars before running
 ```
 
+**Restarting: kill by port, and verify the new process owns it.** The process shows up as `.../MacOS/Python app.py` — capital `P` — so `pkill -f "python app.py"` matches nothing and exits 0. The old server keeps :8000, the new one dies with "Address already in use" into a log nobody reads, and every subsequent request silently hits the *old code with a warm cache*. This has now invalidated a full 230-question eval run and a round of manual verification:
+
+```bash
+lsof -ti :8000 | xargs -r kill -9 ; sleep 3
+nohup venv/bin/python app.py > /tmp/backend.log 2>&1 &
+NEW=$!; sleep 10; [ "$(lsof -ti :8000)" = "$NEW" ] || echo "STALE SERVER — results are worthless"
+```
+
+A p50 latency in the single-digit milliseconds means you measured the cache, not the pipeline. Run evals with `SEMANTIC_CACHE_ENABLED=0`.
+
+**Check the run for API degradation before believing its scorecard.** `eval_ragas.py` is sequential, but each question fans out internally (per-facet retrieval + 3 grading workers), so OpenAI rate-limiting degrades *results*, not just latency — retries stretch a query to minutes, and a `RERANK_DEGRADED` query is ranked by hybrid score alone. Both silently move `exact_discourse_first`. One measured run had a 16.8-minute query, 6 over 60s, and one degraded rerank; two of its three "regressions" then failed to reproduce when the same questions were asked standalone. After any run:
+
+```python
+# max ms, count over 60s, and RERANK_DEGRADED across eval_results.json rows
+rows = json.load(open("eval_results.json"))["rows"]
+```
+
+A clean run has max ms in the low tens of seconds and no `RERANK_DEGRADED`. If it doesn't, re-run before concluding anything — and when a metric moves, re-ask those specific questions standalone to confirm it reproduces.
+
 Required env (from `.env`): `WEAVIATE_URL`, `WEAVIATE_API_KEY`, `OPENAI_API_KEY`, **`VOYAGE_API_KEY`** (reranking), plus `MONGO_URI`, `JWT_SECRET_KEY`, `GOOGLE_CLIENT_ID`, and `MAIL_*` for password-reset email. `FRONTEND_URL` is a comma-separated CORS allowlist (first entry is the default redirect target).
 
 **`VOYAGE_API_KEY` must be set in every environment, including EB.** Without it reranking silently falls back to hybrid-score order and follow-ups return empty. It degrades rather than crashes, so the only signal is `rerank_degraded` on the trace and an ERROR in the log — this is exactly how a rate-limited key went unnoticed across 294 failures. Optional overrides: `RERANK_PROVIDER` (`voyage`|`cohere`), `PLAN_MODEL`, `JUDGE_MODEL`.
@@ -47,7 +66,19 @@ python eval_ragas.py --baseline eval_baseline.json  # PASS/FAIL vs the shipped c
 
 `eval_baseline.json` is the shipped configuration's run; regenerate it when you intentionally move a metric. Supporting scripts: `build_golden_set.py` (sample + LLM-draft labels), `promote_golden_set.py` (apply reviewed fixes, add exact-discourse cases), `replay_real_questions.py` (bulk replay over harvested traffic), `test_knowledge_guard.py` (Entity-route guards, network mocked).
 
-**There is no isolated router eval.** `eval_ragas.py` measures end-to-end outcomes, so a misrouted question and a retrieval miss look identical in it. Every routing bug found so far surfaced by accident rather than by measurement — worth building if you touch `query_planning.py` often.
+### Routing changes — `eval_router.py`
+
+`eval_ragas.py` measures end-to-end outcomes, so a misrouted question and a retrieval miss look identical in it. `eval_router.py` isolates the router: it calls `plan_queries` directly, so it needs **no server** and finishes in seconds.
+
+```bash
+venv/bin/python eval_router.py              # 58 cases from real traffic + past bugs
+venv/bin/python eval_router.py --repeat 3   # + stability; use this one
+venv/bin/python eval_router.py --only unanswerable
+```
+
+**Always use `--repeat 3`.** A single pass hides the failures that matter: "the best time to wake up" (asked 145× in real traffic) passed 1×, then flipped to `unanswerable` on 2 of 3 runs. Instability is reported per *route*, not per intent — `conceptual`/`scenario`/`aspect` all dispatch to the same semantic path, so a flip among them changes nothing a user sees and would otherwise drown out the flips that do.
+
+Cases (`router_cases.json`) come from real traffic and real bugs, never from what the router currently does. `{"not_intent": "unanswerable"}` cases are over-trigger guards — **refusing an answerable question is worse than the bug the refusal feature was built for.** When a case fails, decide which answer is correct before touching the prompt.
 
 Two model-choice traps the harness has already caught, both recorded in `config.py`:
 - **Reasoning models carry a latency floor.** gpt-5-mini measured ~2× slower on both planner and judge even at `reasoning_effort="minimal"`, and worse on every quality metric.
@@ -79,6 +110,7 @@ eb deploy <env>                 # asv-dev (staging) or asv-prod (production)
 - **`app.py`** (~1,370 lines) — single-file Flask app holding every route and all auth. Routes group into: health (`/`), auth (`/auth/google/*`, `/register`, `/login`, `/password/reset/*`), search (`/search`, `/search/verify`, `/followups`, `/query`, `/summarize-question`, `/blog/<id>`), collections, saved discourses, chats, conversation memory, and feedback.
 - **`search/`** — the pipeline, one module per stage. `config.py` is the single source of truth for every model, threshold and flag, and carries the measurements behind each choice; read it before changing a constant.
   - `query_planning.py::plan_queries` (`PLAN_MODEL`, gpt-4o-mini) — multi-turn resolution, scenario distillation, romanized-term glossing, adaptive decomposition into 1–N facets, **plus Router v2 intent classification** (`conceptual`/`scenario`/`aspect`/`factual`/`named_text`/`occasion`/`comparative`/`org_doctrine`/`meta`/`out_of_domain`/`listing`).
+  - **The refusal boundary is enforced in code, not in the prompt.** `_refusal_is_warranted` (`query_planning.py`) can only ever *downgrade* an `unanswerable` verdict to the semantic route — never create one — because declining a question the discourses do answer is the costlier error. It exists because the boundary would not hold in prose: three prompt rewrites were measured against `eval_router.py --repeat 3` and each made things worse (2 failures → 4 → 5). The more prompt spent defining `unanswerable`, the more the model reached for it. **Do not "clarify" that section of the prompt** — add the case to `router_cases.json` and adjust the guard. The signal is the OBJECT, never the superlative: *the best kind of yoga* is a practice (answerable), *the best discourse on meditation* is a text (not).
   - `pipeline.py::search_browse` dispatches on that intent: `meta`/`out_of_domain` short-circuit to guidance; `listing` enumerates a named collection in reading order (`listing.py`); `factual`/`named_text`/`org_doctrine` try the Entity KB (`knowledge.py`, returning hit/gap/miss — a **gap abstains honestly** rather than guessing); everything else takes the semantic route.
   - Semantic route: per-facet `retrieval.py::search_passages` (Weaviate hybrid BM25+vector, `HYBRID_ALPHA=0.5`) → `ranking.py::rerank_passages` (**Voyage `rerank-2.5-lite`** via a provider-agnostic `_rerank` adapter; `RERANK_PROVIDER=cohere` rolls back) → `_rrf_merge` (keeps `source_query` provenance) → `grade_and_quote_passages` (`JUDGE_MODEL`, **gpt-4.1**, extractive — judges/quotes each passage **against its own facet**, sharded into concurrent batches) → `aggregate_to_discourses`. Output is citations-only.
   - `transparency.py` builds the opt-in trace (`include_trace: true`) that powers the frontend's "How I searched" panel and refinement guidance.

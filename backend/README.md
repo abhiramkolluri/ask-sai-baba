@@ -81,7 +81,7 @@ Frontend ──► API Gateway ──► Elastic Beanstalk (Flask: app.py)
 
 **Caching.** Repeat questions short-circuit the whole pipeline (56% of real traffic is a repeat). Failures — service errors, failed listings — are never cached.
 
-Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `test_knowledge_guard.py` (Entity-route precision guards, network mocked). Note there is no router-only eval — routing is currently measured only through end-to-end outcomes.
+Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), **`eval_router.py`** (router-only: 58 cases, no server needed, seconds to run — use `--repeat 3`, since a single pass hides the intermittent misroutes), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `test_knowledge_guard.py` (Entity-route precision guards, network mocked).
 
 ### Auth
 
@@ -159,9 +159,14 @@ python test_weaviate_connection.py                        # Weaviate connectivit
 Search quality is gated by a 218-question golden set sampled from real traffic and weighted by the measured question taxonomy. **Run it before shipping any pipeline change:**
 
 ```bash
-python app.py &                                     # the harness needs a live server
+lsof -ti :8000 | xargs -r kill -9                   # kill by PORT — see the note below
+SEMANTIC_CACHE_ENABLED=0 python app.py &            # the harness needs a live server
 python eval_ragas.py --baseline eval_baseline.json  # prints a PASS/FAIL gate
 ```
+
+> **Two ways this harness will lie to you.** The server runs as `.../MacOS/Python app.py`, so `pkill -f "python app.py"` matches nothing — the old process keeps :8000, the replacement dies on "Address already in use", and the whole run measures *the code you replaced*. And with the cache on, a repeat run replays stored results. **A p50 in single-digit milliseconds means you measured the cache, not the pipeline** — check it before trusting a scorecard.
+
+Routing changes should be gated by `eval_router.py --repeat 3` first: it isolates the router, needs no server, and finishes in seconds.
 
 | Metric | What it protects |
 |---|---|

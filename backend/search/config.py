@@ -129,8 +129,15 @@ HYBRID_ALPHA = 0.5
 # quotes, in sequence. Sharding into concurrent batches cuts the serialized
 # output per call without changing the model, the prompt, or the token count.
 # Independent of JUDGE_MODEL: keep this even if the model swap is reverted.
-GRADE_BATCH_SIZE = 5
-GRADE_MAX_WORKERS = 3
+#
+# Sharding has a REAL accuracy risk that the latency win does not address: each
+# batch is judged blind to the other candidates, so the judge cannot see that a
+# passage it is about to pass is worse than one in another shard. Env-overridable
+# so that risk can be measured rather than assumed — set it above the merge cap
+# to put every candidate in one call and compare `quote_answers_rate`:
+#     GRADE_BATCH_SIZE=999 venv/bin/python eval_ragas.py --baseline eval_baseline.json
+GRADE_BATCH_SIZE = int(os.getenv("GRADE_BATCH_SIZE", "5"))
+GRADE_MAX_WORKERS = int(os.getenv("GRADE_MAX_WORKERS", "3"))
 
 # Router v2: when enabled, plan_queries classifies the question's INTENT and
 # search_browse dispatches on it (meta/out-of-domain short-circuit to guidance,

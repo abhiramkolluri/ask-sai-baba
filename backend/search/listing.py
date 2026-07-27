@@ -70,6 +70,58 @@ def _to_result(props, uuid):
     }
 
 
+def _translit_key(name):
+    """Collapse a romanized title to a comparison key.
+
+    Sanskrit/Telugu transliteration varies mostly in vowels and in a trailing 'h'
+    after consonants — Gita / Geeta / Geetha are the same book. Dropping vowels
+    and h leaves "gtvhn" for all three, so they compare equal.
+    """
+    return re.sub(r"[^a-z]", "", re.sub(r"[aeiouh]", "", (name or "").lower()))
+
+
+def _known_collection_names():
+    """Distinct collection/book names in the corpus. Only called on a lookup miss."""
+    def _fetch_names():
+        client = get_client()
+        if not client:
+            raise RuntimeError("Weaviate client unavailable for collection resolve")
+        articles = client.collections.get("Article")
+        names = set()
+        for o in articles.query.fetch_objects(
+            limit=4000, return_properties=["collection_name", "book"]
+        ).objects:
+            p = o.properties or {}
+            for key in ("book", "collection_name"):
+                v = (p.get(key) or "").strip()
+                if v:
+                    names.add(v)
+        return names
+
+    try:
+        return with_retries(_fetch_names, attempts=WEAVIATE_RETRY_ATTEMPTS,
+                            what="Collection name resolve")
+    except Exception as e:
+        logging.warning(f"collection-name resolve failed: {e}")
+        return set()
+
+
+def _resolve_collection_name(collection):
+    """Map a loosely-spelled collection to the corpus's own spelling, or None."""
+    want = _translit_key(collection)
+    if not want:
+        return None
+    best = None
+    for name in _known_collection_names():
+        key = _translit_key(name)
+        # Equal keys, or the query is a clean prefix/substring of a longer title
+        # ("Prema Vahini" inside "Prema Vahini Vol 2").
+        if key == want or (len(want) >= 4 and want in key):
+            if best is None or len(name) < len(best):
+                best = name
+    return best
+
+
 def list_collection(collection, count=None, order="first"):
     """Return a collection's chapters in reading order.
 
@@ -92,6 +144,24 @@ def list_collection(collection, count=None, order="first"):
         return resp.objects
 
     objs = with_retries(_fetch, attempts=WEAVIATE_RETRY_ATTEMPTS, what="Collection listing")
+
+    if not objs:
+        # The substring filter above is exact, and romanized titles are not: the
+        # corpus spells it "Geeta Vahini" while users (and the router) write
+        # "Gita Vahini" or "Geetha Vahini". None of those substring-match each
+        # other, so a correctly-identified collection returned not_found and the
+        # user was told we don't have a book we do have.
+        #
+        # Only on a miss, resolve against the real collection names by closest
+        # match on a vowel-stripped key ("gitavahini" ~ "geetavahini"). Costs one
+        # extra read, and never runs on the happy path.
+        alt = _resolve_collection_name(collection)
+        if alt and alt.lower() != collection.lower():
+            logging.info(f"listing: {collection!r} resolved to corpus spelling {alt!r}")
+            collection = alt
+            objs = with_retries(_fetch, attempts=WEAVIATE_RETRY_ATTEMPTS,
+                                what="Collection listing (resolved)")
+
     if not objs:
         return {"status": "not_found", "collection": None, "results": []}
 

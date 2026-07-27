@@ -31,13 +31,25 @@ TRACE_VERSION = 1
 # Romanized-term spellings the corpus uses, keyed by common user spellings. Used
 # to emit a SPELLING_HINT when a weak/empty result contains a term the user likely
 # misspelled relative to the corpus. Keys are lowercase user spellings; values are
-# the corpus form to suggest. The discourse corpus consistently uses "Geetha",
-# "Sathya", etc. (English-transliteration of the Telugu/Sanskrit).
+# the corpus form to suggest.
+#
+# Each value must be COUNTED in the corpus, not assumed from the transliteration
+# convention. This table previously claimed the corpus "consistently uses Geetha"
+# on the strength of that convention; the text says otherwise, and the entry sent
+# users toward the spelling least likely to match. Count before adding a row.
 CORPUS_SPELLINGS = {
-    "gita": "Geetha",
-    "geeta": "Geetha",
-    "geetha": "Geetha",
-    "bhagavadgita": "Bhagavad Geetha",
+    # NOT "Geetha". Counted over all 2,409 articles: Gita 1,177 occurrences in
+    # 513 articles, Geeta 294 in 127, Geetha 134 in 82. The old mapping pointed
+    # users who had typed the MOST common form at the rarest one — the opposite
+    # of this table's purpose. "gita" is absent by design: it is already the best
+    # spelling for matching prose, so it needs no hint.
+    #
+    # Careful: this is about the corpus PROSE. Collection names are their own
+    # namespace and disagree with it — the book is titled "Geeta Vahini" even
+    # though the prose overwhelmingly writes "Gita". Do not use this table to
+    # resolve a collection name; listing.py::_resolve_collection_name does that.
+    "geetha": "Gita",
+    "bhagavadgita": "Bhagavad Gita",
     "satya": "Sathya",
     "moksa": "moksha",
     "ahinsa": "ahimsa",

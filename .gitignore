@@ -26,6 +26,7 @@ Database Vectorizer\.env
 /backend/real_questions_new.json
 /backend/quote_audit.json
 /backend/eval_results.json
+/backend/router_eval_results.json
 /backend/real_questions_v3.json
 /backend/real_replay_v3.json
 /backend/entities_extract_checkpoint.json
