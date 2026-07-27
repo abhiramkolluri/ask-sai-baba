@@ -153,7 +153,7 @@ def wipe_passages(passages_col):
 
 
 def build_passage_props(article_uuid, props, passage_text, idx):
-    return {
+    out = {
         "content": passage_text,
         "article_id": str(article_uuid),
         "chunk_index": idx,
@@ -165,6 +165,12 @@ def build_passage_props(article_uuid, props, passage_text, idx):
         # date_authored may not exist on Article — never assume it's present.
         "date_authored": props.get("date_authored", ""),
     }
+    # Normalized structured-search metadata, copied from the article when set
+    # (None values are dropped — Weaviate rejects null property writes).
+    for key in ("book", "volume", "chapter_index", "year"):
+        if props.get(key) is not None:
+            out[key] = props[key]
+    return out
 
 
 def rebuild(rebuild_flag: bool):

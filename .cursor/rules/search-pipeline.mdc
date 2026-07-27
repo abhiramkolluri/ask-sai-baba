@@ -1,0 +1,22 @@
+---
+description: Rules for the discourse search pipeline (router, retrieval, ranking, listing)
+globs: backend/search/**,backend/utils.py,backend/eval_router.py
+alwaysApply: false
+---
+
+# Search pipeline rules
+
+## Architecture (keep the stage boundaries)
+- `query_planning.py` decides (LLM router → SearchPlan: intent semantic|listing|hybrid, queries, filters, sort, limit); `retrieval.py` only reads and fuses (hybrid BM25+vector, RRF); `ranking.py` judges (rerank, grade, quote); `listing.py` serves pure metadata listings with no vector search; `pipeline.py` branches on intent. Don't move relevance judgment into retrieval or Weaviate reads into ranking.
+- `HYBRID_ALPHA` is read from `retrieval`'s namespace at call time — tuning harnesses patch `retrieval.HYBRID_ALPHA`, so don't refactor it into a function default or import it by value.
+
+## Router changes
+- Any prompt or filter-schema change to `plan_search` must keep `eval_router.py` at 27/27 (run it twice — LLM output varies) and `test_router_unit.py` green.
+- Filter values must match corpus reality, not dictionary spelling: check actual property values in Weaviate before pinning a keyword (e.g. corpus has 'shivarathri', 21 articles; 'shivaratri' matches zero).
+- The plan speaks 1-based chapters; `chapter_index` is stored 0-based. Convert in `build_passage_filter` / `build_article_filter` only.
+- On router failure, degrade to semantic search — never surface a routing error to the user.
+
+## Collections index
+- `collections_index.py` groups on one iterator pass and caches per process (TTL `CATALOG_TTL_SECONDS`), serving a stale cache over an error. After bulk corpus changes, restart the server or force-refresh; don't assume the endpoint reflects new data immediately.
+- Fetch limits must cover the whole corpus with headroom (`_FETCH_LIMIT = 5000`) — a too-small limit silently truncates listings (this bug shipped once at 300).
+- Sort listings in Python, not in Weaviate: some articles lack `chapter_index` and the server cannot sort on a property some objects are missing.

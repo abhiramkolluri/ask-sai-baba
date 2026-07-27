@@ -15,7 +15,9 @@ import json
 import logging
 
 from .config import (openai_client, GRADE_MODEL, PLAN_MODEL, MAX_PLANNED_QUERIES,
-                     REASONING_EFFORT, PLAN_IS_REASONING, PLAN_TEMPERATURE)
+                     REASONING_EFFORT, PLAN_IS_REASONING, PLAN_TEMPERATURE,
+                     LISTING_MAX_RESULTS, LLM_SEED)
+from .catalog import get_catalog, canonical_book, format_catalog_for_prompt
 
 # The intent taxonomy the router classifies into; search_browse dispatches on it.
 # Anything outside this set normalizes to "conceptual" (the plain semantic route),
@@ -69,6 +71,8 @@ def expand_short_query(query: str) -> str:
                 },
                 {"role": "user", "content": query},
             ],
+            temperature=LLM_TEMPERATURE,
+            seed=LLM_SEED,
         )
         expanded = (response.choices[0].message.content or "").strip().strip('"')
         return expanded or query
@@ -172,6 +176,30 @@ def _refusal_is_warranted(message):
 # Adaptive multi-query planning (the live pipeline's entry stage)
 # ===========================================================================
 
+# The semantic-query rules, shared verbatim between plan_queries and
+# the merged router so semantic-query planning cannot silently regress.
+QUERY_RULES = (
+    "(1) Resolve any references to earlier turns so each query stands alone. "
+    "(2) Distill long or emotional scenarios down to the underlying spiritual "
+    "concept(s) being asked about; drop names and incidental narrative detail. "
+    "EXCEPTION: when the user asks about a specific story, parable, person, or "
+    "incident (e.g. 'the story of Alexander', 'what did Krishna teach Kuchela'), "
+    "KEEP those proper nouns and story references verbatim in the query — they are "
+    "the search anchor, not incidental detail. "
+    "(3) For romanized Sanskrit/Telugu terms, EXPAND (never shorten): output BOTH the "
+    "corpus spelling AND the user's spelling AND 3-5 English meaning words. Examples: "
+    "'ahinsa' -> 'ahimsa ahinsa non-violence and not harming others'; 'satya' -> "
+    "'sathya satya truth and truthfulness'; 'moksa' -> 'moksha liberation freedom from "
+    "rebirth'. Rule (2)'s distillation applies to long narratives, NOT to short term "
+    "queries. (4) DEFAULT TO ONE QUERY. Most messages are about a single "
+    "concept -> return a single query (e.g. 'controlling the mind' -> [\"control and "
+    "mastery of the mind\"]). Different sub-aspects, synonyms, or rephrasings of the "
+    "SAME concept are NOT multiple concepts. Return 2-4 queries ONLY when the message "
+    "explicitly involves clearly different, separable concepts (e.g. a scenario about "
+    "anger AND forgiveness AND attachment to money). When in doubt, return one."
+)
+
+
 def plan_queries(message: str, history=None, trace_out=None) -> list:
     """Turn a (possibly long, multi-turn) user message into 1-N standalone search
     queries for the English discourse corpus. One gpt-4o-mini JSON call that:
@@ -208,7 +236,9 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             "English-translated spiritual discourses by Sathya Sai Baba. Output 1 to 4 "
             'STANDALONE search queries as JSON: '
             '{"queries":["..."],"occasion":null,"intent":"conceptual","is_comparison":false,"entities":[],'
-            '"collection":null,"list_count":null,"list_order":"first"}. Rules: '
+            '"filters":{"book":null,"volume":null,"chapter_start":null,"chapter_end":null,'
+            '"year_start":null,"year_end":null,"location":null,"occasion":null},'
+            '"sort":null,"limit":null,"list_order":"first"}. Rules: '
             "(1) Resolve any references to earlier turns so each query stands alone. "
             "(2) Distill long or emotional scenarios down to the underlying spiritual "
             "concept(s) being asked about; drop names and incidental narrative detail. "
@@ -311,10 +341,26 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             "which of them is better/more important. "
             'ENTITIES: list any specific named people, places, texts, org terms, or festivals mentioned '
             '(e.g. ["Easwaramma"], ["Bhagavad Geetha"], ["Nine Point Code of Conduct"]); [] if none. '
-            'LISTING FIELDS (only when intent is "listing"): set "collection" to the named book/series/collection '
-            '(e.g. "Prema Vahini", "Summer Showers 1990"); "list_count" to the number requested ("first 5" -> 5, '
-            '"last 3" -> 3; null if no number given); "list_order" to "first", "last", or "all". For non-listing '
-            "intents leave collection null, list_count null, list_order \"first\". "
+            # FILTERS are not listing-only: a topic question constrained by
+            # metadata ("what does the Geeta Vahini say about karma") keeps its
+            # intent and gains a filter, which narrows retrieval instead of
+            # replacing it.
+            'FILTERS: set a filter ONLY when the user states it as a CONSTRAINT. A scripture or place '
+            'named as SUBJECT MATTER is not a filter: "teachings of the Gita", "discourses about '
+            'Brindavan\'s beauty" -> no filters. But naming a book as the SOURCE ("what does the Geeta '
+            'Vahini say about X", "in the Prema Vahini") IS a book filter, and a place where discourses '
+            'were DELIVERED ("in Brindavan", "at Kodaikanal") IS a location filter. Note "the Gita" / '
+            '"Bhagavad Gita" is the scripture Swami comments on, NOT the book "Geeta Vahini" — only an '
+            'explicit Vahini reference filters. Ordinals are 1-based chapters: "first five" -> '
+            'chapter_start 1, chapter_end 5; "chapter 3" -> 3 and 3. Decades expand: "the 1970s" -> '
+            'year_start 1970, year_end 1979; "from 1976" -> 1976 and 1976. location/occasion take one '
+            'lowercase keyword spelled as the corpus spells it ("shivarathri", "dasara", "onam", '
+            '"ugadi"). Map book names onto the EXACT strings listed below ("Gita Vahini" -> "Geeta '
+            'Vahini"); if the book is not in the list, leave book null and keep the phrase in queries. '
+            '"limit" is the count implied ("first 5" -> 5), else null. "sort" is "chapter" for '
+            'within-book order, "date" for chronological, else null. "list_order" is "first", "last", '
+            'or "all" — "the last 3 chapters" -> "last". '
+            + format_catalog_for_prompt(get_catalog()) + " "
             # The only model-written prose the product shows a user, and it landed
             # generic ("This question cannot be answered from the discourses") on
             # exactly the questions where a person most needs a real explanation.
@@ -341,7 +387,7 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             ],
             response_format={"type": "json_object"},
             **({"reasoning_effort": REASONING_EFFORT} if PLAN_IS_REASONING
-               else {"temperature": PLAN_TEMPERATURE}),
+               else {"temperature": PLAN_TEMPERATURE, "seed": LLM_SEED}),
         )
         raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
@@ -356,11 +402,40 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             trace_out["occasion"] = occasion.strip() if isinstance(occasion, str) and occasion.strip() else None
             # Normalize intent to the known taxonomy; unknown/missing -> "conceptual"
             # (the plain semantic route), which is always a safe fallback.
+            # Listing fields (used only when intent == "listing"), parsed defensively.
+            # Filters go through the same validation the structured-search work
+            # built: bounded ints, canonical book names, 1-based chapters, and a
+            # chapter range dropped when there is no book to count within.
+            trace_out["filters"] = _validate_filters(data.get("filters"), message=message)
+            raw_book = (data.get("filters") or {}).get("book") if isinstance(data.get("filters"), dict) else None
+            trace_out["book_requested"] = (
+                raw_book.strip() if isinstance(raw_book, str) and raw_book.strip()
+                and not trace_out["filters"].get("book") else None
+            )
+            trace_out["limit"] = _coerce_int(data.get("limit"), 1, LISTING_MAX_RESULTS)
+            srt = data.get("sort")
+            trace_out["sort"] = srt if srt in ("chapter", "date") else None
+            lo = data.get("list_order")
+            trace_out["list_order"] = lo if lo in ("first", "last", "all") else "first"
+
             intent = data.get("intent")
             intent = intent.strip().lower() if isinstance(intent, str) else ""
             intent = intent if intent in KNOWN_INTENTS else "conceptual"
             if _is_code_or_injection(message):
                 intent = "out_of_domain"
+            # A refusal that arrives WITH a concrete locator — a chapter, a
+            # volume, a year — is incoherent: "show me discourse 10 of Sathya
+            # Sai Speaks volume 14" is a browse request, and refusing it is the
+            # exact failure this guard exists to prevent. Requires no
+            # superlative, so "the most important discourse from Prema Vahini"
+            # (book only, superlative present) still refuses correctly.
+            _locators = ("chapter_start", "volume", "year_start")
+            if (intent == "unanswerable"
+                    and not _SUPERLATIVE.search(message or "")
+                    and any(k in (trace_out.get("filters") or {}) for k in _locators)):
+                logging.info(f"router: {message[:60]!r} refused but names a locator; treating as listing")
+                intent = "listing"
+                data["reason"] = None
             if intent == "unanswerable" and not _refusal_is_warranted(message):
                 # See _refusal_is_warranted: three prompt rewrites could not hold
                 # this boundary, so it is enforced in code instead.
@@ -371,13 +446,6 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
             trace_out["is_comparison"] = bool(data.get("is_comparison"))
             ents = data.get("entities")
             trace_out["entities"] = [e.strip() for e in ents if isinstance(e, str) and e.strip()] if isinstance(ents, list) else []
-            # Listing fields (used only when intent == "listing"), parsed defensively.
-            col = data.get("collection")
-            trace_out["collection"] = col.strip() if isinstance(col, str) and col.strip() else None
-            lc = data.get("list_count")
-            trace_out["list_count"] = lc if isinstance(lc, int) and lc > 0 else None
-            lo = data.get("list_order")
-            trace_out["list_order"] = lo if lo in ("first", "last", "all") else "first"
             # The refusal sentence is the only model-written text this product shows
             # a user, so it is bounded here rather than trusted: non-string, empty,
             # or runaway output is dropped and the frontend falls back to static
@@ -391,3 +459,113 @@ def plan_queries(message: str, history=None, trace_out=None) -> list:
         if trace_out is not None:
             trace_out["fallback"] = True
         return [message]
+
+
+# ===========================================================================
+# Metadata filter validation (from the structured-search work)
+#
+# The router is asked for filters; nothing downstream trusts them until they
+# pass through here. Pure — no LLM, no network beyond the catalog handed in —
+# so test_router_unit.py can exercise it offline.
+# ===========================================================================
+
+FILTER_KEYS = (
+    "book", "volume", "chapter_start", "chapter_end",
+    "year_start", "year_end", "location", "occasion",
+)
+
+# A question ABOUT a thing, rather than a request for discourses delivered at or
+# in it. Deliberately narrow: "what did Swami say in Brindavan" is a constraint
+# and must not match.
+_ASKS_WHAT_IT_MEANS = re.compile(
+    r"\b(what is|what are|meaning of|significance of|what does .{0,24} mean)\b", re.I
+)
+
+# Sanity bounds for router-emitted years (the corpus spans 1953-2006; leave
+# headroom rather than trusting the catalog to be loaded).
+YEAR_MIN, YEAR_MAX = 1930, 2011
+
+
+def _coerce_int(value, lo, hi):
+    """Int within [lo, hi], else None. Accepts numeric strings."""
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        return None
+    return n if lo <= n <= hi else None
+
+
+def _clean_keyword(value):
+    """Router-emitted location/occasion value -> lowercase keyword string."""
+    if not isinstance(value, str):
+        return None
+    cleaned = " ".join(re.findall(r"[a-z]+", value.lower()))
+    return cleaned or None
+
+
+def _validate_filters(raw, catalog=None, message=""):
+    """Router JSON -> a trusted filters dict (possibly empty). Never raises."""
+    if not isinstance(raw, dict):
+        return {}
+    filters = {}
+
+    book = canonical_book(raw.get("book"), catalog)
+    if book:
+        filters["book"] = book
+
+    volume = _coerce_int(raw.get("volume"), 1, 99)
+    if volume is not None:
+        # A volume number implies Sathya Sai Speaks, the corpus's only
+        # volume-organized book — infer it when the router left book null.
+        if not book:
+            inferred = canonical_book("Sathya Sai Speaks", catalog)
+            if inferred:
+                filters["book"] = inferred
+        filters["volume"] = volume
+
+    ch_start = _coerce_int(raw.get("chapter_start"), 1, 999)
+    ch_end = _coerce_int(raw.get("chapter_end"), 1, 999)
+    if ch_start is not None or ch_end is not None:
+        ch_start = ch_start if ch_start is not None else ch_end
+        ch_end = ch_end if ch_end is not None else ch_start
+        if ch_end < ch_start:
+            ch_start, ch_end = ch_end, ch_start
+        # A chapter number is meaningless without a book to count within.
+        if filters.get("book"):
+            filters["chapter_start"], filters["chapter_end"] = ch_start, ch_end
+
+    y_start = _coerce_int(raw.get("year_start"), YEAR_MIN, YEAR_MAX)
+    y_end = _coerce_int(raw.get("year_end"), YEAR_MIN, YEAR_MAX)
+    if y_start is not None or y_end is not None:
+        y_start = y_start if y_start is not None else y_end
+        y_end = y_end if y_end is not None else y_start
+        if y_end < y_start:
+            y_start, y_end = y_end, y_start
+        filters["year_start"], filters["year_end"] = y_start, y_end
+
+    for prop in ("location", "occasion"):
+        value = _clean_keyword(raw.get(prop))
+        if value:
+            filters[prop] = value
+
+    # "the Gita" / "Bhagavad Gita" is the scripture Swami COMMENTS ON; "Geeta
+    # Vahini" is his own book about it. The router conflates them — the prompt
+    # says so explicitly and it still filtered "what does the Gita teach about
+    # karma?" down to the Geeta Vahini, which silently hides the rest of the
+    # corpus from a question about the scripture. Settled in code: the book
+    # filter survives only if the user actually wrote "Vahini".
+    # Same confusion for festivals and places: an occasion/location named as the
+    # SUBJECT ("what is the meaning of Dasara?") is not a request for discourses
+    # delivered there. Filtering on it narrows the corpus to exactly the wrong
+    # axis and can hide the discourse that explains the thing being asked about.
+    if _ASKS_WHAT_IT_MEANS.search(message or ""):
+        for key in ("occasion", "location"):
+            if filters.pop(key, None):
+                logging.info(f"router: dropped {key} filter — the question asks what it MEANS")
+
+    if filters.get("book") == "Geeta Vahini" and not re.search(r"vahini", message or "", re.I):
+        logging.info("router: dropped Geeta Vahini book filter — no 'Vahini' in the message")
+        for key in ("book", "chapter_start", "chapter_end", "volume"):
+            filters.pop(key, None)
+
+    return filters

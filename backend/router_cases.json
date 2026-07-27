@@ -80,7 +80,12 @@
   {
     "q": "list the discourses in Summer Showers 1990",
     "intent": "listing",
-    "collection": "Summer Showers 1990"
+    "filters": {
+      "book": "Summer Showers",
+      "year_start": 1990,
+      "year_end": 1990
+    },
+    "note": "book + year, not one collection string"
   },
   {
     "q": "show me chapters of the Gita Vahini",
@@ -247,5 +252,124 @@
     "q": "what does Prema Vahini teach about love",
     "not_intent": "unanswerable",
     "note": "names a collection but is NOT a listing"
+  },
+  {
+    "q": "return the first five discourses of the Gita Vahini",
+    "intent": "listing",
+    "filters": {
+      "book": "Geeta Vahini"
+    },
+    "list_count": 5,
+    "note": "limit+sort=chapter is an equivalent encoding of chapters 1-5"
+  },
+  {
+    "q": "return all discourses from 1976",
+    "intent": "listing",
+    "filters": {
+      "year_start": 1976,
+      "year_end": 1976
+    }
+  },
+  {
+    "q": "chapter 3 of Dhyana Vahini",
+    "intent": "listing",
+    "filters": {
+      "book": "Dhyana Vahini",
+      "chapter_start": 3,
+      "chapter_end": 3
+    }
+  },
+  {
+    "q": "show me discourse 10 from Sathya Sai Speaks volume 14",
+    "intent": "listing",
+    "filters": {
+      "book": "Sathya Sai Speaks",
+      "volume": 14,
+      "chapter_start": 10,
+      "chapter_end": 10
+    }
+  },
+  {
+    "q": "discourses from the 1970s",
+    "intent": "listing",
+    "filters": {
+      "year_start": 1970,
+      "year_end": 1979
+    }
+  },
+  {
+    "q": "all discourses between 1990 and 1995",
+    "intent": "listing",
+    "filters": {
+      "year_start": 1990,
+      "year_end": 1995
+    }
+  },
+  {
+    "q": "discourses given in Brindavan",
+    "filters": {
+      "location": "brindavan"
+    },
+    "not_intent": "unanswerable",
+    "note": "filter is what matters; intent falls through to semantic either way"
+  },
+  {
+    "q": "Dasara discourses",
+    "filters": {
+      "occasion": "dasara"
+    },
+    "not_intent": "unanswerable",
+    "note": "occasion intent is correct in the 12-intent taxonomy; assert the filter"
+  },
+  {
+    "q": "discourses from 1976 about surrender",
+    "not_intent": "listing",
+    "filters": {
+      "year_start": 1976,
+      "year_end": 1976
+    },
+    "note": "hybrid \u2014 topic keeps its intent, filter narrows retrieval"
+  },
+  {
+    "q": "what does the Geeta Vahini say about the nature of the soul?",
+    "not_intent": "listing",
+    "filters": {
+      "book": "Geeta Vahini"
+    }
+  },
+  {
+    "q": "what did Swami say about seva in Kodaikanal?",
+    "not_intent": "listing",
+    "filters": {
+      "location": "kodaikanal"
+    }
+  },
+  {
+    "q": "what does the Gita teach about karma?",
+    "no_filters": true,
+    "note": "the scripture Swami comments on, NOT the book Geeta Vahini"
+  },
+  {
+    "q": "discourses about Brindavan's beauty",
+    "no_filters": true,
+    "note": "Brindavan as subject matter, not as where it was delivered"
+  },
+  {
+    "q": "the story of Alexander",
+    "no_filters": true
+  },
+  {
+    "q": "what is the meaning of Dasara?",
+    "no_filters": true,
+    "note": "asks what Dasara MEANS, not for discourses given at Dasara"
+  },
+  {
+    "q": "controlling the mind",
+    "no_filters": true
+  },
+  {
+    "q": "first five discourses",
+    "no_filters": true,
+    "note": "no book named \u2014 nothing to list within"
   }
 ]

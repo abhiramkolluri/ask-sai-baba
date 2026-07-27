@@ -26,6 +26,9 @@ from search import (
     grade_passages_by_id,
     generate_followups,
     extract_quoted_phrase,
+    canonical_book,
+    get_collections_index,
+    list_collection_chapters,
 )
 from persistence import (
     load_conversation_history,
@@ -891,6 +894,56 @@ def _sort_key(date_str: str):
         return (year, month_name, day)
     except Exception:
         return (9999, 99, 99)
+
+
+@app.route('/collections', methods=['GET'])
+def get_collections():
+    """The corpus grouped for the Collections tab: Vahinis, Sathya Sai Speaks
+    by volume, year-based discourse series, and Chinna Katha — each entry with
+    the identifiers (`book`, `volume`, `year`) the chapters endpoint takes.
+    Public, like /blog. Cached in-process (see search/collections_index.py).
+    """
+    try:
+        return jsonify(get_collections_index())
+    except Exception as e:
+        print(f"Error building collections index: {e}")
+        return jsonify({'error': 'Collections are temporarily unavailable'}), 503
+
+
+@app.route('/collections/chapters', methods=['GET'])
+def get_collection_chapters():
+    """Discourses in reading order, metadata only.
+
+    Query params (all optional): book (canonical or any casing), volume (int,
+    Sathya Sai Speaks), year (int, year-based series). Without book, the whole
+    corpus is returned as lean title rows — this powers the Collections search
+    bar client-side. Identifiers go in the query string — never path segments —
+    so names with spaces/apostrophes survive the API Gateway proxy unmangled.
+    """
+    book = (request.args.get('book') or '').strip()
+    canon = None
+    if book:
+        canon = canonical_book(book)
+        if not canon:
+            return jsonify({'error': f'Unknown book: {book}'}), 404
+    try:
+        volume = int(request.args['volume']) if 'volume' in request.args else None
+        year = int(request.args['year']) if 'year' in request.args else None
+    except ValueError:
+        return jsonify({'error': 'volume and year must be integers'}), 400
+    undated = request.args.get('undated') in ('1', 'true')
+    try:
+        chapters = list_collection_chapters(canon, volume=volume, year=year, undated=undated)
+        return jsonify({
+            'book': canon,
+            'volume': volume,
+            'year': year,
+            'count': len(chapters),
+            'chapters': chapters,
+        })
+    except Exception as e:
+        print(f"Error listing chapters for {canon!r}: {e}")
+        return jsonify({'error': 'An error occurred fetching chapters'}), 500
 
 
 @app.route('/blog/<id>', methods=['GET'])

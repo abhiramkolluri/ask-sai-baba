@@ -29,7 +29,7 @@ from .config import (
     GRADE_MIN_RELEVANCE,
 )
 
-# Stage 1 — query planning.
+# Stage 1 — query planning & routing.
 from .query_planning import expand_short_query, plan_queries
 
 # Stage 2 — Weaviate reads & rank fusion.
@@ -40,7 +40,15 @@ from .retrieval import (
     search_exact,
     search_browse_articles_legacy,
     get_full_article,
+    build_passage_filter,
 )
+
+# Structured-search support — corpus catalog and the pure metadata listing path.
+from .catalog import get_catalog, canonical_book
+from .listing import list_discourses
+
+# Collections browsing — grouped corpus index + per-collection chapter lists.
+from .collections_index import get_collections_index, list_collection_chapters
 
 # Stage 3 — rerank, grade, aggregate.
 from .ranking import (
@@ -70,6 +78,12 @@ __all__ = [
     "GRADE_MIN_RELEVANCE",
     "expand_short_query",
     "plan_queries",
+    "get_catalog",
+    "canonical_book",
+    "list_discourses",
+    "get_collections_index",
+    "list_collection_chapters",
+    "build_passage_filter",
     "check_vector_store_health",
     "get_embedding",
     "search_passages",

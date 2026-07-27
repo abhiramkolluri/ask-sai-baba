@@ -1,0 +1,27 @@
+---
+description: Rules for code that reads or writes the Weaviate corpus (ingest, backfill, schema, search)
+globs: backend/ingest_*.py,backend/backfill_*.py,backend/weaviate_client.py,backend/metadata_norm.py,backend/search/**,webcrawler/**
+alwaysApply: false
+---
+
+# Weaviate corpus rules
+
+## Schema and metadata
+- Normalized Article props: `book` (TEXT, FIELD tokenization — equality is whole-name exact), `volume` (INT), `chapter_index` (INT, 0-based; user-facing chapters are 1-based, convert at the filter boundary), `year` (INT).
+- Never let autoschema create these props — it picks the wrong tokenization for `book`. `weaviate_client._ensure_props` handles creation, including the fallback for the client/server version skew (weaviate-client 4.9.3 cannot parse newer server config enums; `config.get()` may raise on some collections).
+- Weaviate cannot filter on null without null-indexing — "missing value" filtering (e.g. undated articles) is done in Python after fetching.
+- `content` is vectorized. Never update `content` in place without handling re-embedding; metadata-only updates must touch only skip-vectorization props, and bulk metadata updates should verify vector immutability on the first write (fetch vector before/after, abort on change).
+
+## Ingest invariants
+- Ingests are idempotent by `link` (skip records whose link already exists) and append inserted UUIDs to a `*_ingest_log.json` rollback log.
+- Enrichment of existing articles is fill-only-empty: never overwrite a non-empty field.
+- Never delete or re-key old Sathya Sai Speaks articles (the 518 from saispeaks.sathyasai.org) — SavedDiscourse records reference their UUIDs and hold user highlights.
+- Title matching across sites uses `metadata_norm.slug_key` (stopword-stripped kebab). Any slug key matching multiple records on either side is AMBIGUOUS: log it and skip; never auto-merge.
+- Skip source pages whose content is a "TRANSCRIPT ... UNAVAILABLE" placeholder (see `ingest_sss.is_placeholder`) unless a substantive excerpt accompanies the banner.
+- Wrap passage batch inserts with wipe-then-retry (`insert_passages_with_retry` pattern): a failed `insert_many` may have flushed partial batches, so delete the article's passages before retrying. The cluster occasionally returns transient "no healthy upstream" errors.
+- Dry-run modes must exercise the same record→props mapping as the real run (build `article_props` even when not writing) so schema errors surface before touching the cluster.
+
+## Scrapers (webcrawler/)
+- Be polite: reuse the shared `fetch` helper with its delays.
+- Scrapes must be resumable (skip links already in the output file) and flush incrementally; log failures to a `*_failures.json` and continue rather than aborting on one bad page.
+- Verify content quality before ingest: attribution-line endings are normal ("Prasanthi Nilayam, 1963", "—Baba"); flag empty/near-empty parses.

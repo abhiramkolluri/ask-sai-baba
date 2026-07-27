@@ -59,12 +59,12 @@ Frontend ──► API Gateway ──► Elastic Beanstalk (Flask: app.py)
 
 ### Search pipeline (`/search` → `search_browse`)
 
-**Routing first.** `plan_queries` (`PLAN_MODEL`, gpt-4o-mini) resolves multi-turn references, distills long scenarios, glosses romanized Sanskrit/Telugu, adaptively decomposes multi-concept messages into 1–N facets, **and classifies intent**. `search_browse` then dispatches:
+**Routing first.** `plan_queries` (`PLAN_MODEL`, gpt-4o-mini) resolves multi-turn references, distills long scenarios, glosses romanized Sanskrit/Telugu, adaptively decomposes multi-concept messages into 1–N facets, **classifies intent, and extracts metadata filters** (book / volume / chapter range / year range / location / occasion). One call does all of it, with the prompt grounded in the corpus's real book list so "the Gita Vahini" comes back as the corpus's "Geeta Vahini". `search_browse` then dispatches:
 
 | Intent | Route | Behaviour |
 |---|---|---|
-| `meta`, `out_of_domain` | guidance | Returns nothing plus a reason — the corpus can't answer it, so we don't pretend |
-| `listing` | listing | Enumerates a named collection's chapters in reading order |
+| `meta`, `out_of_domain`, `unanswerable` | guidance | Returns nothing plus a reason — the corpus can't answer it, so we don't pretend. The client is offered questions it *can* answer instead |
+| `listing` | listing | Enumerates by metadata — book, chapter range, year, location, occasion — in chapter or date order |
 | `factual`, `named_text`, `org_doctrine` | structured | Entity KB lookup: **hit** → canonical discourse, **gap** → honest abstention, **miss** → falls through to semantic |
 | everything else | semantic | The passage pipeline below |
 
@@ -81,7 +81,7 @@ Frontend ──► API Gateway ──► Elastic Beanstalk (Flask: app.py)
 
 **Caching.** Repeat questions short-circuit the whole pipeline (56% of real traffic is a repeat). Failures — service errors, failed listings — are never cached.
 
-Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), **`eval_router.py`** (router-only: 58 cases, no server needed, seconds to run — use `--repeat 3`, since a single pass hides the intermittent misroutes), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `test_knowledge_guard.py` (Entity-route precision guards, network mocked).
+Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), **`eval_router.py`** (router-only: 75 cases covering intent AND filter extraction, no server needed, seconds to run — use `--repeat 3`, since a single pass hides the intermittent misroutes), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `test_knowledge_guard.py` (Entity-route precision guards, network mocked), `test_router_unit.py` (filter validation + Weaviate filter composition — pure, no network).
 
 ### Auth
 
@@ -103,6 +103,8 @@ Protect a route with the `@require_auth` decorator; read the caller's email via 
 | POST | `/query` | RAG answer with citations |
 | POST | `/summarize-question` | Summarize/clean a user question |
 | GET | `/blog/<id>` | Full article by id |
+| GET | `/collections` | Grouped collection index (Vahinis, Sathya Sai Speaks, series, Chinna Katha) |
+| GET | `/collections/chapters` | One collection's chapters; `?book=&volume=&year=` |
 | POST | `/register`, `/login` | Manual auth |
 | GET | `/auth/google/authorize`, `/auth/google/callback`, POST `/auth/google/login` | Google OAuth |
 | POST | `/password/reset/request`, `/password/reset/verify`, `/password/reset/confirm` | Password reset |

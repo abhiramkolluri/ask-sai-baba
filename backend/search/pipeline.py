@@ -40,9 +40,12 @@ from .config import (
     FOLLOWUP_MIN_HITS,
     FOLLOWUP_MIN_RERANK_SCORE,
     FOLLOWUP_MAX_WORKERS,
+    LLM_TEMPERATURE,
+    LLM_SEED,
 )
 from .query_planning import plan_queries
-from .retrieval import search_passages, search_exact, _rrf_merge, phrase_in_text, fetch_passages_by_ids
+from .retrieval import (search_passages, search_exact, _rrf_merge, phrase_in_text,
+                        fetch_passages_by_ids, build_passage_filter)
 from .ranking import (
     rerank_passages,
     grade_and_quote_passages,
@@ -52,7 +55,7 @@ from .ranking import (
 from .transparency import new_trace, StageTimer, assess_quality
 from .resilience import PipelineServiceError
 from .knowledge import lookup_entity
-from .listing import list_collection
+from .listing import list_discourses
 from . import cache
 
 
@@ -287,9 +290,10 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # incomplete plan to the listing route made us tell the user we couldn't
         # find a collection they had named correctly. Falling through to semantic
         # search returns something useful instead of a confident falsehood.
-        if ROUTER_V2_ENABLED and intent == "listing" and not plan_meta.get("collection"):
+        if (ROUTER_V2_ENABLED and intent == "listing"
+                and not plan_meta.get("filters") and not plan_meta.get("book_requested")):
             logging.warning(
-                f"listing intent with no collection for {query!r}; "
+                f"listing intent with no filters for {query!r}; "
                 "falling through to semantic route (incomplete plan)."
             )
             intent = "conceptual"
@@ -297,19 +301,39 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
                 trace["intent"] = intent
 
         if ROUTER_V2_ENABLED and intent == "listing":
+            filters = plan_meta.get("filters") or {}
+            # A book the catalog did not recognise still reaches the listing
+            # route, where _resolve_book_name gets a chance at the spelling. If
+            # that fails too, "we don't have that book" is the honest answer —
+            # far better than semanticizing it into plausible-looking results.
+            if not filters.get("book") and plan_meta.get("book_requested"):
+                filters = {**filters, "book": plan_meta["book_requested"]}
             with StageTimer(trace, "listing"):
-                lst = list_collection(plan_meta.get("collection"),
-                                      plan_meta.get("list_count"),
-                                      plan_meta.get("list_order"))
+                lst = list_discourses(filters,
+                                      sort=plan_meta.get("sort"),
+                                      limit=plan_meta.get("limit"),
+                                      order=plan_meta.get("list_order"))
             if trace:
                 trace["route"] = "listing"
                 trace["listing"] = {
-                    "collection": lst.get("collection") or plan_meta.get("collection"),
+                    "collection": lst.get("book") or filters.get("book"),
+                    "filters": filters,
                     "count": len(lst.get("results", [])),
                     "order": plan_meta.get("list_order") or "first",
                     "not_found": lst["status"] != "found",
                 }
-            return _finish(lst.get("results", []))
+            # location/occasion values are sparse and messy in the corpus, so an
+            # empty listing on those is more likely a metadata gap than a true
+            # "we don't have any" — fall through to a semantic search rather
+            # than asserting absence. Book/chapter/year are trustworthy, so an
+            # empty result there is the honest answer.
+            sparse = "location" in filters or "occasion" in filters
+            if lst["status"] == "found" or not sparse:
+                return _finish(lst.get("results", []))
+            logging.info(f"listing on sparse metadata {filters} empty; trying semantic route")
+            intent = "conceptual"
+            if trace:
+                trace["intent"] = intent
 
         # (c.2) Structured knowledge route: factual/named-text/org-doctrine
         # questions are looked up in the Entity collection instead of being
@@ -336,6 +360,12 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         if trace:
             trace["route"] = "semantic"
 
+        # Hybrid: a topic question that also named metadata ("what does the
+        # Geeta Vahini say about karma", "teachings on devotion from the 1990s")
+        # keeps its intent and narrows the candidate set. Composed once here
+        # rather than per facet — every facet of one message shares it.
+        passage_filter = build_passage_filter(plan_meta.get("filters"))
+
         def _retrieve_one(q, occ):
             """Retrieve + rerank a single facet. Runs concurrently across facets,
             so it times itself into its own stats row rather than a shared trace
@@ -347,7 +377,8 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
             if EVERY facet errored (distinguishing infra failure from empty)."""
             started = time.perf_counter()
             try:
-                cands = search_passages(q, PASSAGE_OVERFETCH, occasion=occ)
+                cands = search_passages(q, PASSAGE_OVERFETCH, occasion=occ,
+                                        filters=passage_filter)
             except PipelineServiceError as e:
                 logging.error(f"facet retrieval errored for {q!r}: {e}")
                 return [], {"facet": q, "retrieved": 0, "kept_after_rerank": 0,
@@ -393,6 +424,7 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
 
         ranked_lists, facet_stats = _retrieve_and_rerank(occasion)
         fell_back = False
+        filter_fell_back = False
         if occasion and sum(s["retrieved"] for s in facet_stats) < 5:
             # The occasion filter found (almost) nothing — the occasion name may
             # not match corpus metadata. Retry unfiltered rather than returning a
@@ -400,6 +432,17 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
             # the UI can say so honestly.
             fell_back = True
             ranked_lists, facet_stats = _retrieve_and_rerank(None)
+
+        # Same treatment for the router's metadata filters. location/occasion in
+        # particular are sparse and inconsistently spelled in the corpus, so a
+        # filter matching nothing is far more likely a metadata gap than a real
+        # absence — "Aradhana day" returned zero because no passage carries that
+        # occasion, not because the discourses are silent on it.
+        if passage_filter is not None and sum(s["retrieved"] for s in facet_stats) < 5:
+            logging.info(f"metadata filter {plan_meta.get('filters')} matched almost nothing; retrying unfiltered")
+            passage_filter = None
+            filter_fell_back = True
+            ranked_lists, facet_stats = _retrieve_and_rerank(occasion if not fell_back else None)
 
         # Record per-facet stats first so the trace is complete even when we
         # short-circuit on a service error below.
@@ -414,6 +457,12 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
                     "occasion": occasion,
                     "applied": not fell_back,
                     "fell_back": fell_back,
+                }
+            if plan_meta.get("filters"):
+                trace["filters"] = {
+                    "requested": plan_meta["filters"],
+                    "applied": not filter_fell_back,
+                    "fell_back": filter_fell_back,
                 }
 
         # If EVERY facet failed to reach the search service, this is an
@@ -711,6 +760,8 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None,
                 {"role": "user", "content": user_content},
             ],
             response_format={"type": "json_object"},
+            temperature=LLM_TEMPERATURE,
+            seed=LLM_SEED,
         )
         raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):

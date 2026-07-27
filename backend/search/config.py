@@ -80,6 +80,13 @@ VOYAGE_TIMEOUT = 5
 VOYAGE_MAX_RETRIES = 2
 WEAVIATE_RETRY_ATTEMPTS = 2
 
+# Decoding settings for every pipeline LLM call (planning, grading, follow-ups).
+# temperature=0 plus a fixed seed makes repeat runs of the same query return the
+# same plans/grades/quotes. NOTE: OpenAI's seed is best-effort reproducibility,
+# not a guarantee — outputs can still change across their backend updates.
+LLM_TEMPERATURE = 0.0
+LLM_SEED = 42
+
 PASSAGE_OVERFETCH = 40
 RERANK_KEEP = 15
 # Per-provider model ids; the active one is chosen by RERANK_PROVIDER.
@@ -167,8 +174,8 @@ SEMANTIC_CACHE_SIZE = 512
 
 # Listing route: how many chapters to return for "list the chapters of X" with no
 # explicit count, and the hard cap for "all chapters of X".
-LISTING_DEFAULT = 10
-LISTING_MAX = 50
+# Superseded by LISTING_MAX_RESULTS / LISTING_SNIPPET_SENTENCES below, which the
+# merged metadata listing uses. Kept only if something still imports them.
 
 # NOTE: PLAN_TEMPERATURE / JUDGE_TEMPERATURE are RETAINED ONLY for a rollback to
 # the gpt-4o family. gpt-5-mini rejects the parameter, so neither is sent while
@@ -229,6 +236,15 @@ MAX_PLANNED_QUERIES = 4
 # Best-quote selection (select_best_sentences): target quote length, a contiguous
 # 2–3 sentence chunk.
 BEST_CHUNK_SENTENCES = 3
+
+# Structured search (router metadata filters + the listing path).
+# LISTING_MAX_RESULTS caps pure metadata listings ("all discourses from 1976")
+# regardless of what the router or caller asks for; LISTING_SNIPPET_SENTENCES is
+# how many leading sentences a listing card shows as its snippet (there is no
+# answering quote to extract — nothing was asked about the content).
+LISTING_MAX_RESULTS = 25
+LISTING_SNIPPET_SENTENCES = 3
+CATALOG_TTL_SECONDS = 6 * 3600  # corpus vocabulary cache for the router prompt
 
 # Follow-up question generation (generate_followups). One cheap LLM call proposes
 # candidate follow-ups grounded in the discourses already retrieved for the answer,

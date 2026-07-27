@@ -69,11 +69,17 @@ def classify(q):
     try:
         plan_queries(q, None, trace_out=meta)
     except Exception as e:
-        return {"intent": f"ERROR:{e}", "collection": None, "list_count": None}
+        return {"intent": f"ERROR:{e}", "filters": {}, "collection": None,
+                "list_count": None, "reason": None}
+    filters = meta.get("filters") or {}
     return {
         "intent": meta.get("intent"),
-        "collection": meta.get("collection"),
-        "list_count": meta.get("list_count"),
+        "filters": filters,
+        # `collection` is how the older cases name the book; it now arrives as
+        # filters.book, so map it here rather than rewriting every case.
+        "collection": filters.get("book") or meta.get("book_requested"),
+        "book_requested": meta.get("book_requested"),
+        "list_count": meta.get("limit"),
         "reason": meta.get("unanswerable_reason"),
     }
 
@@ -88,6 +94,31 @@ def check(case, got):
     forbid = case.get("not_intent")
     if forbid and got_i == forbid:
         problems.append(f"intent is {forbid!r} (must not be)")
+    # Filters the merged router extracts (book / year range / chapter range /
+    # location / occasion). Only the keys a case names are checked; anything
+    # else the router adds is left alone.
+    for key, want in (case.get("filters") or {}).items():
+        have = got["filters"].get(key)
+        if have == want:
+            continue
+        # `book` is the one filter with two legitimate spellings. The catalog
+        # normally canonicalises it, but when it doesn't the raw name is carried
+        # as book_requested and listing.py resolves it — which is what actually
+        # reaches the user. Accept either, mirroring the pipeline.
+        if key == "book" and have is None and got.get("book_requested"):
+            from search.listing import _resolve_book_name
+            if (_resolve_book_name(got["book_requested"]) or "").lower() == str(want).lower():
+                continue
+        # "first five chapters" is equally correct as limit=5 or as
+        # chapter_start=1/chapter_end=5; both reach the same five chapters.
+        if key in ("chapter_start", "chapter_end") and got["list_count"]:
+            span_ok = (key == "chapter_start" and want == 1) or \
+                      (key == "chapter_end" and want == got["list_count"])
+            if span_ok:
+                continue
+        problems.append(f"filters[{key}]={have!r} != {want!r}")
+    if case.get("no_filters") and got["filters"]:
+        problems.append(f"expected no filters, got {got['filters']}")
     if "collection" in case:
         if not got["collection"]:
             problems.append("collection NOT extracted")
@@ -103,14 +134,21 @@ def check(case, got):
             # looks up directly but resolves to the shorter "Summer Showers".
             want, raw = case["collection"].lower(), got["collection"]
             if want not in raw.lower():
-                from search.listing import _resolve_collection_name
-                resolved = _resolve_collection_name(raw)
+                from search.listing import _resolve_book_name
+                resolved = _resolve_book_name(raw)
                 if not resolved or want not in resolved.lower():
                     problems.append(
                         f"collection {raw!r} (resolves to {resolved!r}) "
                         f"!= {case['collection']!r}")
     if "list_count" in case and got["list_count"] != case["list_count"]:
-        problems.append(f"list_count {got['list_count']} != {case['list_count']}")
+        # Same equivalence the other way: an explicit chapter range of the right
+        # width expresses the count without setting `limit`.
+        f = got["filters"]
+        span = (f.get("chapter_end") - f.get("chapter_start") + 1
+                if f.get("chapter_start") is not None and f.get("chapter_end") is not None else None)
+        if span != case["list_count"]:
+            problems.append(f"list_count {got['list_count']} != {case['list_count']}"
+                            f" (and chapter span {span} does not express it either)")
     return (not problems), "; ".join(problems)
 
 
@@ -152,7 +190,16 @@ def main():
         got = next(r for r in runs if _route_of(r["intent"]) == modal)
         ok, detail = check(case, got)
 
-        label = case.get("intent") or f"not:{case['not_intent']}"
+        # Filter-only cases assert extraction, not intent, so they group under
+        # their own label rather than crashing the per-intent scorecard.
+        if case.get("intent"):
+            label = case["intent"]
+        elif case.get("not_intent"):
+            label = f"not:{case['not_intent']}"
+        elif case.get("filters"):
+            label = "filters"
+        else:
+            label = "no-filters"
         per_intent[label][1] += 1
         if ok:
             per_intent[label][0] += 1
