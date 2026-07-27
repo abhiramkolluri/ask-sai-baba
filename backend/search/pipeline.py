@@ -602,23 +602,28 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None,
           FOLLOWUP_MIN_RERANK_SCORE survive; survivors are ranked by the score they
           reach and the best FOLLOWUP_KEEP are returned.
 
-    REDIRECT MODE (`intent="unanswerable"`): there are no results to ground on,
-    because the question was one the discourses cannot answer — a ranking nobody
-    made, our own opinion, or a prediction about one person. Stage A instead
-    proposes questions NEAR the user's evident interest that the corpus can
-    answer. Stage B is unchanged and is the reason this is safe to offer:
-    suggesting a redirect that also fails would compound the original refusal,
-    and every candidate is already verified against real retrieval.
+    REDIRECT MODE (`intent="unanswerable"` OR no results at all): there is
+    nothing to ground on because the user got no answer — either the question was
+    refused (a ranking nobody made, our own opinion, a prediction about one
+    person) or the search simply matched nothing. Both leave the same dead end, so
+    both get redirects. Stage A rewrites THEIR question into one the corpus can
+    answer — keeping the subject and what they wanted to know, changing only the
+    part that cannot be answered — and offers further angles after it. Stage B is
+    unchanged and is what makes this safe: suggesting a redirect that also fails
+    would compound the original dead end, so every candidate is verified against
+    real retrieval before it is shown.
 
     Returns a list of question strings (possibly empty). Never raises — any failure
     returns [] so the UI degrades to showing no follow-ups.
     """
     if not query or not isinstance(query, str):
         return []
-    redirect = intent == "unanswerable"
-    if not results and not redirect:
-        # Nothing was retrieved for the answer -> nothing to ground or funnel from.
-        return []
+    # Redirect whenever the user got NO ANSWER, not only on an explicit refusal.
+    # A question that simply matched nothing (out_of_domain, a known KB gap, a
+    # listing we don't hold, or plain no-matches) leaves exactly the same dead end
+    # as a refusal: an empty screen and no idea what to ask next. The only thing
+    # that differs is why, which is what `unanswerable_reason` carries.
+    redirect = intent == "unanswerable" or not results
     history = history or []
     try:
         # --- Stage A: propose candidates, grounded in what was actually retrieved. ---
@@ -650,7 +655,12 @@ def generate_followups(query: str, results: List[Dict[str, Any]], history=None,
                 "A user asked a search tool over English-translated spiritual discourses by "
                 "Sathya Sai Baba a question it CANNOT answer. Your job is to offer questions it "
                 "CAN answer, staying as close as possible to what the person actually wants.\n\n"
-                f"Why the original could not be answered: {unanswerable_reason or 'It asks for a judgment, opinion, or prediction that no discourse states.'}\n\n"
+                # Be accurate about WHY: telling the model a question "asks for a
+                # judgment" when it merely matched nothing sends it rewriting the
+                # wrong flaw. A refusal carries its own reason; an empty search
+                # does not, and the honest fallback is that nothing matched.
+                f"Why the original could not be answered: "
+                f"{unanswerable_reason or ('It asks for a judgment, opinion, or prediction that no discourse states.' if intent == 'unanswerable' else 'The search found no discourse that answers it — it may be outside what these discourses cover, or phrased in a way the corpus does not match.')}\n\n"
                 f'Propose {FOLLOWUP_CANDIDATES} STANDALONE questions as JSON: {{"candidates":["..."]}}. Rules: '
                 "(1) THE FIRST CANDIDATE MUST BE A REWRITE OF THEIR OWN QUESTION, not a related "
                 "question. Keep their subject and what they were actually trying to find out, and "
