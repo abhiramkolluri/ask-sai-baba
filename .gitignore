@@ -39,3 +39,6 @@ Database Vectorizer\.env
 # accumulate loose in backend/ and were ignored one filename at a time; the
 # scripts now write everything here via _artifact().
 /backend/artifacts/
+
+# EB deployment bundles built by package_eb.sh — regenerated on every deploy.
+/backend-*.zip
