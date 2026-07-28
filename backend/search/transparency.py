@@ -110,6 +110,12 @@ def new_trace(query, history=None):
         "kb_gap": False,
         # Set by the listing route: {collection, count, order, not_found}.
         "listing": None,
+        # Set whenever the keyword route was ATTEMPTED (a bare 1-2 word query):
+        # {term, literal_passages, discourses, fell_back}. `fell_back` True means
+        # too few discourses used the term literally and the semantic route ran
+        # instead — so this is present with route="semantic" as well as with
+        # route="keyword".
+        "keyword": None,
         "retrieval": {"facet_results": [], "merged_candidates": 0},
         "grading": {
             "model": None,
@@ -194,10 +200,16 @@ def assess_quality(trace, results):
         trace["quality"] = "none"
     elif (trace.get("exact_phrase", {}).get("matched")
           or trace.get("route") == "structured"
-          or trace.get("route") == "listing"):
-        # A verified exact-phrase match, a canonical entity lookup, OR an ordered
-        # collection listing is a precise outcome regardless of count — one
-        # canonical discourse, or 5 requested chapters, is a strong result.
+          or trace.get("route") == "listing"
+          or trace.get("route") == "keyword"):
+        # A verified exact-phrase match, a canonical entity lookup, an ordered
+        # collection listing, OR a keyword match is a precise outcome regardless
+        # of count — one canonical discourse, or 5 requested chapters, is a strong
+        # result. The keyword route belongs here for a second reason: it only ever
+        # returns at all once KEYWORD_MIN_DISCOURSES discourses literally contain
+        # the term (thinner than that and it falls through to semantic), and its
+        # score is normalized BM25, which has no meaningful comparison against
+        # QUALITY_STRONG_MIN_RELEVANCE — a grader-calibrated bar.
         trace["quality"] = "strong"
     elif num >= QUALITY_STRONG_MIN_RESULTS and top_rel >= QUALITY_STRONG_MIN_RELEVANCE:
         trace["quality"] = "strong"
@@ -213,6 +225,14 @@ def assess_quality(trace, results):
     intent = trace.get("intent")
     if intent == "factual":
         base_reasons.append({"code": "FACTUAL_QUESTION"})
+    # Which search a bare topic word got, and why. Also a KIND-of-query note, not
+    # a retrieval miss: the user typed one word and should know that means we
+    # matched the word rather than its meaning — and that a full question would
+    # search differently.
+    kw = trace.get("keyword")
+    if kw:
+        code = "KEYWORD_FELL_BACK" if kw.get("fell_back") else "KEYWORD_MATCH"
+        base_reasons.append({"code": code, "data": {"term": kw.get("term")}})
     if trace.get("is_comparison"):
         base_reasons.append({"code": "COMPARISON_BOTH_SIDES"})
     # Degraded ranking is reported even on "strong" results: the discourses are

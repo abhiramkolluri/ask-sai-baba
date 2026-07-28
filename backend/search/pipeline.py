@@ -32,6 +32,7 @@ from .config import (
     MERGE_PER_FACET_CAP,
     FACET_MAX_WORKERS,
     ROUTER_V2_ENABLED,
+    KEYWORD_ROUTE_ENABLED,
     CHAT_FALLBACK_DISCOURSES,
     FOLLOWUP_CANDIDATES,
     FOLLOWUP_KEEP,
@@ -43,7 +44,7 @@ from .config import (
     LLM_TEMPERATURE,
     LLM_SEED,
 )
-from .query_planning import plan_queries
+from .query_planning import plan_queries, is_keyword_query
 from .retrieval import (search_passages, search_exact, _rrf_merge, phrase_in_text,
                         fetch_passages_by_ids, build_passage_filter)
 from .ranking import (
@@ -55,6 +56,7 @@ from .ranking import (
 from .transparency import new_trace, StageTimer, assess_quality
 from .resilience import PipelineServiceError
 from .knowledge import lookup_entity
+from .keyword import keyword_search
 from .listing import list_discourses
 from . import cache
 
@@ -237,6 +239,40 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
             # (b) No exact match — fall through using the phrase as the query, but
             # route into the passage pipeline instead of near_text.
             query = exact_phrase
+
+        # (a.2) Keyword shortcut: a bare 1-2 word query ("karma", "inner peace")
+        # is a topic to browse, not a question to answer. Lexical BM25 gives the
+        # discourses that actually USE the word, where the semantic route would
+        # expand it into synonyms and hand back thematically adjacent ones.
+        #
+        # This sits BEFORE planning deliberately — it is the only placement that
+        # removes the planner LLM call rather than just the grader.
+        #
+        # Skipped when an exact phrase was requested: a quoted query that missed
+        # has already reassigned `query` above and owns its own trace state
+        # (EXACT_PHRASE_MISS), which this route would overwrite with a keyword
+        # story the user never asked for.
+        #
+        # `defer_grading` is ignored here — there is nothing to defer, so the
+        # trace stays undeferred and the client skips its /search/verify call.
+        if KEYWORD_ROUTE_ENABLED and not exact_phrase:
+            term = is_keyword_query(query)
+            if term:
+                outcome = keyword_search(term, limit)
+                if trace:
+                    trace["keyword"] = {
+                        "term": term,
+                        "literal_passages": outcome["literal_passages"],
+                        "discourses": len(outcome["discourses"]),
+                        "fell_back": outcome["status"] == "thin",
+                    }
+                if outcome["status"] == "hit":
+                    if trace:
+                        trace["route"] = "keyword"
+                    return _finish(outcome["discourses"])
+                # "thin" — too few discourses literally use the term. Fall through
+                # to the semantic route, which has synonyms; trace.keyword records
+                # that we tried, so the frontend can say so.
 
         # (c) Plan the query into 1-N standalone sub-queries (multi-turn + distillation
         #     + adaptive decomposition), retrieve and rerank EACH against its own facet,
@@ -544,6 +580,21 @@ def grade_passages_by_id(query: str, passage_specs, limit: int = 10, return_trac
     """
     trace = new_trace(query, None) if return_trace else None
     grade_meta = trace["grading"] if trace else None
+
+    # Phase 1's trace does not survive to here (this call is stateless by
+    # design), and phase 1 could not have said this anyway: a deferred search
+    # short-circuits assess_quality to "pending" with no reasons. So re-derive
+    # the one routing fact worth carrying across the two calls.
+    #
+    # is_keyword_query is pure, and reaching phase 2 at all settles the rest:
+    # the keyword route never defers, so if these are semantic candidates being
+    # graded for a bare term, that term MUST have fallen back for want of
+    # literal matches. The passage counts belong to phase 1 and are simply
+    # absent — the frontend's fall-back copy only needs the term.
+    if trace and KEYWORD_ROUTE_ENABLED:
+        fell_back_term = is_keyword_query(query)
+        if fell_back_term:
+            trace["keyword"] = {"term": fell_back_term, "fell_back": True}
 
     def _finish(results):
         if trace is None:

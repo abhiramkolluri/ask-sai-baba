@@ -3,7 +3,8 @@
 A user query flows through four stages, one module each:
 
     query_planning  → 1–N standalone, glossed sub-queries
-    retrieval       → hybrid BM25 + vector candidates (+ legacy Article reads)
+    retrieval       → hybrid BM25 + vector candidates (+ pure-BM25 for the keyword
+                      route, + legacy Article reads)
     ranking         → Cohere rerank, LLM extractive grade, aggregate to discourses
     pipeline        → orchestration that sequences the above into entrypoints
 
@@ -30,22 +31,27 @@ from .config import (
 )
 
 # Stage 1 — query planning & routing.
-from .query_planning import expand_short_query, plan_queries
+from .query_planning import expand_short_query, plan_queries, is_keyword_query
 
 # Stage 2 — Weaviate reads & rank fusion.
 from .retrieval import (
     check_vector_store_health,
     get_embedding,
     search_passages,
+    search_passages_keyword,
     search_exact,
     search_browse_articles_legacy,
     get_full_article,
     build_passage_filter,
+    phrase_in_text,
 )
 
 # Structured-search support — corpus catalog and the pure metadata listing path.
 from .catalog import get_catalog, canonical_book
 from .listing import list_discourses
+
+# Keyword route — lexical search for bare 1-2 word topic queries.
+from .keyword import keyword_search
 
 # Collections browsing — grouped corpus index + per-collection chapter lists.
 from .collections_index import get_collections_index, list_collection_chapters
@@ -78,6 +84,8 @@ __all__ = [
     "GRADE_MIN_RELEVANCE",
     "expand_short_query",
     "plan_queries",
+    "is_keyword_query",
+    "keyword_search",
     "get_catalog",
     "canonical_book",
     "list_discourses",
@@ -87,9 +95,11 @@ __all__ = [
     "check_vector_store_health",
     "get_embedding",
     "search_passages",
+    "search_passages_keyword",
     "search_exact",
     "search_browse_articles_legacy",
     "get_full_article",
+    "phrase_in_text",
     "rerank_passages",
     "select_best_sentences",
     "grade_and_quote_passages",

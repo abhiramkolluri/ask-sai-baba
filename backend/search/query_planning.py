@@ -16,7 +16,7 @@ import logging
 
 from .config import (openai_client, GRADE_MODEL, PLAN_MODEL, MAX_PLANNED_QUERIES,
                      REASONING_EFFORT, PLAN_IS_REASONING, PLAN_TEMPERATURE,
-                     LISTING_MAX_RESULTS, LLM_SEED)
+                     LISTING_MAX_RESULTS, LLM_SEED, KEYWORD_MAX_TOKENS)
 from .catalog import get_catalog, canonical_book, format_catalog_for_prompt
 
 # The intent taxonomy the router classifies into; search_browse dispatches on it.
@@ -170,6 +170,84 @@ def _refusal_is_warranted(message):
     return bool(_TEXT_WORDS.search(m)
                 or _PERSONAL_FUTURE.search(m)
                 or _ASKS_OUR_OPINION.search(m))
+
+
+# Words that turn a short string into a QUESTION rather than a topic. One of
+# these anywhere in a 1-2 token query means the user is asking, not browsing, so
+# the semantic route keeps it. Interrogatives, the bare auxiliaries that open a
+# yes/no question, and the imperatives that open a request.
+_QUESTION_WORDS = frozenset("""
+    what why how when where who whom which whose
+    is are was were am be been do does did done
+    can could should would will shall may might must
+    tell give show list find explain define describe compare summarize
+    vs versus
+""".split())
+
+
+# Short input that is NOT a topic: greetings, pleasantries, app-meta, and the
+# junk people type to see whether a search box works. These have to be listed,
+# because the thing that disqualifies them is the user's intent, which lexical
+# matching cannot see — and the corpus genuinely contains the words. Measured:
+# bare "test" returns 10 discourses led by "Welcome The Tests", and "Hello"
+# returns 10 more, where the golden set (q034, q035) expects an abstention and
+# the router delivers one. Falling through to the router is the whole fix: it
+# already classifies every one of these out_of_domain.
+_NON_TOPICAL = frozenset([
+    "hi", "hello", "helo", "hey", "hai", "yo",
+    "namaste", "namaskar", "namaskaram", "sairam", "sai ram", "om sai", "jai sai",
+    "good morning", "good afternoon", "good evening", "good night",
+    "thanks", "thank you", "thanks!", "thx", "ty",
+    "ok", "okay", "k", "yes", "yeah", "yep", "no", "nope", "sure", "please",
+    "bye", "goodbye", "see you",
+    "test", "testing", "test test", "tests",
+    "asdf", "asdfgh", "qwerty", "abc", "abcd", "123", "1234", "xyz",
+    "help", "hmm", "hm", "huh", "nothing", "none", "n/a", "na",
+])
+
+
+def is_keyword_query(query):
+    """Return the cleaned term when `query` is a bare topic word/phrase, else None.
+
+    WHY THIS IS CODE AND NOT PROMPT TEXT
+    Same reasoning as the guards above: this decides which machinery runs, and a
+    router that classifies "karma" differently run-to-run would make the whole
+    route feel random. It is also the one case the router prompt is actively
+    working AGAINST — rule (9) tells the model to expand a bare topic into
+    synonym facets, which is exactly what this route exists to stop. Settling it
+    before plan_queries is called is also what makes the route cheap: this is the
+    only placement that actually removes the planner LLM call.
+
+    Deliberately narrow. Three rules do the work:
+
+    1. RAW token count <= KEYWORD_MAX_TOKENS. Raw, not "meaningful" — dropping
+       stopwords first would let "importance of truth" through as two content
+       words, and the aspect ("importance of") is precisely what the semantic
+       route is good at and lexical matching would throw away.
+    2. No question word anywhere. "is karma real" is 3 tokens and would fail (1)
+       anyway, but "what karma" or "how truth" would not, and neither is a topic.
+    3. Not in _NON_TOPICAL — a greeting or junk input is short and declarative
+       but names no topic, and the router abstains on it correctly.
+
+    A question mark disqualifies too: it is the user telling us they asked
+    something, whatever the wording.
+    """
+    term = " ".join((query or "").split())
+    if not term or "?" in term:
+        return None
+
+    tokens = [t.strip(",.:;!'\"()[]-—–") for t in term.split()]
+    tokens = [t for t in tokens if t]  # drop tokens that were pure punctuation
+    if not tokens or len(tokens) > KEYWORD_MAX_TOKENS:
+        return None
+    if any(t.lower() in _QUESTION_WORDS for t in tokens):
+        return None
+
+    cleaned = " ".join(tokens)
+    if cleaned.lower() in _NON_TOPICAL:
+        return None
+
+    return cleaned
 
 
 # ===========================================================================

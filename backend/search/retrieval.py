@@ -23,7 +23,8 @@ import weaviate
 from weaviate_client import get_client
 from weaviate.classes.query import Filter, MetadataQuery
 
-from .config import openai_client, HYBRID_ALPHA, PASSAGE_OVERFETCH, EXCLUDED_COLLECTIONS, WEAVIATE_RETRY_ATTEMPTS, PASSAGE_COLLECTION
+from .config import (openai_client, HYBRID_ALPHA, PASSAGE_OVERFETCH, EXCLUDED_COLLECTIONS,
+                     WEAVIATE_RETRY_ATTEMPTS, PASSAGE_COLLECTION, KEYWORD_OVERFETCH)
 from .resilience import with_retries
 
 
@@ -155,27 +156,65 @@ def search_passages(query: str, overfetch: int = PASSAGE_OVERFETCH, occasion: st
             filters=_passage_filters(occasion, filters),
             return_metadata=MetadataQuery(score=True)
         )
-        results = []
-        for obj in response.objects:
-            props = obj.properties
-            results.append({
-                "_id": str(obj.uuid),
-                "article_id": props.get("article_id", ""),
-                "chunk_index": props.get("chunk_index", 0),
-                "content": props.get("content", ""),
-                "title": props.get("title", ""),
-                "location": props.get("location", ""),
-                "occasion": props.get("occasion", ""),
-                "link": props.get("link", ""),
-                "collection_name": props.get("collection_name", ""),
-                "date_authored": props.get("date_authored", ""),
-                "score": obj.metadata.score or 0.0,
-            })
-        return results
+        return [_passage_row(obj) for obj in response.objects]
 
     # Raises PipelineServiceError when retries are exhausted; the caller
     # (search_browse) distinguishes this from a genuinely empty result.
     return with_retries(_query, attempts=WEAVIATE_RETRY_ATTEMPTS, what="Passage hybrid search")
+
+
+def search_passages_keyword(term: str, overfetch: int = KEYWORD_OVERFETCH,
+                            filters=None) -> List[Dict[str, Any]]:
+    """Pure lexical (BM25) search over the Passage collection.
+
+    The keyword route (see search/keyword.py) for bare 1-2 word topic queries.
+    Uses Weaviate's ``bm25`` primitive rather than ``hybrid(alpha=0)`` on purpose:
+    bm25 never vectorizes the query, so this route makes **zero** embedding calls
+    and no LLM calls at all.
+
+    BM25 is TOKEN-based and will happily rank a passage that matches one word of
+    a two-word term, so callers must verify with ``phrase_in_text`` before
+    claiming a literal match — the same promise the exact-phrase branch keeps.
+
+    Shares ``_passage_filters`` with the hybrid path, which is what keeps the
+    EXCLUDED_COLLECTIONS exclusion ANDed in. Retries like the hybrid path so a
+    transient Weaviate failure raises rather than reading as "no matches".
+    """
+    def _query():
+        client = get_client()
+        if not client:
+            # Treated as transient: get_client rebuilds the connection on retry.
+            raise RuntimeError("Weaviate client not available for keyword search.")
+        passages = client.collections.get(PASSAGE_COLLECTION)
+        response = passages.query.bm25(
+            query=term,
+            limit=overfetch,
+            query_properties=["content", "title"],
+            filters=_passage_filters(None, filters),
+            return_metadata=MetadataQuery(score=True)
+        )
+        return [_passage_row(obj) for obj in response.objects]
+
+    return with_retries(_query, attempts=WEAVIATE_RETRY_ATTEMPTS, what="Passage BM25 search")
+
+
+def _passage_row(obj) -> Dict[str, Any]:
+    """One Passage object as the pipeline's passage dict. Shared by every read of
+    the collection so the hybrid and lexical paths cannot drift in shape."""
+    props = obj.properties
+    return {
+        "_id": str(obj.uuid),
+        "article_id": props.get("article_id", ""),
+        "chunk_index": props.get("chunk_index", 0),
+        "content": props.get("content", ""),
+        "title": props.get("title", ""),
+        "location": props.get("location", ""),
+        "occasion": props.get("occasion", ""),
+        "link": props.get("link", ""),
+        "collection_name": props.get("collection_name", ""),
+        "date_authored": props.get("date_authored", ""),
+        "score": obj.metadata.score or 0.0,
+    }
 
 def fetch_passages_by_ids(passage_ids: List[str]) -> Dict[str, Dict[str, Any]]:
     """Fetch passages by Weaviate UUID, returned as {passage_id: passage_dict}.

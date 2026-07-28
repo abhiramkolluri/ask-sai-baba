@@ -59,10 +59,13 @@ Frontend ──► API Gateway ──► Elastic Beanstalk (Flask: app.py)
 
 ### Search pipeline (`/search` → `search_browse`)
 
-**Routing first.** `plan_queries` (`PLAN_MODEL`, gpt-4o-mini) resolves multi-turn references, distills long scenarios, glosses romanized Sanskrit/Telugu, adaptively decomposes multi-concept messages into 1–N facets, **classifies intent, and extracts metadata filters** (book / volume / chapter range / year range / location / occasion). One call does all of it, with the prompt grounded in the corpus's real book list so "the Gita Vahini" comes back as the corpus's "Geeta Vahini". `search_browse` then dispatches:
+**Before the router: the keyword route.** A bare 1–2 word query — `karma`, `truth`, `inner peace` — is a topic to browse, not a question to answer, and it short-circuits *before* `plan_queries` is called (`is_keyword_query`, a pure function in `query_planning.py`). It runs pure BM25 (`search_passages_keyword`), keeps only passages that literally contain the term, puts discourses whose title names it first, and returns — **no planner, no grader, no embedding call, ~0.5s** against ~5s for the semantic route. Fewer than `KEYWORD_MIN_DISCOURSES` literal matches ("thin") falls through to the semantic route, which has synonyms; lexical search does not, and that is both the point of it and why it needs an escape hatch. Rolls back with `KEYWORD_ROUTE_ENABLED=0`.
+
+**Routing.** `plan_queries` (`PLAN_MODEL`, gpt-4o-mini) resolves multi-turn references, distills long scenarios, glosses romanized Sanskrit/Telugu, adaptively decomposes multi-concept messages into 1–N facets, **classifies intent, and extracts metadata filters** (book / volume / chapter range / year range / location / occasion). One call does all of it, with the prompt grounded in the corpus's real book list so "the Gita Vahini" comes back as the corpus's "Geeta Vahini". `search_browse` then dispatches:
 
 | Intent | Route | Behaviour |
 |---|---|---|
+| *(pre-router: bare 1–2 word query)* | keyword | Lexical BM25, literal matches only, title matches first. Thin result → falls through to semantic |
 | `meta`, `out_of_domain`, `unanswerable` | guidance | Returns nothing plus a reason — the corpus can't answer it, so we don't pretend. The client is offered questions it *can* answer instead |
 | `listing` | listing | Enumerates by metadata — book, chapter range, year, location, occasion — in chapter or date order |
 | `factual`, `named_text`, `org_doctrine` | structured | Entity KB lookup: **hit** → canonical discourse, **gap** → honest abstention, **miss** → falls through to semantic |
@@ -81,7 +84,7 @@ Frontend ──► API Gateway ──► Elastic Beanstalk (Flask: app.py)
 
 **Caching.** Repeat questions short-circuit the whole pipeline (56% of real traffic is a repeat). Failures — service errors, failed listings — are never cached.
 
-Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), **`eval_router.py`** (router-only: 75 cases covering intent AND filter extraction, no server needed, seconds to run — use `--repeat 3`, since a single pass hides the intermittent misroutes), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `test_knowledge_guard.py` (Entity-route precision guards, network mocked), `test_router_unit.py` (filter validation + Weaviate filter composition — pure, no network).
+Harnesses: `eval_ragas.py` (218-question golden set, gates every search change), **`eval_router.py`** (router-only: 75 cases covering intent AND filter extraction, no server needed, seconds to run — use `--repeat 3`, since a single pass hides the intermittent misroutes), `eval_transliteration.py` (romanized robustness + `HYBRID_ALPHA`; α=0.5 confirmed optimal), `test_knowledge_guard.py` (Entity-route precision guards, network mocked), `test_router_unit.py` (filter validation + Weaviate filter composition — pure, no network), `test_keyword_route.py` (keyword gate + lexical route — pure, no network; note that `eval_router.py` calls `plan_queries` directly and so does **not** cover the keyword gate, which sits upstream of it).
 
 ### Auth
 

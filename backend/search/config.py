@@ -153,6 +153,34 @@ GRADE_MAX_WORKERS = int(os.getenv("GRADE_MAX_WORKERS", "3"))
 # richer routing roll out and roll back with one line.
 ROUTER_V2_ENABLED = True
 
+# Keyword route: a BARE 1-2 word query ("karma", "truth", "inner peace") is a
+# topic to browse, not a question to answer, and the semantic path handles it
+# badly in both directions. The router prompt's rule (9) deliberately EXPANDS a
+# bare topic into synonym facets, so the user gets thematically adjacent
+# discourses instead of the ones that actually use the word; and the grader is
+# then asked "does this passage answer the question" about something that poses
+# no question. This route skips both LLM calls and does lexical BM25 instead.
+# Env-overridable so eval runs can A/B it (ROUTER_V2_ENABLED's bare-constant
+# style can't be turned off without an edit, which is why this one differs).
+KEYWORD_ROUTE_ENABLED = os.getenv("KEYWORD_ROUTE_ENABLED", "1") not in ("0", "false", "False")
+
+# Raw whitespace tokens, NOT "meaningful" ones. Counting raw is the whole point:
+# "the truth" (2) takes the keyword route, "importance of truth" (3) keeps the
+# semantic route, where the aspect ("importance of") is the part that matters.
+KEYWORD_MAX_TOKENS = 2
+
+# Higher than PASSAGE_OVERFETCH (40) because this route needs DISCOURSE
+# DIVERSITY, not depth: BM25 on a common term stacks many passages from the same
+# heavily-topical discourse, and aggregate_to_discourses keeps one per article.
+KEYWORD_OVERFETCH = 60
+
+# Below this many distinct discourses literally using the term, the corpus does
+# not really cover it as a word (rare terms, transliteration variants like
+# "vairagya") and we fall through to the semantic route rather than serve a thin
+# literal result. Thresholding on DISCOURSES, not passages, is also what lets
+# assess_quality call this route "strong" without inventing a BM25-scale bar.
+KEYWORD_MIN_DISCOURSES = 3
+
 # Which Weaviate collection the passage pipeline reads. Phase 3 re-embeds the
 # corpus into "Passage_v2" (Cohere embed-v4) alongside the original "Passage"
 # (OpenAI text-embedding-3-large); flip this to cut over after the eval harness
