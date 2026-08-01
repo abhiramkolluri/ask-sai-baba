@@ -198,6 +198,14 @@ def assess_quality(trace, results):
 
     if num == 0:
         trace["quality"] = "none"
+    elif trace.get("route") == "keyword" and (trace.get("keyword") or {}).get("served_thin"):
+        # A keyword result served as the LAST RESORT after every other route came
+        # back empty (pipeline.py::_finish). Fewer than KEYWORD_MIN_DISCOURSES
+        # discourses use the term, so this is exactly the "thin result dressed up
+        # as a thick one" that the threshold exists to prevent — calling it strong
+        # would be the dressing up. The discourses are real literal matches, which
+        # is why we show them at all, but the user should get the refinement tip.
+        trace["quality"] = "partial"
     elif (trace.get("exact_phrase", {}).get("matched")
           or trace.get("route") == "structured"
           or trace.get("route") == "listing"
@@ -205,11 +213,11 @@ def assess_quality(trace, results):
         # A verified exact-phrase match, a canonical entity lookup, an ordered
         # collection listing, OR a keyword match is a precise outcome regardless
         # of count — one canonical discourse, or 5 requested chapters, is a strong
-        # result. The keyword route belongs here for a second reason: it only ever
-        # returns at all once KEYWORD_MIN_DISCOURSES discourses literally contain
-        # the term (thinner than that and it falls through to semantic), and its
-        # score is normalized BM25, which has no meaningful comparison against
-        # QUALITY_STRONG_MIN_RELEVANCE — a grader-calibrated bar.
+        # result. The keyword route belongs here for a second reason: on this
+        # branch it cleared KEYWORD_MIN_DISCOURSES (the thin case is handled
+        # above), and its score is normalized BM25, which has no meaningful
+        # comparison against QUALITY_STRONG_MIN_RELEVANCE — a grader-calibrated
+        # bar.
         trace["quality"] = "strong"
     elif num >= QUALITY_STRONG_MIN_RESULTS and top_rel >= QUALITY_STRONG_MIN_RELEVANCE:
         trace["quality"] = "strong"
@@ -231,7 +239,16 @@ def assess_quality(trace, results):
     # search differently.
     kw = trace.get("keyword")
     if kw:
-        code = "KEYWORD_FELL_BACK" if kw.get("fell_back") else "KEYWORD_MATCH"
+        if kw.get("served_thin"):
+            # Fell back AND the fallback found nothing, so we served the few
+            # literal matches after all. "I searched for its meaning instead"
+            # (KEYWORD_FELL_BACK) would be a plain lie here — the meaning search
+            # is exactly what returned nothing.
+            code = "KEYWORD_SERVED_THIN"
+        elif kw.get("fell_back"):
+            code = "KEYWORD_FELL_BACK"
+        else:
+            code = "KEYWORD_MATCH"
         base_reasons.append({"code": code, "data": {"term": kw.get("term")}})
     if trace.get("is_comparison"):
         base_reasons.append({"code": "COMPARISON_BOTH_SIDES"})

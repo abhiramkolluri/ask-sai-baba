@@ -171,10 +171,27 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
     plan_meta = trace["planning"] if trace else {}
     grade_meta = trace["grading"] if trace else None
 
+    # Literal matches the keyword route found but judged too thin to serve (see
+    # keyword.py). Assigned below when that route falls through; _finish reads it
+    # at call time and serves it rather than returning nothing.
+    keyword_reserve = []
+
     def _finish(results):
         """Record result-level fields + quality on the trace (if any), cache the
         value, and return in the caller's requested shape: (results, trace) when
         tracing, else results."""
+        # Last resort: every route came back empty, but the keyword route did find
+        # passages that literally contain the term. An empty screen for a word the
+        # corpus demonstrably uses is worse than a thin answer, so serve them here
+        # rather than at each individual dead end — this covers the guidance
+        # short-circuit, a no-match semantic run, and a grader that kept nothing.
+        if not results and keyword_reserve:
+            logging.info("Serving %d thin keyword discourse(s) — every other route "
+                         "returned nothing.", len(keyword_reserve))
+            results = keyword_reserve
+            if trace:
+                trace["route"] = "keyword"
+                trace.setdefault("keyword", {})["served_thin"] = True
         if trace is None:
             value = results
             cacheable = True
@@ -272,7 +289,10 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
                     return _finish(outcome["discourses"])
                 # "thin" — too few discourses literally use the term. Fall through
                 # to the semantic route, which has synonyms; trace.keyword records
-                # that we tried, so the frontend can say so.
+                # that we tried, so the frontend can say so. Hold the literal
+                # matches: if semantic also finds nothing, _finish serves these
+                # instead of an empty screen.
+                keyword_reserve = outcome.get("thin_discourses") or []
 
         # (c) Plan the query into 1-N standalone sub-queries (multi-turn + distillation
         #     + adaptive decomposition), retrieve and rerank EACH against its own facet,

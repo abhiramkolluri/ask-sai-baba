@@ -39,6 +39,9 @@ def keyword_search(term, limit=5):
     """Lexically search the corpus for `term`.
 
     Returns ``{"status": "hit"|"thin", "discourses": [...], "literal_passages": n}``.
+    On "thin" it also returns ``thin_discourses`` — the literal matches that were
+    too few to serve as a primary result, kept for the caller to fall back on when
+    the semantic route also comes up empty.
     Discourse dicts come out of ``aggregate_to_discourses``, so they are the exact
     shape the semantic route emits — format_docs, follow-up grounding and the
     frontend cards all just work.
@@ -85,7 +88,19 @@ def keyword_search(term, limit=5):
     if len(discourses) < KEYWORD_MIN_DISCOURSES:
         logging.info("Keyword route thin for %r (%d literal passages, %d discourses) — "
                      "falling through to semantic.", term, len(literal), len(discourses))
-        return {"status": "thin", "discourses": [], "literal_passages": len(literal)}
+        # `discourses` stays empty: "thin" still means "do not serve this as the
+        # primary result", and the semantic route still gets first refusal.
+        # But these passages DO literally contain the term, and discarding them
+        # outright is how a proper noun the corpus mentions once or twice ends up
+        # returning nothing at all — semantic has no synonyms to offer for a name,
+        # so it lands on out_of_domain and abstains. Hand them back separately so
+        # the pipeline can serve them as a last resort instead of an empty screen.
+        return {
+            "status": "thin",
+            "discourses": [],
+            "thin_discourses": select_best_sentences(term, discourses),
+            "literal_passages": len(literal),
+        }
 
     # One reranker call over sentence windows, no LLM: picks the chunk of each
     # passage where the term is actually in use, rather than the passage's opening
