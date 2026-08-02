@@ -637,6 +637,14 @@ def search_endpoint():
         # /search/verify. Absent (the default) this is the original single-call
         # behavior, so an older client keeps working unchanged.
         defer_grading = bool(request.json.get('defer_grading'))
+        # Optional caller-supplied scope, e.g. the Collections UI searching
+        # inside one book: {"book": "Prema Vahini"}. Validated inside
+        # search_browse via the router's own _validate_filters, so a client
+        # cannot compose arbitrary Weaviate filters. Body-only addition on an
+        # existing route — no OpenAPI/API Gateway resync needed.
+        scope_filters = request.json.get('filters')
+        if not isinstance(scope_filters, dict):
+            scope_filters = None
         if query:
             exact_phrase = extract_quoted_phrase(query)
             # Browse shows more results than chat; allow_empty stays True so an
@@ -644,10 +652,12 @@ def search_endpoint():
             if include_trace:
                 results, trace = search_browse(
                     query, limit=10, exact_phrase=exact_phrase,
-                    history=history, return_trace=True, defer_grading=defer_grading)
+                    history=history, return_trace=True, defer_grading=defer_grading,
+                    filters=scope_filters)
                 return jsonify({'results': results, 'trace': trace})
             results = search_browse(query, limit=10, exact_phrase=exact_phrase,
-                                    history=history, defer_grading=defer_grading)
+                                    history=history, defer_grading=defer_grading,
+                                    filters=scope_filters)
             return jsonify(results)
         else:
             return jsonify({'error': 'Query parameter is missing'}), 400

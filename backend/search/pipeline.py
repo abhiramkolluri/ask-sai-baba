@@ -44,7 +44,7 @@ from .config import (
     LLM_TEMPERATURE,
     LLM_SEED,
 )
-from .query_planning import plan_queries, is_keyword_query
+from .query_planning import plan_queries, is_keyword_query, _validate_filters
 from .retrieval import (search_passages, search_exact, _rrf_merge, phrase_in_text,
                         fetch_passages_by_ids, build_passage_filter)
 from .ranking import (
@@ -122,7 +122,7 @@ def format_docs(docs):
 # Main discourse search — plan → retrieve → rerank → fuse → grade → aggregate
 # ===========================================================================
 
-def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_empty: bool = True, history=None, return_trace: bool = False, defer_grading: bool = False):
+def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_empty: bool = True, history=None, return_trace: bool = False, defer_grading: bool = False, filters=None):
     """Search discourses via the passage pipeline (hybrid -> rerank -> grade -> aggregate).
 
     Keeps the quoted-phrase exact-match shortcut from the legacy implementation.
@@ -152,10 +152,28 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
     # stage functions as `trace_out` without None checks. plan_meta is always a
     # real dict (throwaway when untraced) because the planner reports the occasion
     # filter through it and occasion routing must work for chat too.
+    # Caller-supplied scope (the Collections UI searching inside one book), as
+    # opposed to the filters the router INFERS from the wording. Validated
+    # through the same function the router output goes through so the client can
+    # never compose an arbitrary Weaviate filter — unknown keys are dropped.
+    #
+    # Deliberately passed with NO `message`: the two guards in _validate_filters
+    # that second-guess a book (the Geeta-Vahini drop, the "asks what it MEANS"
+    # drop) exist to protect against over-filtering something the router only
+    # guessed at. Here the user picked the collection by hand, so there is
+    # nothing to second-guess, and both guards are already `message`-gated.
+    #
+    # Resolved BEFORE the cache lookup because it is part of the cache key.
+    scope_filters = _validate_filters(filters) if filters else {}
+    scoped = bool(scope_filters)
+
     # Repeated-question cache (Phase 4, off by default). Keyed on the original
     # args before `query` is reassigned by the exact-phrase branch. A hit returns
     # the exact prior value; a miss/disabled cache returns None.
-    cache_args = (query, history, exact_phrase, allow_empty, return_trace, defer_grading)
+    # scope_filters is part of the key: the same term searched inside two
+    # different collections must not share an entry.
+    cache_args = (query, history, exact_phrase, allow_empty, return_trace,
+                  defer_grading, scope_filters)
     cached = cache.get(*cache_args)
     if cached is not None:
         # Tag the trace so the stage timings below aren't misread as this
@@ -235,7 +253,14 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # Weaviate filters are token-based and can return bag-of-words matches
         # that never contain the phrase, so each hit is verified with
         # phrase_in_text before we honor the "exact match" claim.
-        if exact_phrase:
+        #
+        # Skipped entirely under a caller scope. search_exact queries the
+        # ARTICLE collection, whose metadata shape differs from Passage — the
+        # one build_passage_filter targets — so there is no correct filter to
+        # hand it here. Falling through to the semantic path costs latency on a
+        # quoted in-collection search but keeps the scope honest, and silently
+        # returning another book's discourse is the worse failure.
+        if exact_phrase and not scoped:
             if trace:
                 trace["exact_phrase"]["phrase"] = exact_phrase
             exact_results = search_exact(exact_phrase, limit=limit)
@@ -275,7 +300,14 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         if KEYWORD_ROUTE_ENABLED and not exact_phrase:
             term = is_keyword_query(query)
             if term:
-                outcome = keyword_search(term, limit)
+                # Pass the caller scope down: this route returns before the
+                # semantic path where filters are normally applied, so without
+                # this a scoped one-word search would answer from the whole
+                # corpus.
+                outcome = keyword_search(
+                    term, limit,
+                    filters=build_passage_filter(scope_filters) if scoped else None,
+                )
                 if trace:
                     trace["keyword"] = {
                         "term": term,
@@ -420,7 +452,11 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # Geeta Vahini say about karma", "teachings on devotion from the 1990s")
         # keeps its intent and narrows the candidate set. Composed once here
         # rather than per facet — every facet of one message shares it.
-        passage_filter = build_passage_filter(plan_meta.get("filters"))
+        # A caller-supplied scope WINS over anything the router inferred: the
+        # user picked this collection explicitly, so a router guess must not
+        # widen it or redirect it to a different book.
+        effective_filters = {**(plan_meta.get("filters") or {}), **scope_filters}
+        passage_filter = build_passage_filter(effective_filters)
 
         def _retrieve_one(q, occ):
             """Retrieve + rerank a single facet. Runs concurrently across facets,
@@ -494,7 +530,14 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
         # filter matching nothing is far more likely a metadata gap than a real
         # absence — "Aradhana day" returned zero because no passage carries that
         # occasion, not because the discourses are silent on it.
-        if passage_filter is not None and sum(s["retrieved"] for s in facet_stats) < 5:
+        #
+        # NOT when the scope came from the caller. That heuristic is right for a
+        # filter the router GUESSED at, and catastrophic for one the user chose:
+        # searching inside Prema Vahini would quietly return Geeta Vahini hits
+        # with nothing in the UI saying the scope was abandoned. A truthful "no
+        # matches in this collection" is the correct answer there.
+        if (passage_filter is not None and not scoped
+                and sum(s["retrieved"] for s in facet_stats) < 5):
             logging.info(f"metadata filter {plan_meta.get('filters')} matched almost nothing; retrying unfiltered")
             passage_filter = None
             filter_fell_back = True
@@ -514,11 +557,16 @@ def search_browse(query: str, limit: int = 5, exact_phrase: str = None, allow_em
                     "applied": not fell_back,
                     "fell_back": fell_back,
                 }
-            if plan_meta.get("filters"):
+            if plan_meta.get("filters") or scoped:
                 trace["filters"] = {
-                    "requested": plan_meta["filters"],
+                    "requested": effective_filters,
                     "applied": not filter_fell_back,
                     "fell_back": filter_fell_back,
+                    # Distinguishes "the corpus has nothing" from "this
+                    # collection has nothing" — an empty scoped result is a
+                    # real answer about the collection, not a search failure.
+                    "scoped": scoped,
+                    **({"scope": scope_filters} if scoped else {}),
                 }
 
         # If EVERY facet failed to reach the search service, this is an

@@ -35,8 +35,14 @@ from .ranking import aggregate_to_discourses, select_best_sentences
 from .retrieval import phrase_in_text, search_passages_keyword
 
 
-def keyword_search(term, limit=5):
+def keyword_search(term, limit=5, filters=None):
     """Lexically search the corpus for `term`.
+
+    `filters` is an optional prebuilt Weaviate filter narrowing the search — the
+    Collections UI passes one to keep a within-collection search inside its own
+    book. Without it this route would answer a scoped search from the whole
+    corpus, which is the common case here: a bare one-word query is exactly what
+    goes into a search box, and it is precisely what reaches this route.
 
     Returns ``{"status": "hit"|"thin", "discourses": [...], "literal_passages": n}``.
     On "thin" it also returns ``thin_discourses`` — the literal matches that were
@@ -49,7 +55,7 @@ def keyword_search(term, limit=5):
     Raises PipelineServiceError (from search_passages_keyword) when Weaviate is
     unreachable; the caller distinguishes that from an empty corpus match.
     """
-    candidates = search_passages_keyword(term, overfetch=KEYWORD_OVERFETCH)
+    candidates = search_passages_keyword(term, overfetch=KEYWORD_OVERFETCH, filters=filters)
 
     # Keep only passages that genuinely contain the term. phrase_in_text tolerates
     # punctuation between words, so "inner peace" still matches "inner, peace" and

@@ -82,7 +82,9 @@ def passage(article_id, content, title="Some Discourse", score=1.0):
 def stub_bm25(rows):
     """Force keyword_search to see exactly these candidates, no Weaviate, and
     skip the reranker call select_best_sentences would make."""
-    keyword.search_passages_keyword = lambda term, overfetch=None: list(rows)
+    # `filters` accepted because keyword_search forwards the caller scope (the
+    # Collections in-collection search) down to the BM25 call.
+    keyword.search_passages_keyword = lambda term, overfetch=None, filters=None: list(rows)
     keyword.select_best_sentences = lambda q, d: d
 
 
