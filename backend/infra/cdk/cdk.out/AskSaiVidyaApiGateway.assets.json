@@ -1,16 +1,16 @@
 {
-  "version": "52.0.0",
+  "version": "53.0.0",
   "files": {
-    "70f9486296846664859495643303c21089f30a6a4f76b4c9aff0ddd0ccbdcea3": {
+    "496cc1b1f8230613d6c6221482a997229d15f430732727de9a0cb9797bb21915": {
       "displayName": "AskSaiVidyaApiGateway Template",
       "source": {
         "path": "AskSaiVidyaApiGateway.template.json",
         "packaging": "file"
       },
       "destinations": {
-        "current_account-current_region-c700cd2c": {
+        "current_account-current_region-73e95cf9": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "70f9486296846664859495643303c21089f30a6a4f76b4c9aff0ddd0ccbdcea3.json",
+          "objectKey": "496cc1b1f8230613d6c6221482a997229d15f430732727de9a0cb9797bb21915.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }

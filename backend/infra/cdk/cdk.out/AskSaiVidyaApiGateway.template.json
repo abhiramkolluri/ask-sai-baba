@@ -900,6 +900,176 @@
         }
        }
       },
+      "/search/verify": {
+       "post": {
+        "summary": "Search Verify Endpoint",
+        "description": "Phase 2 of the two-phase search: turn provisional candidates into quotes.\n\n    The client posts the passage ids it got from a `defer_grading` search, each\n    paired with the facet that surfaced it, and gets back the SAME shape as\n    /search — {results, trace} — so it can replace its provisional list wholesale.\n\n    Passages the grader rejects are simply absent from `results`; that is what\n    removes an unverified card. Always 200 with a (possibly empty) list, matching\n    /followups' contract, so a verification failure degrades to \"no verified\n    quotes\" rather than breaking the answer the user is already looking at.",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object"
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-prod.eba-hteyej8e.us-east-1.elasticbeanstalk.com/search/verify",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/followups": {
+       "post": {
+        "summary": "Followups Endpoint",
+        "description": "Generate verified follow-up questions for an answer the user just received.\n\n    The client passes the original query, recent history, and the discourses it got\n    back from /search (used to ground candidate generation). Each candidate is then\n    verified against the search pipeline so only follow-ups that surface\n    directly-answering quotes are returned. Always 200 with a (possibly empty) list.",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "requestBody": {
+         "content": {
+          "application/json": {
+           "schema": {
+            "type": "object"
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "POST",
+         "uri": "http://asv-prod.eba-hteyej8e.us-east-1.elasticbeanstalk.com/followups",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
       "/query": {
        "post": {
         "summary": "Query Endpoint",
@@ -1052,6 +1222,326 @@
          "type": "http_proxy",
          "httpMethod": "POST",
          "uri": "http://asv-prod.eba-hteyej8e.us-east-1.elasticbeanstalk.com/summarize-question",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/discourses/years": {
+       "get": {
+        "summary": "Get Discourse Years",
+        "description": "Return all years that have at least one discourse, with discourse counts.\n    Response: { years: [ { year: \"1958\", count: 42 }, ... ] }  (sorted asc)",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-prod.eba-hteyej8e.us-east-1.elasticbeanstalk.com/discourses/years",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/discourses/year/{id}": {
+       "get": {
+        "summary": "Get Discourses By Year",
+        "description": "Return paginated discourses for a given year.\n    Query params: page (1-based, default 1), limit (default 20)\n    Response: { discourses: [...], total: N, page: N, pages: N }",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "404": {
+          "description": "Resource Not Found"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "parameters": [
+         {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+           "type": "string"
+          }
+         }
+        ],
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-prod.eba-hteyej8e.us-east-1.elasticbeanstalk.com/discourses/year/{id}",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         },
+         "requestParameters": {
+          "integration.request.path.id": "method.request.path.id"
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/collections": {
+       "get": {
+        "summary": "Get Collections",
+        "description": "The corpus grouped for the Collections tab: Vahinis, Sathya Sai Speaks\n    by volume, year-based discourse series, and Chinna Katha — each entry with\n    the identifiers (`book`, `volume`, `year`) the chapters endpoint takes.\n    Public, like /blog. Cached in-process (see search/collections_index.py).",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-prod.eba-hteyej8e.us-east-1.elasticbeanstalk.com/collections",
+         "passthroughBehavior": "when_no_match",
+         "responses": {
+          "default": {
+           "statusCode": "200"
+          }
+         }
+        }
+       },
+       "options": {
+        "summary": "CORS preflight coverage",
+        "responses": {
+         "200": {
+          "description": "CORS enabled headers internally applied natively over options",
+          "headers": {
+           "Access-Control-Allow-Origin": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Methods": {
+            "schema": {
+             "type": "string"
+            }
+           },
+           "Access-Control-Allow-Headers": {
+            "schema": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "mock",
+         "requestTemplates": {
+          "application/json": "{\n  \"statusCode\": 200\n}"
+         },
+         "responses": {
+          "default": {
+           "statusCode": "200",
+           "responseParameters": {
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Api-Key'",
+            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,DELETE'",
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+           }
+          }
+         }
+        }
+       }
+      },
+      "/collections/chapters": {
+       "get": {
+        "summary": "Get Collection Chapters",
+        "description": "Discourses in reading order, metadata only.\n\n    Query params (all optional): book (canonical or any casing), volume (int,\n    Sathya Sai Speaks), year (int, year-based series). Without book, the whole\n    corpus is returned as lean title rows — this powers the Collections search\n    bar client-side. Identifiers go in the query string — never path segments —\n    so names with spaces/apostrophes survive the API Gateway proxy unmangled.",
+        "responses": {
+         "200": {
+          "description": "Successful Response",
+          "content": {
+           "application/json": {
+            "schema": {
+             "type": "object"
+            }
+           }
+          }
+         },
+         "400": {
+          "description": "Bad Request"
+         },
+         "500": {
+          "description": "Server Error"
+         }
+        },
+        "x-amazon-apigateway-integration": {
+         "type": "http_proxy",
+         "httpMethod": "GET",
+         "uri": "http://asv-prod.eba-hteyej8e.us-east-1.elasticbeanstalk.com/collections/chapters",
          "passthroughBehavior": "when_no_match",
          "responses": {
           "default": {
@@ -2348,7 +2838,7 @@
     "aws:cdk:path": "AskSaiVidyaApiGateway/AskSaiVidyaApi/Account"
    }
   },
-  "AskSaiVidyaApiDeployment469C96CE58ba2b21dbc2996d9e85bbd88ddf182f": {
+  "AskSaiVidyaApiDeployment469C96CE750b6c3d8101dbbd2c83711b1bc53ea9": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
     "Description": "Automatically created by the RestApi construct",
@@ -2365,7 +2855,7 @@
    "Type": "AWS::ApiGateway::Stage",
    "Properties": {
     "DeploymentId": {
-     "Ref": "AskSaiVidyaApiDeployment469C96CE58ba2b21dbc2996d9e85bbd88ddf182f"
+     "Ref": "AskSaiVidyaApiDeployment469C96CE750b6c3d8101dbbd2c83711b1bc53ea9"
     },
     "RestApiId": {
      "Ref": "AskSaiVidyaApi60624B8C"
@@ -2382,7 +2872,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02MzQrCMBAGn6X3NEotgseq90p9AFnjWtf+JDQbSil5d7cVwdPMDsuX6SzP9TaB0afm0aQt3fV8ZTCNknSbwVENjCNMkh2aCj0XjtTp2f9UaMNg8Agel14YY0PP6oyutVOHolL/Lpmv189VoiLo9FzZdm0LY1ysDOwCR3WZ+GX7zU4f9D55e6J0kHnqUFdffgA/S8zdxAAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02MzQrCMBAGn6X3NEqlgseq90p9AFnjWtf+JDQbSil5d7cVwdPMDsuX6SzP9TaB0afm0aQt3fV8ZTCNknSbwVENjCNMkh2aCj0XjtTp2f9UaMNg8Agel14YY0PP6oyutVOHolL/Lpmv189VoiLo9FzZdm0LY1ysDOwCR3WZ+GX7zU4f9D55e6J0kHnqUFdffgCFGUYexAAAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "AskSaiVidyaApiGateway/CDKMetadata/Default"
